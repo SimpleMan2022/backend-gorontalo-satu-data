@@ -15,7 +15,7 @@ trait ApiResponse
         'status' => true,
         'message' => null
     ];
-    public static function successResponseWithDataIndex($data_model = null,$data_resource = null, $message = null, $code = 200)
+    public static function successResponseWithDataIndex($data_model = null, $data_resource = null, $message = null, $code = 200)
     {
         self::$response1['code'] = $code;
         self::$response1['status'] = true;
@@ -27,7 +27,7 @@ trait ApiResponse
                 'current_page' => $data_model->currentPage(),
                 'total_pages' => $data_model->lastPage(),
             ],
-            'data'=> $data_resource
+            'data' => $data_resource
         ];
         return response()->json(self::$response1, self::$response1['code']);
     }
