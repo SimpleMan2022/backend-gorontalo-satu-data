@@ -10,4 +10,5 @@ class AntarWaktu extends Model
     use HasFactory;
 
     protected $guarded = ['id'];
+    protected $table = 'antar_waktu';
 }
