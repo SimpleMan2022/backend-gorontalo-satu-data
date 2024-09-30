@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SektorController;
 use Illuminate\Support\Facades\Route;
@@ -17,13 +18,20 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post("logout", "logout");
     });
 
-});
+    // Sektor Route
+    Route::prefix('sektor')->controller(SektorController::class)->group(function () {
+        Route::get("", "index")->name('sektor.index');
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{sektor}", "update");
+        Route::delete("/delete/{sektor}", "destroy");
+    });
 
-// Sektor Route
-Route::prefix('sektor')->controller(SektorController::class)->group(function () {
-    Route::get("", "index");
-    Route::post("", "store");
-    Route::get("/{id}", "show");
-    Route::patch("/edit/{sektor}", "update");
-    Route::delete("/delete/{sektor}", "destroy");
+    Route::prefix('antarwaktu')->controller(AntarWaktuController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
 });
