@@ -52,10 +52,17 @@ class UserOpdKabupatenController extends Controller
                 'email' => 'required',
                 'nama' => 'required',
                 'password' => 'required',
-                'nama_opd' => 'required',
-                'lokasi_opd' => 'required',
+                'opd_kabupaten_id' => 'required',
                 'user_jabatan' => 'required',
             ]);
+
+            if (User::where('email', $validated['email'])->exists()) {
+                return $this->errorResponse('Email telah terdaftar', Response::HTTP_BAD_REQUEST);
+            }
+
+            if (!OpdKabupaten::where('id', $validated['opd_kabupaten_id'])->exists()) {
+                return $this->errorResponse('OPD tidak ditemukan', Response::HTTP_BAD_REQUEST);
+            }
 
             // Mengubah menjadi huruf kecil
             $lowercaseString = strtolower($request->nama);
@@ -65,18 +72,14 @@ class UserOpdKabupatenController extends Controller
             $validated['password'] = Hash::make($request->password);
             $user = User::create($validated);
             if ($user){
-                $opd_kabupaten = OpdKabupaten::create([
-                    'nama' => $request->nama_opd,
-                    'lokasi' => $request->lokasi_opd,
-                ]);
-                if ($opd_kabupaten){
-                    $user_opd_kabupaten = UserOpdKabupaten::create([
+                
+                    UserOpdKabupaten::create([
                         'nama' => $request->nama,
-                        'opd_kabupaten_id' => $opd_kabupaten->id,
+                        'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
                         'user_id' => $user->id,
                         'jabatan' => $request->user_jabatan,
                     ]);
-                }
+          
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
@@ -106,6 +109,28 @@ class UserOpdKabupatenController extends Controller
                 ]);
             }
         } catch(Exception $e){
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function byOpdKabupaten(string $id)
+    {
+        try {
+            // Retrieve all records where the OpdKabupaten ID matches
+            $data = UserOpdKabupaten::where('opd_kabupaten_id', $id)->get();
+
+            if ($data->isNotEmpty()) {
+                return $this->successResponseWithData(
+                    UserOpdKabupatenResource::collection($data),
+                    'success',
+                    Response::HTTP_OK
+                );
+            } else {
+                return response()->json([
+                    'message' => 'Data tidak ditemukan.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
