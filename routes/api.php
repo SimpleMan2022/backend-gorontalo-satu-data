@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\SektorController;
 use App\Http\Controllers\UserOpdKabupatenController;
 use App\Http\Controllers\UserOpdProvinsiController;
@@ -36,7 +37,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('antarwaktu')->controller(AntarWaktuController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
-        Route::get("/{id}", "show");
+        // Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
     });
@@ -54,8 +55,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
     });
 
-    // User Opd Provinsi
-    Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
+    // Periode
+    
+    Route::prefix('periode')->controller(PeriodeController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
@@ -73,4 +75,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/delete-pivot/{id}", "destroyPivot");
     });
+});
+
+
+// User Opd Provinsi
+Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
+    Route::get("", "index");
+    Route::post("", "store");
+    Route::get("/{id}", "show");
+    Route::patch("/edit/{id}", "update");
+    Route::delete("/delete/{id}", "destroy");
 });

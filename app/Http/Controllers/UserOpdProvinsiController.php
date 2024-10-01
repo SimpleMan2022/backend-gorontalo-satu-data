@@ -23,14 +23,17 @@ class UserOpdProvinsiController extends Controller
     public function index()
     {
         try {
-            $data = UserOpdProvinsi::orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = UserOpdProvinsi::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
-                    UserOpdProvinsiResource::collection($data), 
-                    'success', 
-                    Response::HTTP_OK);
-            } else {
+                    UserOpdProvinsiResource::collection($data),
+                    'success',
+                    Response::HTTP_OK
+                );
+                // return $data;
+            }else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
                 ]);
