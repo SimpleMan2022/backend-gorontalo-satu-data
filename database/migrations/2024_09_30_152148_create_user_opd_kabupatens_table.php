@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('user_opd_kabupaten', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->string('email')->unique();
             $table->integer('opd_kabupaten_id');
             $table->integer('user_id');
             $table->string('jabatan');

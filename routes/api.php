@@ -47,3 +47,12 @@ Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)
     Route::patch("/edit/{id}", "update");
     Route::delete("/delete/{id}", "destroy");
 });
+
+// User Opd Kabupaten
+Route::prefix('user_opd_kabupaten')->controller(UserOpdKabupatenController::class)->group(function () {
+    Route::get("", "index");
+    Route::post("", "store");
+    Route::get("/{id}", "show");
+    Route::patch("/edit/{id}", "update");
+    Route::delete("/delete/{id}", "destroy");
+});
