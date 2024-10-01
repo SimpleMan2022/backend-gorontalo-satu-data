@@ -3,6 +3,8 @@
 use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\SektorController;
+use App\Http\Controllers\UserOpdKabupatenController;
+use App\Http\Controllers\UserOpdProvinsiController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
@@ -27,6 +29,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{sektor}", "destroy");
     });
 
+    // Antar Waktu
     Route::prefix('antarwaktu')->controller(AntarWaktuController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
@@ -34,4 +37,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
     });
+
+});
+// User Opd Provinsi
+Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
+    Route::get("", "index");
+    Route::post("", "store");
+    Route::get("/{id}", "show");
+    Route::patch("/edit/{id}", "update");
+    Route::delete("/delete/{id}", "destroy");
 });

@@ -10,4 +10,5 @@ class Sektor extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $table = 'sektor';
 }
