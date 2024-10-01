@@ -9,9 +9,19 @@ class Indikator extends Model
 {
     use HasFactory;
 
-    protected $guarded = [];
+    protected $guarded = ['id'];
+    protected $table = 'indikator';
 
+    public function antar_waktu() {
+        return $this->belongsTo(AntarWaktu::class);
+    }
     public function sektor() {
-        return $this->belongsTo(Sektor::Class);
+        return $this->belongsTo(Sektor::class);
+    }
+    public function opd_provinsi() {
+        return $this->belongsTo(OpdProvinsi::class);
+    }
+    public function pivot_indikator_subjek() {
+        return $this->hasMany(PivotIndikatorSubjek::class);
     }
 }

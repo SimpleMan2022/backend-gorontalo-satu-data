@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;
+use Exception;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller

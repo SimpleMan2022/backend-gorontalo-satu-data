@@ -10,4 +10,9 @@ class Sektor extends Model
     use HasFactory;
 
     protected $guarded = [];
+    protected $table = 'sektor';
+
+    public function indikator() {
+        return $this->hasMany(Indikator::class);
+    }
 }
