@@ -30,6 +30,22 @@ class OpdKabupatenController extends Controller
         }
     }
 
+    public function byOpdProvinsi($opd_provinsi)
+    {
+        try {
+            $data = OpdKabupaten::where('opd_provinsi_id',$opd_provinsi)->orderBy('created_at', 'desc')->get();
+            if ($data->isNotEmpty()) {
+                return $this->successResponseWithData($data, 'success', Response::HTTP_OK);
+            } else {
+                return response()->json([
+                    'message' => 'Data masih kosong.'
+                ]);
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function store(Request $request)
     {
         try {

@@ -114,4 +114,5 @@ Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group
     Route::get("/{id}", "show");
     Route::patch("/edit/{id}", "update");
     Route::delete("/delete/{id}", "destroy");
+    Route::get("byOpdProvinsi/{opd_provinsi}", "byOpdKabupaten");
 });
