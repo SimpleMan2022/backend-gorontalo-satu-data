@@ -18,13 +18,22 @@ use Illuminate\Support\Facades\Hash;
 class UserOpdProvinsiController extends Controller
 {
     use ApiResponse;
+
+
     public function index()
     {
         try {
-            $data = UserOpdProvinsi::orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = UserOpdProvinsi::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData($data, 'success', Response::HTTP_OK);
-            } else {
+                return $this->successResponseWithDataIndex(
+                    $data,
+                    UserOpdProvinsiResource::collection($data),
+                    'success',
+                    Response::HTTP_OK
+                );
+                // return $data;
+            }else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
                 ]);
@@ -81,21 +90,16 @@ class UserOpdProvinsiController extends Controller
     public function show(string $id)
     {
         try {
-            // Mencari data sektor dengan id
+            // Mencari data user opd provinsi dengan id
             $data = UserOpdProvinsi::find($id);
 
-            // Mengecek apabila terdapat data dengan id yang sama
-            if ($data) {
-                return $this->successResponseWithData(
-                    UserOpdProvinsiResource::make($data),
-                    'success',
-                    Response::HTTP_OK
-                );
-            } else {
-                return response()->json([
-                    'message' => 'Data tidak ditemukan.'
-                ]);
-            }
+            return $this->successResponseWithData(
+                UserOpdProvinsiResource::make($data),
+                'success',
+                Response::HTTP_OK
+            );
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -171,6 +175,8 @@ class UserOpdProvinsiController extends Controller
                 }
             }
             return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
@@ -181,7 +187,6 @@ class UserOpdProvinsiController extends Controller
     public function destroy(string $id)
     {
         try {
-
             // Menghapus data sektor sesuai request $sektor
             $user_opd_provinsi = UserOpdProvinsi::find($id);
             $user_opd_provinsi->delete();
