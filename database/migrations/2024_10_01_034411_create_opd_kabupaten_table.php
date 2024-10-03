@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('nama');
             $table->string('lokasi');
-            $table->foreignId('kabupaten_id');
+            $table->foreignId('kabupaten_id')->references('id')->on('regencies')->onDelete('cascade');
             $table->foreignId('opd_provinsi_id')->references('id')->on('opd_provinsi')->onDelete('cascade');
             $table->timestamps();
         });
