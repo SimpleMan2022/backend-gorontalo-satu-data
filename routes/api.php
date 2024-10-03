@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BeritaAcaraController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\SektorController;
 use App\Http\Controllers\UserOpdKabupatenController;
@@ -10,7 +11,7 @@ use App\Http\Controllers\OpdProvinsiController;
 use App\Http\Controllers\OpdKabupatenController;
 use App\Http\Controllers\IndikatorController;
 use App\Http\Controllers\SubjekController;
-
+use App\Models\BeritaAcara;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
@@ -114,5 +115,12 @@ Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group
     Route::get("/{id}", "show");
     Route::patch("/edit/{id}", "update");
     Route::delete("/delete/{id}", "destroy");
-    Route::get("byOpdProvinsi/{opd_provinsi}", "byOpdKabupaten");
+});
+
+Route::prefix('berita_acara')->controller(BeritaAcaraController::class)->group(function () {
+    Route::get("", "index");
+    Route::post("", "store");
+    Route::get("/{id}", "show");
+    Route::patch("/edit/{id}", "update");
+    Route::delete("/delete/{id}", "destroy");
 });
