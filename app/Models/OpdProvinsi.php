@@ -18,4 +18,8 @@ class OpdProvinsi extends Model
     public function indikator() {
         return $this->hasMany(Indikator::class);
     }
+
+    public function opd_kabupaten() {
+        return $this->hasMany(OpdKabupaten::class);
+    }
 }

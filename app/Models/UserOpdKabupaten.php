@@ -10,4 +10,12 @@ class UserOpdKabupaten extends Model
     use HasFactory;
     protected $guarded = [];
     protected $table = 'user_opd_kabupaten';
+
+    public function opd_kabupaten() {
+        return $this->belongsTo(OpdKabupaten::class);
+    }
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }

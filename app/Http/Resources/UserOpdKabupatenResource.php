@@ -14,6 +14,14 @@ class UserOpdKabupatenResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'nama' => $this->nama,
+            'opd_kabupaten_id' => $this->opd_kabupaten,
+            'user_id' => $this->user,
+            'jabatan' => $this->jabatan,
+            'created_at' => $this->created_at->format('d F Y'),
+            'updated_at' => $this->created_at->format('d F Y')
+        ];
     }
 }

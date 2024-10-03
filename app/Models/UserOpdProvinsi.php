@@ -15,4 +15,8 @@ class UserOpdProvinsi extends Model
     public function opd_provinsi() {
         return $this->belongsTo(OpdProvinsi::class);
     }
+
+    public function user() {
+        return $this->belongsTo(User::class);
+    }
 }
