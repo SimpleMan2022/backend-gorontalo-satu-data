@@ -11,9 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('regencies', function (Blueprint $table) {
-            $table->char('id', 4)->primary();
-            $table->char('province_id', 2)->foreign('province_id')->references('id')->on('provinces')->onDelete('cascade');
+        Schema::create('villages', function (Blueprint $table) {
+            $table->id();
+            $table->char('district_id', 7)->foreign('district_id')->references('id')->on('districts')->onDelete('cascade');
             $table->string('name');
         });
     }
@@ -23,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('regencies');
+        Schema::dropIfExists('villages');
     }
 };

@@ -11,8 +11,9 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('provinces', function (Blueprint $table) {
-            $table->char('id', 2)->primary();
+        Schema::create('districts', function (Blueprint $table) {
+            $table->id();
+            $table->char('regency_id', 4)->foreign('regency_id')->references('id')->on('regencies')->onDelete('cascade');
             $table->string('name');
         });
     }
@@ -22,6 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('provinces');
+        Schema::dropIfExists('districts');
     }
 };
