@@ -21,8 +21,8 @@ class IndikatorResource extends JsonResource
             'antar_waktu_id' => $this->antar_waktu,
             'opd_provinsi_id' => $this->opd_provinsi,
             'status' => $this->status,
-            'created_at' => $this->created_at->format('d F Y'),
-            'updated_at' => $this->created_at->format('d F Y')
+            'created_at' => $this->created_at,
+            'updated_at' => $this->created_at
         ];
     }
 }
