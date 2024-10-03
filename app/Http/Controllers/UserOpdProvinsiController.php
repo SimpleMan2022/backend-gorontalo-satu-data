@@ -50,10 +50,17 @@ class UserOpdProvinsiController extends Controller
                 'email' => 'required',
                 'nama' => 'required',
                 'password' => 'required',
-                'nama_opd' => 'required',
-                'lokasi_opd' => 'required',
+                'opd_provinsi_id' => 'required',
                 'user_jabatan' => 'required',
             ]);
+
+            if (User::where('email', $validated['email'])->exists()) {
+                return $this->errorResponse('Email telah terdaftar', Response::HTTP_BAD_REQUEST);
+            }
+
+            if (!OpdProvinsi::where('id', $validated['opd_provinsi_id'])->exists()) {
+                return $this->errorResponse('OPD tidak ditemukan', Response::HTTP_BAD_REQUEST);
+            }
 
             // Mengubah menjadi huruf kecil
             $lowercaseString = strtolower($request->nama);
@@ -63,18 +70,14 @@ class UserOpdProvinsiController extends Controller
             $validated['password'] = Hash::make($request->password);
             $user = User::create($validated);
             if ($user){
-                $opd_provinsi = OpdProvinsi::create([
-                    'nama' => $request->nama_opd,
-                    'lokasi' => $request->lokasi_opd,
-                ]);
-                if ($opd_provinsi){
-                    $user_opd_provinsi = UserOpdProvinsi::create([
+                
+                    UserOpdProvinsi::create([
                         'nama' => $request->nama,
-                        'opd_provinsi_id' => $opd_provinsi->id,
+                        'opd_provinsi_id' => $validated["opd_provinsi_id"],
                         'user_id' => $user->id,
                         'jabatan' => $request->user_jabatan,
                     ]);
-                }
+          
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
@@ -100,6 +103,33 @@ class UserOpdProvinsiController extends Controller
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
+    }
+
+    public function byOpdProvinsi(string $id)
+    {
+        try {
+            // Retrieve all records where the OpdProvinsi ID matches
+            $data = UserOpdProvinsi::where('opd_provinsi_id', $id)->get();
+
+            if ($data->isNotEmpty()) {
+                return $this->successResponseWithData(
+                    UserOpdProvinsiResource::collection($data),
+                    'success',
+                    Response::HTTP_OK
+                );
+            } else {
+                return response()->json([
+                    'message' => 'Data tidak ditemukan.'
+                ], Response::HTTP_NOT_FOUND);
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function edit(string $id)
+    {
+        //
     }
 
     public function update(Request $request, string $id)

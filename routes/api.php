@@ -6,6 +6,8 @@ use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\SektorController;
 use App\Http\Controllers\UserOpdKabupatenController;
 use App\Http\Controllers\UserOpdProvinsiController;
+use App\Http\Controllers\OpdProvinsiController;
+use App\Http\Controllers\OpdKabupatenController;
 use App\Http\Controllers\IndikatorController;
 use App\Http\Controllers\SubjekController;
 
@@ -85,4 +87,32 @@ Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)
     Route::get("/{id}", "show");
     Route::patch("/edit/{id}", "update");
     Route::delete("/delete/{id}", "destroy");
+    Route::get("byOpdProvinsi/{id}", "byOpdProvinsi");
+});
+
+// User Opd Kabupaten
+Route::prefix('user_opd_kabupaten')->controller(UserOpdKabupatenController::class)->group(function () {
+    Route::get("", "index");
+    Route::post("", "store");
+    Route::get("/{id}", "show");
+    Route::patch("/edit/{id}", "update");
+    Route::delete("/delete/{id}", "destroy");
+    Route::get("byOpdKabupaten/{id}", "byOpdKabupaten");
+});
+
+Route::prefix('opd_provinsi')->controller(OpdProvinsiController::class)->group(function () {
+    Route::get("", "index");
+    Route::post("", "store");
+    Route::get("/{id}", "show");
+    Route::patch("/edit/{id}", "update");
+    Route::delete("/delete/{id}", "destroy");
+});
+
+Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group(function () {
+    Route::get("", "index");
+    Route::post("", "store");
+    Route::get("/{id}", "show");
+    Route::patch("/edit/{id}", "update");
+    Route::delete("/delete/{id}", "destroy");
+});
 });
