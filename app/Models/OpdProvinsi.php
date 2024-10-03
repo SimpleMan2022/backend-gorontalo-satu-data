@@ -14,4 +14,8 @@ class OpdProvinsi extends Model
     public function user_opd_provinsi() {
         return $this->hasMany(UserOpdProvinsi::class);
     }
+
+    public function indikator() {
+        return $this->hasMany(Indikator::class);
+    }
 }

@@ -11,4 +11,8 @@ class AntarWaktu extends Model
 
     protected $guarded = ['id'];
     protected $table = 'antar_waktu';
+
+    public function indikator() {
+        return $this->hasMany(Indikator::class);
+    }
 }
