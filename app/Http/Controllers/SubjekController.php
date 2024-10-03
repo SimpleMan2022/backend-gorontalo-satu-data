@@ -124,6 +124,40 @@ class SubjekController extends Controller
         }
     }
 
+    public function update(Request $request, $id) {
+        try {
+            // Membuat Validasi
+            $req = $request->validate([
+                'nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
+                'indikator_id' => 'required|integer|exists:indikator,id',  // Validasi setiap 'indikator_id' di dalam array sebagai integer dan harus ada di tabel 'indikators'
+            ]);
+
+            $data = Subjek::find($id);
+
+            if($data) {
+                $data->update($req);
+                return $this->successResponseWithData(
+                    SubjekResource::make($data),
+                    'success',
+                    Response::HTTP_OK
+                );
+            }else {
+                return $this->errorResponse(
+                    'Data tidak ditemukan',
+                    Response::HTTP_INTERNAL_SERVER_ERROR
+                );
+            }
+
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        }catch (ValidationException $e) {
+            // Handle validation errors
+            return $this->errorResponse($e->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+        }catch( Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function destroy($id) {
         try {
             // Menghapus data sektor sesuai request $sektor
