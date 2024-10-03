@@ -22,10 +22,17 @@ class UserOpdProvinsiController extends Controller
     public function index()
     {
         try {
-            $data = UserOpdProvinsi::orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = UserOpdProvinsi::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData($data, 'success', Response::HTTP_OK);
-            } else {
+                return $this->successResponseWithDataIndex(
+                    $data,
+                    UserOpdProvinsiResource::collection($data),
+                    'success',
+                    Response::HTTP_OK
+                );
+                // return $data;
+            }else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
                 ]);
@@ -41,32 +48,35 @@ class UserOpdProvinsiController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'password' => 'required',
-                'nama_opd' => 'required',
-                'lokasi_opd' => 'required',
+                // 'password' => 'required',
+                'opd_provinsi_id' => 'required',
                 'user_jabatan' => 'required',
             ]);
+
+            if (User::where('email', $validated['email'])->exists()) {
+                return $this->errorResponse('Email telah terdaftar', Response::HTTP_BAD_REQUEST);
+            }
+
+            if (!OpdProvinsi::where('id', $validated['opd_provinsi_id'])->exists()) {
+                return $this->errorResponse('OPD tidak ditemukan', Response::HTTP_BAD_REQUEST);
+            }
 
             // Mengubah menjadi huruf kecil
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
 
-            $validated['password'] = Hash::make($request->password);
+            $validated['password'] = Hash::make('gsdmakro123');
             $user = User::create($validated);
             if ($user){
-                $opd_provinsi = OpdProvinsi::create([
-                    'nama' => $request->nama_opd,
-                    'lokasi' => $request->lokasi_opd,
-                ]);
-                if ($opd_provinsi){
-                    $user_opd_provinsi = UserOpdProvinsi::create([
+                
+                    UserOpdProvinsi::create([
                         'nama' => $request->nama,
-                        'opd_provinsi_id' => $opd_provinsi->id,
+                        'opd_provinsi_id' => $validated["opd_provinsi_id"],
                         'user_id' => $user->id,
                         'jabatan' => $request->user_jabatan,
                     ]);
-                }
+          
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
@@ -79,20 +89,37 @@ class UserOpdProvinsiController extends Controller
     public function show(string $id)
     {
         try {
-            // Mencari data sektor dengan id
+            // Mencari data user opd provinsi dengan id
             $data = UserOpdProvinsi::find($id);
 
-            // Mengecek apabila terdapat data dengan id yang sama
-            if ($data) {
+            return $this->successResponseWithData(
+                UserOpdProvinsiResource::make($data),
+                'success',
+                Response::HTTP_OK
+            );
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function byOpdProvinsi(string $id)
+    {
+        try {
+            // Retrieve all records where the OpdProvinsi ID matches
+            $data = UserOpdProvinsi::where('opd_provinsi_id', $id)->get();
+
+            if ($data->isNotEmpty()) {
                 return $this->successResponseWithData(
-                    UserOpdProvinsiResource::make($data),
+                    UserOpdProvinsiResource::collection($data),
                     'success',
                     Response::HTTP_OK
                 );
             } else {
                 return response()->json([
                     'message' => 'Data tidak ditemukan.'
-                ]);
+                ], Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -110,7 +137,7 @@ class UserOpdProvinsiController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'password' => 'required',
+                // 'password' => 'required',
                 'nama_opd' => 'required',
                 'lokasi_opd' => 'required',
                 'user_jabatan' => 'required',
@@ -123,7 +150,7 @@ class UserOpdProvinsiController extends Controller
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
 
-            $validated['password'] = Hash::make($request->password);
+            // $validated['password'] = Hash::make($request->password);
             $user = User::find($user_opd_provinsi->user_id);
             $user->update($validated);
             if ($user){
@@ -147,6 +174,8 @@ class UserOpdProvinsiController extends Controller
                 }
             }
             return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
@@ -157,7 +186,6 @@ class UserOpdProvinsiController extends Controller
     public function destroy(string $id)
     {
         try {
-
             // Menghapus data sektor sesuai request $sektor
             $user_opd_provinsi = UserOpdProvinsi::find($id);
             $user_opd_provinsi->delete();
