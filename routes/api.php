@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BeritaAcaraController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\SektorController;
 use App\Http\Controllers\UserOpdKabupatenController;
@@ -11,7 +12,7 @@ use App\Http\Controllers\OpdKabupatenController;
 use App\Http\Controllers\IndikatorController;
 use App\Http\Controllers\VariabelController;
 use App\Http\Controllers\SubjekController;
-
+use App\Models\BeritaAcara;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
@@ -113,7 +114,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("by-opd-kabupaten/{id}", "byOpdKabupaten");
     });
 
-
     Route::prefix('opd_provinsi')->controller(OpdProvinsiController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
@@ -131,4 +131,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("by-opd-provinsi/{opd_provinsi}", "byOpdKabupaten");
     });
 
+});
+
+Route::prefix('berita_acara')->controller(BeritaAcaraController::class)->group(function () {
+    Route::get("", "index");
+    Route::post("", "store");
+    Route::get("/{id}", "show");
+    Route::patch("/edit/{id}", "update");
+    Route::delete("/delete/{id}", "destroy");
 });
