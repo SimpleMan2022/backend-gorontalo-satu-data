@@ -58,7 +58,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     // Periode
-    
+
     Route::prefix('periode')->controller(PeriodeController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
@@ -114,5 +114,4 @@ Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group
     Route::get("/{id}", "show");
     Route::patch("/edit/{id}", "update");
     Route::delete("/delete/{id}", "destroy");
-});
 });

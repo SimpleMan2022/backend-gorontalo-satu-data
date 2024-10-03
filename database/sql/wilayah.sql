@@ -1,41 +1,13 @@
--- phpMyAdmin SQL Dump
--- version 5.2.0
--- https://www.phpmyadmin.net/
---
--- Host: localhost:3306
--- Generation Time: Sep 27, 2024 at 12:55 AM
--- Server version: 8.0.30
--- PHP Version: 8.2.24
+INSERT INTO `provinces` (`id`, `name`) VALUES
+('75', 'GORONTALO');
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
-
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `gsd`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `districts`
---
-
-CREATE TABLE `districts` (
-  `id` char(7) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `regency_id` char(4) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-
---
--- Dumping data for table `districts`
---
+INSERT INTO `regencies` (`id`, `province_id`, `name`) VALUES
+('7501', '75', 'KABUPATEN BOALEMO'),
+('7502', '75', 'KABUPATEN GORONTALO'),
+('7503', '75', 'KABUPATEN POHUWATO'),
+('7504', '75', 'KABUPATEN BONE BOLANGO'),
+('7505', '75', 'KABUPATEN GORONTALO UTARA'),
+('7571', '75', 'KOTA GORONTALO');
 
 INSERT INTO `districts` (`id`, `regency_id`, `name`) VALUES
 ('7501031', '7501', 'MANANGGU'),
@@ -115,64 +87,6 @@ INSERT INTO `districts` (`id`, `regency_id`, `name`) VALUES
 ('7571030', '7571', 'KOTA UTARA'),
 ('7571031', '7571', 'KOTA TENGAH'),
 ('7571032', '7571', 'SIPATANA');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `provinces`
---
-
-CREATE TABLE `provinces` (
-  `id` char(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-
---
--- Dumping data for table `provinces`
---
-
-INSERT INTO `provinces` (`id`, `name`) VALUES
-('75', 'GORONTALO');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `regencies`
---
-
-CREATE TABLE `regencies` (
-  `id` char(4) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `province_id` char(2) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-
---
--- Dumping data for table `regencies`
---
-
-INSERT INTO `regencies` (`id`, `province_id`, `name`) VALUES
-('7501', '75', 'KABUPATEN BOALEMO'),
-('7502', '75', 'KABUPATEN GORONTALO'),
-('7503', '75', 'KABUPATEN POHUWATO'),
-('7504', '75', 'KABUPATEN BONE BOLANGO'),
-('7505', '75', 'KABUPATEN GORONTALO UTARA'),
-('7571', '75', 'KOTA GORONTALO');
-
--- --------------------------------------------------------
-
---
--- Table structure for table `villages`
---
-
-CREATE TABLE `villages` (
-  `id` char(10) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `district_id` char(7) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL,
-  `name` varchar(255) CHARACTER SET utf8mb3 COLLATE utf8mb3_unicode_ci NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_unicode_ci;
-
---
--- Dumping data for table `villages`
---
 
 INSERT INTO `villages` (`id`, `district_id`, `name`) VALUES
 ('7501031001', '7501031', 'MANANGGU'),
@@ -897,61 +811,3 @@ INSERT INTO `villages` (`id`, `district_id`, `name`) VALUES
 ('7571032003', '7571032', 'TANGGIKIKI'),
 ('7571032004', '7571032', 'BULOTADA TIMUR'),
 ('7571032005', '7571032', 'BULOTADAA');
-
---
--- Indexes for dumped tables
---
-
---
--- Indexes for table `districts`
---
-ALTER TABLE `districts`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `districts_id_index` (`regency_id`);
-
---
--- Indexes for table `provinces`
---
-ALTER TABLE `provinces`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `regencies`
---
-ALTER TABLE `regencies`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `regencies_province_id_index` (`province_id`);
-
---
--- Indexes for table `villages`
---
-ALTER TABLE `villages`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `villages_district_id_index` (`district_id`);
-
---
--- Constraints for dumped tables
---
-
---
--- Constraints for table `districts`
---
-ALTER TABLE `districts`
-  ADD CONSTRAINT `districts_regency_id_foreign` FOREIGN KEY (`regency_id`) REFERENCES `regencies` (`id`);
-
---
--- Constraints for table `regencies`
---
-ALTER TABLE `regencies`
-  ADD CONSTRAINT `regencies_province_id_foreign` FOREIGN KEY (`province_id`) REFERENCES `provinces` (`id`);
-
---
--- Constraints for table `villages`
---
-ALTER TABLE `villages`
-  ADD CONSTRAINT `villages_district_id_foreign` FOREIGN KEY (`district_id`) REFERENCES `districts` (`id`);
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
