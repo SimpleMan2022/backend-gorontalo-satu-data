@@ -18,6 +18,7 @@ use Illuminate\Support\Facades\Hash;
 class UserOpdProvinsiController extends Controller
 {
     use ApiResponse;
+    
     public function index()
     {
         try {
