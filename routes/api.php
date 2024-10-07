@@ -94,7 +94,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
         Route::get("byOpdProvinsi/{id}", "byOpdProvinsi");
     });
-  
+
     // User Opd Provinsi
     Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
         Route::get("", "index");
@@ -105,9 +105,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("byOpdKabupaten/{id}", "byOpdKabupaten");
         Route::get("by-opd-provinsi/{id}", "byOpdProvinsi");
     });
-
-    });
-
     // User Opd Kabupaten
     Route::prefix('user_opd_kabupaten')->controller(UserOpdKabupatenController::class)->group(function () {
         Route::get("", "index");
@@ -140,12 +137,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("by-opd-provinsi/{opd_provinsi}", "byOpdKabupaten");
     });
 
-});
-
-Route::prefix('berita_acara')->controller(BeritaAcaraController::class)->group(function () {
-    Route::get("", "index");
-    Route::post("", "store");
-    Route::get("/{id}", "show");
-    Route::patch("/edit/{id}", "update");
-    Route::delete("/delete/{id}", "destroy");
+    Route::prefix('berita_acara')->controller(BeritaAcaraController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
 });
