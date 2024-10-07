@@ -116,3 +116,7 @@ Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group
     Route::delete("/delete/{id}", "destroy");
     Route::get("byOpdProvinsi/{opd_provinsi}", "byOpdKabupaten");
 });
+
+Route::get('/docs', function () {
+    return redirect('/api/documentation');
+});
