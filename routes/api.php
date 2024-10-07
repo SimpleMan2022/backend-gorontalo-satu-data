@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AntarWaktuController;
+use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
 use App\Http\Controllers\PeriodeController;
@@ -83,7 +84,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete-pivot/{id}", "destroyPivot");
     });
 
-    // Variabel
     Route::prefix('variabel')->controller(VariabelController::class)->group(function () {
         Route::get("", "index");
         Route::get("/by-indikator/{indikator}", "byIndikator");
@@ -92,8 +92,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::get("byOpdProvinsi/{id}", "byOpdProvinsi");
     });
-
+  
     // User Opd Provinsi
     Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
         Route::get("", "index");
@@ -101,7 +102,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::get("byOpdKabupaten/{id}", "byOpdKabupaten");
         Route::get("by-opd-provinsi/{id}", "byOpdProvinsi");
+    });
+
     });
 
     // User Opd Kabupaten
@@ -120,6 +124,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+    });
+
+    Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
+        // Route::get("", "index");
+        Route::post("", "store");
     });
 
     Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group(function () {

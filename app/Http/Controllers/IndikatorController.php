@@ -22,9 +22,10 @@ class IndikatorController extends Controller
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
-                    IndikatorResource::collection($data), 
-                    'success', 
-                    Response::HTTP_OK);
+                    IndikatorResource::collection($data),
+                    'success',
+                    Response::HTTP_OK
+                );
             } else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
@@ -35,15 +36,17 @@ class IndikatorController extends Controller
         }
     }
 
-    public function bySektor($sektor) {
+    public function bySektor($sektor)
+    {
         try {
-            $data = Indikator::where('sektor_id',$sektor)->orderBy('created_at', 'desc')->get();
+            $data = Indikator::where('sektor_id', $sektor)->orderBy('created_at', 'desc')->get();
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
-                    IndikatorResource::collection($data), 
-                    'success', 
-                    Response::HTTP_OK);
+                    IndikatorResource::collection($data),
+                    'success',
+                    Response::HTTP_OK
+                );
             } else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
@@ -55,15 +58,17 @@ class IndikatorController extends Controller
     }
 
 
-    public function byAntarWaktu($antar_waktu) {
+    public function byAntarWaktu($antar_waktu)
+    {
         try {
-            $data = Indikator::where('antar_waktu_id',$antar_waktu)->orderBy('created_at', 'desc')->get();
+            $data = Indikator::where('antar_waktu_id', $antar_waktu)->orderBy('created_at', 'desc')->get();
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
-                    IndikatorResource::collection($data), 
-                    'success', 
-                    Response::HTTP_OK);
+                    IndikatorResource::collection($data),
+                    'success',
+                    Response::HTTP_OK
+                );
             } else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
@@ -75,15 +80,17 @@ class IndikatorController extends Controller
     }
 
 
-    public function byOpdProvinsi($opd_provinsi) {
+    public function byOpdProvinsi($opd_provinsi)
+    {
         try {
-            $data = Indikator::where('opd_provinsi_id',$opd_provinsi)->orderBy('created_at', 'desc')->get();
+            $data = Indikator::where('opd_provinsi_id', $opd_provinsi)->orderBy('created_at', 'desc')->get();
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
-                    IndikatorResource::collection($data), 
-                    'success', 
-                    Response::HTTP_OK);
+                    IndikatorResource::collection($data),
+                    'success',
+                    Response::HTTP_OK
+                );
             } else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
@@ -94,7 +101,8 @@ class IndikatorController extends Controller
         }
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
             $validated = $request->validate([
                 'nama' => 'required',
@@ -105,7 +113,7 @@ class IndikatorController extends Controller
             ]);
 
             $indikator = Indikator::create($validated);
-            
+
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
@@ -114,7 +122,8 @@ class IndikatorController extends Controller
         }
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         try {
             // Mencari data sektor dengan id
             $data = Indikator::find($id);
@@ -131,13 +140,13 @@ class IndikatorController extends Controller
                     'message' => 'Data tidak ditemukan.'
                 ]);
             }
-        
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         try {
             $validated = $request->validate([
                 'nama' => 'required',
@@ -148,7 +157,7 @@ class IndikatorController extends Controller
             ]);
 
             $indikator = Indikator::find($id)->update($validated);
-            
+
             return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
@@ -159,7 +168,8 @@ class IndikatorController extends Controller
         }
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         try {
             // Menghapus data sektor sesuai request $sektor
             Indikator::find($id)->delete();
