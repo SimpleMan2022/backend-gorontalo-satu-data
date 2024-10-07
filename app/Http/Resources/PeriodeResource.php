@@ -19,8 +19,9 @@ class PeriodeResource extends JsonResource
             'nama' => $this->nama,
             'tanggal_mulai' => $this->tanggal_mulai,
             'tanggal_selesai' => $this->tanggal_selesai,
+            'opd_provinsi_id' => $this->opd_provinsi_id,
             'created_at' => $this->created_at,
-            'updated_at' => $this->updated_at
+            'updated_at' => $this->updated_at,
         ];
     }
 }

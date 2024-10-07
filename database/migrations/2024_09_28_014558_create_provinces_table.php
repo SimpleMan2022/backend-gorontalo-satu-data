@@ -11,9 +11,8 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('villages', function (Blueprint $table) {
-            $table->char('id', 10)->primary();
-            $table->char('district_id', 7)->foreign('district_id')->references('id')->on('districts')->onDelete('cascade');
+        Schema::create('provinces', function (Blueprint $table) {
+            $table->id();
             $table->string('name');
         });
     }
@@ -23,6 +22,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('villages');
+        Schema::dropIfExists('provinces');
     }
 };
