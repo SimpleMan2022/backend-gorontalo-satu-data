@@ -3,16 +3,14 @@
 namespace App\Http\Controllers;
 
 use App\Http\Resources\EnumeratorResource;
-use App\Models\UserOpdKabupaten;
 use App\Http\Traits\ApiResponse;
-use App\Models\OpdKabupaten;
 use App\Models\User;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
-use App\Http\Resources\UserOpdKabupatenResource;
 use App\Models\Enumerator;
+use App\Models\EnumeratorKabupaten;
+use App\Models\EnumeratorProvinsi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -53,6 +51,8 @@ class EnumeratorController extends Controller
                 'email' => 'required',
                 'nama' => 'required',
                 'user_jabatan' => 'required',
+                'opd_kabupaten_id'=> 'nullable|integer|prohibited_if:opd_provinsi_id,!=null',
+                'opd_provinsi_id'=> 'nullable|integer|prohibited_if:opd_kabupaten_id,!=null',
             ]);
 
             // Mengubah menjadi huruf kecil
@@ -62,14 +62,29 @@ class EnumeratorController extends Controller
 
             $validated['password'] = Hash::make('gsdmakro123');
             $user = User::create($validated);
-            if ($user){
-                
-                    Enumerator::create([
-                        'nama' => $request->nama,
-                        'user_id' => $user->id,
-                        'jabatan' => $request->user_jabatan,
+            if ($user) {
+                // Create Enumerator entry
+                $enumerator = Enumerator::create([
+                    'nama' => $request->nama,
+                    'user_id' => $user->id,
+                    'jabatan' => $request->user_jabatan,
+                ]);
+    
+                // Check for opd_kabupaten_id and create in EnumeratorKabupaten
+                if ($request->opd_kabupaten_id) {
+                    EnumeratorKabupaten::create([
+                        'opd_kabupaten_id' => $request->opd_kabupaten_id,
+                        'enumerator_id' => $enumerator->id,
                     ]);
-          
+                }
+    
+                // Check for opd_provinsi_id and create in EnumeratorProvinsi
+                if ($request->opd_provinsi_id) {
+                    EnumeratorProvinsi::create([
+                        'opd_provinsi_id' => $request->opd_provinsi_id,
+                        'enumerator_id' => $enumerator->id,
+                    ]);
+                }
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
