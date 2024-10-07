@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AntarWaktuController;
+use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\SektorController;
@@ -77,42 +78,46 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/delete-pivot/{id}", "destroyPivot");
     });
-});
 
+    // User Opd Provinsi
+    Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+        Route::get("byOpdProvinsi/{id}", "byOpdProvinsi");
+    });
 
-// User Opd Provinsi
-Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
-    Route::get("", "index");
-    Route::post("", "store");
-    Route::get("/{id}", "show");
-    Route::patch("/edit/{id}", "update");
-    Route::delete("/delete/{id}", "destroy");
-    Route::get("byOpdProvinsi/{id}", "byOpdProvinsi");
-});
+    // User Opd Kabupaten
+    Route::prefix('user_opd_kabupaten')->controller(UserOpdKabupatenController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+        Route::get("byOpdKabupaten/{id}", "byOpdKabupaten");
+    });
 
-// User Opd Kabupaten
-Route::prefix('user_opd_kabupaten')->controller(UserOpdKabupatenController::class)->group(function () {
-    Route::get("", "index");
-    Route::post("", "store");
-    Route::get("/{id}", "show");
-    Route::patch("/edit/{id}", "update");
-    Route::delete("/delete/{id}", "destroy");
-    Route::get("byOpdKabupaten/{id}", "byOpdKabupaten");
-});
+    Route::prefix('opd_provinsi')->controller(OpdProvinsiController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
 
-Route::prefix('opd_provinsi')->controller(OpdProvinsiController::class)->group(function () {
-    Route::get("", "index");
-    Route::post("", "store");
-    Route::get("/{id}", "show");
-    Route::patch("/edit/{id}", "update");
-    Route::delete("/delete/{id}", "destroy");
-});
+    Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+        Route::get("byOpdProvinsi/{opd_provinsi}", "byOpdKabupaten");
+    });
 
-Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group(function () {
-    Route::get("", "index");
-    Route::post("", "store");
-    Route::get("/{id}", "show");
-    Route::patch("/edit/{id}", "update");
-    Route::delete("/delete/{id}", "destroy");
-    Route::get("byOpdProvinsi/{opd_provinsi}", "byOpdKabupaten");
+    Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
+        // Route::get("", "index");
+        Route::post("", "store");
+    });
 });

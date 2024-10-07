@@ -11,11 +11,23 @@ class OpdProvinsi extends Model
     protected $guarded = [];
     protected $table = 'opd_provinsi';
 
-    public function user_opd_provinsi() {
+    public function user_opd_provinsi()
+    {
         return $this->hasMany(UserOpdProvinsi::class);
     }
 
-    public function indikator() {
+    public function indikator()
+    {
         return $this->hasMany(Indikator::class);
+    }
+
+    public function periode()
+    {
+        return $this->hasMany(Periode::class);
+    }
+
+    public function artikel_kawasan()
+    {
+        return $this->hasMany(ArtikelKawasan::class);
     }
 }

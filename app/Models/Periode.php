@@ -11,4 +11,9 @@ class Periode extends Model
 
     protected $guarded = ['id'];
     protected $table = 'periode';
+
+    public function opd_provinsi()
+    {
+        return $this->belongsTo(OpdProvinsi::class);
+    }
 }

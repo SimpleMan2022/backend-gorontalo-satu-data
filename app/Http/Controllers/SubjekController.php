@@ -7,6 +7,7 @@ use App\Models\{Subjek, PivotIndikatorSubjek};
 // use App\Http\Resources\SubjekResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 
@@ -14,36 +15,39 @@ class SubjekController extends Controller
 {
     use ApiResponse;
 
-    public function index() {
+    public function index()
+    {
         try {
             $data = Subjek::orderBy('created_at', 'desc')->get();
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithData(
                     $data,
-                    'success', 
-                    Response::HTTP_OK);
+                    'success',
+                    Response::HTTP_OK
+                );
             } else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
                 ]);
-        }
+            }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function multiStore(Request $request) {
+    public function multiStore(Request $request)
+    {
         try {
             $req = $request->validate([
                 '*.nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
                 '*.indikator_id' => 'required|integer|exists:indikator,id',  // Validasi setiap 'indikator_id' di dalam array sebagai integer dan harus ada di tabel 'indikators'
             ]);
 
-            foreach($req as $item) {
-                
+            foreach ($req as $item) {
+
                 // Cek apakah subjek sudah ada berdasarkan nama
                 $subjek = Subjek::where('nama', $item['nama'])->first();
-                
+
                 // // Jika subjek belum ada, maka buat baru
                 if (!$subjek) {
                     $subjek = Subjek::create([
@@ -51,26 +55,25 @@ class SubjekController extends Controller
                         // tambahkan field lain sesuai kebutuhan
                     ]);
                 }
-            
+
                 // Buat data pada pivot jika belum ada
                 $pivot = PivotIndikatorSubjek::firstOrCreate([
                     'indikator_id' => $item['indikator_id'],
                     'subjek_id' => $subjek->id,
                 ]);
-                
             }
-            
+
             return $this->successResponse(
                 'success',
                 Response::HTTP_OK
             );
-
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
             $req = $request->validate([
                 'nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
@@ -78,7 +81,7 @@ class SubjekController extends Controller
             ]);
 
             $subjek = Subjek::where('nama', $request->nama)->first();
-                
+
             // // Jika subjek belum ada, maka buat baru
             if (!$subjek) {
                 $subjek = Subjek::create([
@@ -89,19 +92,19 @@ class SubjekController extends Controller
                     'success',
                     Response::HTTP_OK
                 );
-            }else {
+            } else {
                 return $this->errorResponse(
                     'failed',
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
             }
-
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         try {
             // Mencari data sektor dengan id
             $data = Subjek::find($id);
@@ -118,13 +121,13 @@ class SubjekController extends Controller
                     'message' => 'Data tidak ditemukan.'
                 ]);
             }
-        
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         try {
             // Menghapus data sektor sesuai request $sektor
             Subjek::find($id)->delete();
@@ -137,7 +140,8 @@ class SubjekController extends Controller
     }
 
 
-    public function destroyPivot($id) {
+    public function destroyPivot($id)
+    {
         try {
             // Menghapus data sektor sesuai request $sektor
             PivotIndikatorSubjek::find($id)->delete();
