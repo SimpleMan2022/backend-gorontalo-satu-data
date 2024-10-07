@@ -24,4 +24,7 @@ class Indikator extends Model
     public function pivot_indikator_subjek() {
         return $this->hasMany(PivotIndikatorSubjek::class);
     }
+    public function variabel() {
+        return $this->hasMany(Variabel::class);
+    }
 }

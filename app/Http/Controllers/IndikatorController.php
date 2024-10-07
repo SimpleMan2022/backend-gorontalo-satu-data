@@ -15,10 +15,10 @@ class IndikatorController extends Controller
 {
     use ApiResponse;
 
-    public function index()
-    {
+    public function index(Request $request) {
         try {
-            $data = Indikator::orderBy('created_at', 'desc')->get();
+            $perpage = $request->per_page ?? 10;
+            $data = Indikator::orderBy('created_at', 'desc')->paginate($perpage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
@@ -173,6 +173,21 @@ class IndikatorController extends Controller
         try {
             // Menghapus data sektor sesuai request $sektor
             Indikator::find($id)->delete();
+            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function multiDestroy() {
+        try {
+            // Menghapus data sektor sesuai request $sektor
+            $id = request('id');
+            $ids = explode(",", $id);
+            $indikator = Indikator::whereIn('id', $ids)->delete();
+
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
