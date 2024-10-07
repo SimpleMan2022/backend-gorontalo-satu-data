@@ -14,6 +14,14 @@ class UserOpdProvinsiResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'id' => $this->id,
+            'nama' => $this->nama,
+            'opd_provinsi_id' => $this->opd_provinsi,
+            'user_id' => $this->user,
+            'jabatan' => $this->jabatan,
+            'created_at' => $this->created_at->format('d F Y'),
+            'updated_at' => $this->created_at->format('d F Y')
+        ];
     }
 }

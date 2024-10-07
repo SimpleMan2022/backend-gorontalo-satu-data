@@ -21,6 +21,8 @@ class OpdProvinsi extends Model
         return $this->hasMany(Indikator::class);
     }
 
+    public function opd_kabupaten() {
+        return $this->hasMany(OpdKabupaten::class);
     public function periode()
     {
         return $this->hasMany(Periode::class);

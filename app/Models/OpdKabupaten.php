@@ -14,4 +14,12 @@ class OpdKabupaten extends Model
     public function user_opd_kabupaten() {
         return $this->hasMany(UserOpdKabupaten::class);
     }
+
+    public function opd_provinsi() {
+        return $this->belongsTo(OpdProvinsi::class);
+    }
+
+    public function kabupaten() {
+        return $this->belongsTo(Kabupaten::class);
+    }
 }
