@@ -18,8 +18,7 @@ use Illuminate\Support\Facades\Hash;
 class UserOpdProvinsiController extends Controller
 {
     use ApiResponse;
-
-
+    
     public function index()
     {
         try {
@@ -49,7 +48,7 @@ class UserOpdProvinsiController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'password' => 'required',
+                // 'password' => 'required',
                 'opd_provinsi_id' => 'required',
                 'user_jabatan' => 'required',
             ]);
@@ -67,7 +66,7 @@ class UserOpdProvinsiController extends Controller
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
 
-            $validated['password'] = Hash::make($request->password);
+            $validated['password'] = Hash::make('gsdmakro123');
             $user = User::create($validated);
             if ($user){
                 
@@ -138,7 +137,7 @@ class UserOpdProvinsiController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'password' => 'required',
+                // 'password' => 'required',
                 'nama_opd' => 'required',
                 'lokasi_opd' => 'required',
                 'user_jabatan' => 'required',
@@ -151,7 +150,7 @@ class UserOpdProvinsiController extends Controller
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
 
-            $validated['password'] = Hash::make($request->password);
+            // $validated['password'] = Hash::make($request->password);
             $user = User::find($user_opd_provinsi->user_id);
             $user->update($validated);
             if ($user){

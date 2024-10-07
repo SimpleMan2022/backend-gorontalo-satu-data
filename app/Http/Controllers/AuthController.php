@@ -34,29 +34,27 @@ class AuthController extends Controller
   public function login(Request $request)
   {
     try {
-        if (!Auth::attempt($request->only('username', 'password'))) {
-            return response()->json([
-              'message' => 'Terdapat kesalahan kredensial'
-            ], 401);
-        }
-        $user = User::where('username', $request->username)->firstOrFail();
-        $token = $user->createToken('auth_token')->plainTextToken;
-        $data = [
-            'token_type' => 'Bearer',
-            'token' => $token,
-            // 'id' => $user
-        ];
-      
-        return $this->successResponseWithData(
-            $data,
-            'success',
-            Response::HTTP_OK
-        );
-    }catch(Exception $e) {
-        return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+      if (!Auth::attempt($request->only('username', 'password'))) {
+        return $this->errorResponse('Terdapat kesalahan kredensial.', Response::HTTP_UNAUTHORIZED);
+      }
+      $user = User::where('username', $request->username)->firstOrFail();
+      $token = $user->createToken('auth_token')->plainTextToken;
+      $data = [
+        'token_type' => 'Bearer',
+        'token' => $token,
+        // 'id' => $user
+      ];
+
+      return $this->successResponseWithData(
+        $data,
+        'success',
+        Response::HTTP_OK
+      );
+    } catch (Exception $e) {
+      return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
-    
+
 
   public function getUser(Request $request)
   {
