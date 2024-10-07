@@ -145,3 +145,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
     });
 });
+
+Route::get('/docs', function () {
+    return redirect('/api/documentation');
+});
