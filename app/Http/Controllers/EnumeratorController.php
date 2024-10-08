@@ -20,9 +20,15 @@ class EnumeratorController extends Controller
     public function index()
     {
         try{
-            $data = Enumerator::orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = Enumerator::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()){
-                return $this->successResponseWithData($data,'success', Response::HTTP_OK);
+                return $this->successResponseWithDataIndex(
+                    $data,
+                    EnumeratorResource::collection($data),
+                    'success', 
+                    Response::HTTP_OK
+                );
             }else {
                 return response()->json([
                     'message' => 'Data masih kosong.'

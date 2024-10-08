@@ -18,8 +18,8 @@ class EnumeratorProvinsiResource extends JsonResource
             'id' => $this->id,
             'enumerator_id' => $this->enumerator,
             'opd_provinsi_id' => $this->opd_provinsi,
-            'created_at' => $this->created_at->format('d F Y'),
-            'updated_at' => $this->created_at->format('d F Y')
+            'created_at' => $this->created_at,
+            'updated_at' => $this->created_at
         ];
     }
 }

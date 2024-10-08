@@ -8,7 +8,6 @@ use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Resources\OpdKabupatenResource;
-
 use Illuminate\Http\Request;
 
 class OpdKabupatenController extends Controller
@@ -17,9 +16,15 @@ class OpdKabupatenController extends Controller
     public function index()
     {
         try {
-            $data = OpdKabupaten::orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = OpdKabupaten::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData($data, 'success', Response::HTTP_OK);
+                return $this->successResponseWithData(
+                    $data,
+                    OpdKabupatenResource::collection($data),
+                    'success', 
+                    Response::HTTP_OK
+                );
             } else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
@@ -33,9 +38,15 @@ class OpdKabupatenController extends Controller
     public function byOpdProvinsi($opd_provinsi)
     {
         try {
-            $data = OpdKabupaten::where('opd_provinsi_id',$opd_provinsi)->orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = OpdKabupaten::where('opd_provinsi_id',$opd_provinsi)->orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData($data, 'success', Response::HTTP_OK);
+                return $this->successResponseWithData(
+                    $data,
+                    OpdKabupatenResource::collection($data),
+                    'success', 
+                    Response::HTTP_OK
+                );
             } else {
                 return response()->json([
                     'message' => 'Data masih kosong.'

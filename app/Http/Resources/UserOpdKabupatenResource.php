@@ -20,8 +20,8 @@ class UserOpdKabupatenResource extends JsonResource
             'opd_kabupaten_id' => $this->opd_kabupaten,
             'user_id' => $this->user,
             'jabatan' => $this->jabatan,
-            'created_at' => $this->created_at->format('d F Y'),
-            'updated_at' => $this->created_at->format('d F Y')
+            'created_at' => $this->created_at,
+            'updated_at' => $this->created_at
         ];
     }
 }
