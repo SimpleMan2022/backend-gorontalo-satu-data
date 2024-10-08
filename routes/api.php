@@ -4,6 +4,9 @@ use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
+use App\Http\Controllers\EnumeratorController;
+use App\Http\Controllers\EnumeratorKabupatenController;
+use App\Http\Controllers\EnumeratorProvinsiController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\SektorController;
 use App\Http\Controllers\UserOpdKabupatenController;
@@ -138,6 +141,30 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::prefix('berita_acara')->controller(BeritaAcaraController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+
+    Route::prefix('enumerator')->controller(EnumeratorController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+    
+    Route::prefix('enumerator_kabupaten')->controller(EnumeratorKabupatenController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+
+    Route::prefix('enumerator_provinsi')->controller(EnumeratorProvinsiController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
