@@ -38,7 +38,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::patch("/edit/{sektor}", "update");
-        Route::delete("/delete/{sektor}", "destroy");
+        Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
 

@@ -8,7 +8,6 @@ use App\Models\Sektor;
 use App\Http\Resources\SektorResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 
@@ -119,12 +118,12 @@ class SektorController extends Controller
         }
     }
 
-    public function destroy(Sektor $sektor)
+    public function destroy($id)
     {
         try {
 
             // Menghapus data sektor sesuai request $sektor
-            $data = Sektor::find($sektor);
+            $data = Sektor::find($id);
 
             if ($data) {
                 $data->delete();
@@ -135,7 +134,7 @@ class SektorController extends Controller
                 );
             }
 
-            return $this->successResponse('successfully deleted data', Response::HTTP_OK);
+            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
