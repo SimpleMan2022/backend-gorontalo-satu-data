@@ -13,6 +13,7 @@ use App\Models\EnumeratorKabupaten;
 use App\Models\EnumeratorProvinsi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use Spatie\Permission\Models\Role;
 
 class EnumeratorController extends Controller
 {
@@ -69,6 +70,8 @@ class EnumeratorController extends Controller
                     'user_id' => $user->id,
                     'jabatan' => $request->user_jabatan,
                 ]);
+
+                $enumerator->assignRole('enumerator');
     
                 // Check for opd_kabupaten_id and create in EnumeratorKabupaten
                 if ($request->opd_kabupaten_id) {

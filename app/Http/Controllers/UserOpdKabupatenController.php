@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Resources\UserOpdKabupatenResource;
-
+use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -71,15 +71,15 @@ class UserOpdKabupatenController extends Controller
 
             $validated['password'] = Hash::make('gsdmakro123');
             $user = User::create($validated);
+            $user->assignRole('opd_kabupaten');
             if ($user){
                 
-                    UserOpdKabupaten::create([
-                        'nama' => $request->nama,
-                        'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
-                        'user_id' => $user->id,
-                        'jabatan' => $request->user_jabatan,
-                    ]);
-          
+                UserOpdKabupaten::create([
+                    'nama' => $request->nama,
+                    'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
+                    'user_id' => $user->id,
+                    'jabatan' => $request->user_jabatan,
+                ]);
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
