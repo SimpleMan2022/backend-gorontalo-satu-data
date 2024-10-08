@@ -8,7 +8,6 @@ use App\Models\Sektor;
 use App\Http\Resources\SektorResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 
