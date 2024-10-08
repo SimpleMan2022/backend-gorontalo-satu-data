@@ -17,9 +17,15 @@ class OpdProvinsiController extends Controller
     public function index()
     {
         try {
-            $data = OpdProvinsi::orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = OpdProvinsi::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData($data, 'success', Response::HTTP_OK);
+                return $this->successResponseWithData(
+                    $data, 
+                    OpdProvinsiResource::collection($data),
+                    'success', 
+                    Response::HTTP_OK
+                );
             } else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
@@ -29,6 +35,8 @@ class OpdProvinsiController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    
 
     public function store(Request $request)
     {

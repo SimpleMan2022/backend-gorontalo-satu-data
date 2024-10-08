@@ -14,4 +14,20 @@ class Enumerator extends Model
     public function user() {
         return $this->belongsTo(User::class);
     }
+
+    public function enumerator_kabupaten() {
+        return $this->hasMany(EnumeratorKabupaten::class);
+    }
+
+    public function enumerator_provinsi() {
+        return $this->hasMany(EnumeratorProvinsi::class);
+    }
+
+    public function opd_kabupaten() {
+        return $this->belongsTo(OpdKabupaten::class);
+    }
+
+    public function opd_provinsi() {
+        return $this->belongsTo(OpdProvinsi::class);
+    }
 }
