@@ -21,8 +21,8 @@ class BeritaAcaraResource extends JsonResource
             'file' => $this->file,
             'indikator_id' => $this->indikator,
             'status' => $this->status,
-            'created_at' => $this->created_at->format('d F Y'),
-            'updated_at' => $this->created_at->format('d F Y')
+            'created_at' => $this->created_at,
+            'updated_at' => $this->created_at
         ];
     }
 }

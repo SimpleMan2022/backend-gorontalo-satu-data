@@ -17,8 +17,8 @@ class IndikatorController extends Controller
 
     public function index(Request $request) {
         try {
-            $perpage = $request->per_page ?? 10;
-            $data = Indikator::orderBy('created_at', 'desc')->paginate($perpage);
+            $perPage = $request->per_page ?? 10;
+            $data = Indikator::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
@@ -39,7 +39,8 @@ class IndikatorController extends Controller
     public function bySektor($sektor)
     {
         try {
-            $data = Indikator::where('sektor_id', $sektor)->orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = Indikator::where('sektor_id', $sektor)->orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
@@ -61,7 +62,8 @@ class IndikatorController extends Controller
     public function byAntarWaktu($antar_waktu)
     {
         try {
-            $data = Indikator::where('antar_waktu_id', $antar_waktu)->orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = Indikator::where('antar_waktu_id', $antar_waktu)->orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
@@ -83,7 +85,8 @@ class IndikatorController extends Controller
     public function byOpdProvinsi($opd_provinsi)
     {
         try {
-            $data = Indikator::where('opd_provinsi_id', $opd_provinsi)->orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = Indikator::where('opd_provinsi_id', $opd_provinsi)->orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
@@ -153,6 +156,25 @@ class IndikatorController extends Controller
                 'sektor_id' => 'required',
                 'antar_waktu_id' => 'required',
                 'opd_provinsi_id' => 'required',
+                'status' => 'required',
+            ]);
+
+            $indikator = Indikator::find($id)->update($validated);
+
+            return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal diperbarui', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
                 'status' => 'required',
             ]);
 

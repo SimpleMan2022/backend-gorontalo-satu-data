@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Resources\UserOpdKabupatenResource;
-
+use Spatie\Permission\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 
@@ -21,9 +21,15 @@ class UserOpdKabupatenController extends Controller
     public function index()
     {
         try{
-            $data = UserOpdKabupaten::orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = UserOpdKabupaten::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()){
-                return $this->successResponseWithData($data,'success', Response::HTTP_OK);
+                return $this->successResponseWithData(
+                    $data,
+                    UserOpdKabupatenResource::collection($make),
+                    'success', 
+                    Response::HTTP_OK
+                );
             }else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
@@ -32,7 +38,7 @@ class UserOpdKabupatenController extends Controller
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
+    }    
 
     /**
      * Show the form for creating a new resource.
@@ -71,15 +77,15 @@ class UserOpdKabupatenController extends Controller
 
             $validated['password'] = Hash::make('gsdmakro123');
             $user = User::create($validated);
+            $user->assignRole('opd_kabupaten');
             if ($user){
                 
-                    UserOpdKabupaten::create([
-                        'nama' => $request->nama,
-                        'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
-                        'user_id' => $user->id,
-                        'jabatan' => $request->user_jabatan,
-                    ]);
-          
+                UserOpdKabupaten::create([
+                    'nama' => $request->nama,
+                    'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
+                    'user_id' => $user->id,
+                    'jabatan' => $request->user_jabatan,
+                ]);
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
@@ -116,8 +122,9 @@ class UserOpdKabupatenController extends Controller
     public function byOpdKabupaten(string $id)
     {
         try {
+            $perPage = $request->per_page ?? 10;
             // Retrieve all records where the OpdKabupaten ID matches
-            $data = UserOpdKabupaten::where('opd_kabupaten_id', $id)->get();
+            $data = UserOpdKabupaten::where('opd_kabupaten_id', $id)->paginate($perPage);
 
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithData(

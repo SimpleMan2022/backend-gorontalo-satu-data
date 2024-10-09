@@ -10,6 +10,7 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
+use Spatie\Permission\Models\Role;
 use App\Http\Resources\UserOpdProvinsiResource;
 
 use Illuminate\Http\Request;
@@ -68,6 +69,7 @@ class UserOpdProvinsiController extends Controller
 
             $validated['password'] = Hash::make('gsdmakro123');
             $user = User::create($validated);
+            $user->assignRole('opd_provinsi');
             if ($user){
                 
                     UserOpdProvinsi::create([

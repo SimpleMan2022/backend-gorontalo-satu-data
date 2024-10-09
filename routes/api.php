@@ -4,6 +4,9 @@ use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
+use App\Http\Controllers\EnumeratorController;
+use App\Http\Controllers\EnumeratorKabupatenController;
+use App\Http\Controllers\EnumeratorProvinsiController;
 use App\Http\Controllers\PeriodeController;
 use App\Http\Controllers\SektorController;
 use App\Http\Controllers\UserOpdKabupatenController;
@@ -13,6 +16,8 @@ use App\Http\Controllers\OpdKabupatenController;
 use App\Http\Controllers\IndikatorController;
 use App\Http\Controllers\VariabelController;
 use App\Http\Controllers\SubjekController;
+use App\Http\Controllers\PivotOpdSektorController;
+use App\Http\Controllers\PivotEnumeratorIndikatorController;
 use App\Models\BeritaAcara;
 use Illuminate\Support\Facades\Route;
 
@@ -35,7 +40,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::patch("/edit/{sektor}", "update");
-        Route::delete("/delete/{sektor}", "destroy");
+        Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
 
@@ -58,6 +63,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/by-opd/{opd_provinsi}", "byOpdProvinsi");
         Route::get("/{id}", "show");
         Route::get("/{id}", "show");
+        Route::patch("/update-status/{id}", "updateStatus");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
@@ -84,6 +90,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete-pivot/{id}", "destroyPivot");
     });
 
+    // Subjek
+    Route::prefix('pivot-enumerator-indikator')->controller(PivotEnumeratorIndikatorController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::post("/multi-store", "multiStore");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+
     Route::prefix('variabel')->controller(VariabelController::class)->group(function () {
         Route::get("", "index");
         Route::get("/by-indikator/{indikator}", "byIndikator");
@@ -96,7 +112,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     // User Opd Provinsi
-    Route::prefix('user_opd_provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
+    Route::prefix('user-opd-provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
@@ -106,7 +122,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("by-opd-provinsi/{id}", "byOpdProvinsi");
     });
     // User Opd Kabupaten
-    Route::prefix('user_opd_kabupaten')->controller(UserOpdKabupatenController::class)->group(function () {
+    Route::prefix('user-opd-kabupaten')->controller(UserOpdKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
@@ -115,7 +131,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("by-opd-kabupaten/{id}", "byOpdKabupaten");
     });
 
-    Route::prefix('opd_provinsi')->controller(OpdProvinsiController::class)->group(function () {
+    Route::prefix('opd-provinsi')->controller(OpdProvinsiController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
@@ -129,7 +145,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
     });
 
-    Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group(function () {
+    Route::prefix('opd-kabupaten')->controller(OpdKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
@@ -138,8 +154,43 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("by-opd-provinsi/{opd_provinsi}", "byOpdKabupaten");
     });
 
-    Route::prefix('berita_acara')->controller(BeritaAcaraController::class)->group(function () {
+    Route::prefix('berita-acara')->controller(BeritaAcaraController::class)->group(function () {
         Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+
+    Route::prefix('enumerator')->controller(EnumeratorController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+    
+    Route::prefix('enumerator-kabupaten')->controller(EnumeratorKabupatenController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+
+    Route::prefix('enumerator-provinsi')->controller(EnumeratorProvinsiController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+
+
+    Route::prefix('pivot-opd-sektor')->controller(PivotOpdSektorController::class)->group(function () {
+        Route::get("", "index");
+        Route::get("/by-opd/{id}", "byOpd");
+        Route::get("/by-sektor/{id}", "bySektor");
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
