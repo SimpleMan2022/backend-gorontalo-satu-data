@@ -15,4 +15,8 @@ class Sektor extends Model
     public function indikator() {
         return $this->hasMany(Indikator::class);
     }
+
+    public function pivot_opd_sektor() {
+        return $this->hasMany(PivotOpdSektor::class);
+    }
 }

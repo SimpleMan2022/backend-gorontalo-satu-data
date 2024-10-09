@@ -171,6 +171,25 @@ class IndikatorController extends Controller
         }
     }
 
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'status' => 'required',
+            ]);
+
+            $indikator = Indikator::find($id)->update($validated);
+
+            return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal diperbarui', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function destroy($id)
     {
         try {

@@ -30,4 +30,8 @@ class Enumerator extends Model
     public function opd_provinsi() {
         return $this->belongsTo(OpdProvinsi::class);
     }
+
+    public function pivot_enumerator_indikator() {
+        return $this->hasMany(PivotEnumeratorIndikator::class);
+    }
 }

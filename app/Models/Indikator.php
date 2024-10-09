@@ -27,4 +27,7 @@ class Indikator extends Model
     public function variabel() {
         return $this->hasMany(Variabel::class);
     }
+    public function pivot_enumerator_indikator() {
+        return $this->hasMany(PivotEnumeratorIndikator::class);
+    }
 }
