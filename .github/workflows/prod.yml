@@ -21,7 +21,7 @@ jobs:
       - name: 🌍 Deploy to VPS
         run: |
           echo "🔄 Pulling latest changes from the repository..."
-          ssh -o StrictHostKeyChecking=no {{ secrets.SSH_USERNAME }}@{{ secrets.SSH_HOST }} "
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
             cd /var/www/backend-gsd && 
             git pull origin main && 
             echo '📦 Installing dependencies...' && 
