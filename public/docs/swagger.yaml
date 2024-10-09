@@ -1,0 +1,1308 @@
+openapi: '3.0.2'
+info:
+  title: Gorontalo Satu Data
+  version: '1.0'
+servers:
+  - url: https://api.gsd.my.id/v1
+    description: Production Server
+  - url: http://localhost:8000/api
+    description: Development Server
+
+tags:
+  - name: Authentication
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Authentication
+      summary: Melakukan autentikasi pengguna
+      description: API untuk mendapatkan token autentikasi pengguna
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: 'farel'
+                password:
+                  type: string
+                  example: '12345678'
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Login berhasil"
+                  data:
+                    type: object
+                    properties:
+                      token_type:
+                        type: string
+                        example: "Bearer"
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 400
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Login Gagal"
+                  data:
+                    type: object
+                    properties:
+                      username:
+                        type: string
+                        example: "The username field is required"
+  /auth/me:
+    get:
+      tags:
+        - Authentication
+      summary: Mengambil data pengguna yang sedang login
+      description: API untuk mendapatkan data pengguna yang sedang login berdasarkan token autentikasi
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "succes"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      username:
+                        type: string
+                        example: 'admin'
+                      email:
+                        type: string
+                        example: 'admin@example.com'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 401
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated"
+  /auth/logout:
+    post:
+      tags:
+        - Authentication
+      summary: Melakukan logout pengguna
+      description: API untuk logout pengguna dengan menghapus token autentikasi
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Logout berhasil"
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 401
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated"
+
+  /sektor:
+    get:
+      tags:
+        - Sektor
+      summary: Mendapatkan semua data sektor
+      description: API untuk mendapatkan semua data sektor
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Detail sektor berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                            example: 1
+                          per_page:
+                            type: number
+                            example: 10
+                          current_page:
+                            type: number
+                            example: 1
+                          total_pages:
+                            type: number
+                            example: 1
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            nama:
+                              type: string
+                              example: "Kesehatan"
+                            created_at:
+                              type: string
+                              example: "07 October 2024"
+        '500':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 400
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data masih kosong"
+    post:
+      tags:
+        - Sektor
+      summary: Menambahkan sektor baru
+      description: API untuk menambahkan sektor baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nama:
+                  type: string
+                  example: 'Pendidikan'
+      responses:
+        '201':
+          description: Sektor berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 201
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "succes"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      nama:
+                        type: string
+                        example: "Pendidikan"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 400
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+  /sektor/{id}:
+    get:
+      tags:
+        - Sektor
+      summary: Mendapatkan detail sektor
+      description: API untuk mendapatkan detail sektor berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Detail sektor berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "succes"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      nama:
+                        type: string
+                        example: "Pendidikan"
+        '404':
+          description: Sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 404
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+    patch:
+      tags:
+        - Sektor
+      summary: Mengupdate sektor
+      description: API untuk mengupdate data sektor berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nama:
+                  type: string
+                  example: "Infrastruktur"
+      responses:
+        '200':
+          description: Sektor berhasil diupdate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "succes"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      nama:
+                        type: string
+                        example: "Infrastruktur"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 400
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak valid"
+    delete:
+      tags:
+        - Sektor
+      summary: Menghapus sektor
+      description: API untuk menghapus sektor berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Sektor berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        '404':
+          description: Sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 404
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthenticated"
+
+  /antar-waktu:
+    get:
+      tags:
+        - Antar Waktu
+      summary: Mendapatkan semua data antar waktu
+      description: API untuk mendapatkan semua data antar waktu
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Detail antar waktu berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: number
+                            example: 1
+                          per_page:
+                            type: number
+                            example: 10
+                          current_page:
+                            type: number
+                            example: 1
+                          total_pages:
+                            type: number
+                            example: 1
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            tahun:
+                              type: string
+                              example: "2024"
+                            nama:
+                              type: string
+                              example: "Triwulan 2"
+                            created_at:
+                              type: string
+                              example: "07 October 2024"
+        '500':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 400
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data masih kosong"
+    post:
+      tags:
+        - Antar Waktu
+      summary: Menambahkan antar waktu baru
+      description: API untuk menambahkan antar waktu baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tahun:
+                  type: string
+                  example: '2024'
+                nama:
+                  type: string
+                  example: 'Triwulan 1'
+      responses:
+        '201':
+          description: Antar waktu berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 201
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      tahun:
+                        type: string
+                        example: "2024"
+                      nama:
+                        type: string
+                        example: "Triwulan 1"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 400
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+  /antar-waktu/{id}:                  
+    patch:
+      tags:
+        - Antar Waktu
+      summary: Mengupdate antar waktu
+      description: API untuk mengupdate data antar waktu berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                tahun:
+                  type: string
+                  example: "2024"
+                nama:
+                  type: string
+                  example: "Triwulan 2"
+      responses:
+        '200':
+          description: Antar waktu berhasil diupdate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      tahun:
+                        type: string
+                        example: "2024"
+                      nama:
+                        type: string
+                        example: "Triwulan 2"
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 400
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+    delete:
+      tags:
+        - Antar Waktu
+      summary: Menghapus antar waktu
+      description: API untuk menghapus antar waktu berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Antar waktu berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        '404':
+          description: Antar waktu tidak ditemukan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 404
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+  /antarwaktu/multi-delete?{id},{id}:                  
+    delete:
+      tags:
+        - Antar Waktu
+      summary: Menghapus semua sekaligus
+      description: API untuk menghapus antar waktu sekaligus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Antar waktu berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        '404':
+          description: Antar waktu tidak ditemukan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 404
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+
+  /indikator:
+    get:
+      tags:
+        - Indikator
+      summary: Mendapatkan daftar indikator
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Berhasil mendapatkan daftar indikator
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 1
+                          per_page:
+                            type: integer
+                            example: 10
+                          current_page:
+                            type: integer
+                            example: 1
+                          total_pages:
+                            type: integer
+                            example: 1
+                      data:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            nama:
+                              type: string
+                              example: Agregat sebaran fasilitas kesehatan negeri
+                            sektor_id:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 3
+                                nama:
+                                  type: string
+                                  example: kesehatan
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                  example: 2024-10-08T01:12:51.000000Z
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                                  example: 2024-10-08T01:12:51.000000Z
+                            antar_waktu_id:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 3
+                                tahun:
+                                  type: string
+                                  example: 2025
+                                nama:
+                                  type: string
+                                  example: Triwulan
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                  example: 2024-10-08T01:12:26.000000Z
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                                  example: 2024-10-08T01:12:26.000000Z
+                            opd_provinsi_id:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 2
+                                nama:
+                                  type: string
+                                  example: Dinas Kesehatan
+                                lokasi:
+                                  type: string
+                                  example: Jl. Kesehatan No. 1
+                                created_at:
+                                  type: string
+                                  format: date-time
+                                  example: 2024-10-07T02:28:10.000000Z
+                                updated_at:
+                                  type: string
+                                  format: date-time
+                                  example: 2024-10-07T02:28:10.000000Z
+                            status:
+                              type: string
+                              example: public
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: 2024-10-08T01:21:16.000000Z
+                            updated_at:
+                              type: string
+                              format: date-time
+                              example: 2024-10-08T01:21:16.000000Z
+        '401':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 401
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthorized
+    post:
+      tags:
+        - Indikator
+      summary: Menambahkan indikator baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nama:
+                  type: string
+                  example: "Agregat sebaran fasilitas kesehatan negeri"
+                sektor_id:
+                  type: integer
+                  example: 3
+                antar_waktu_id:
+                  type: integer
+                  example: 3
+                opd_provinsi_id:
+                  type: integer
+                  example: 2
+                status:
+                  type: string
+                  example: "public"
+      responses:
+        '201':
+          description: Indikator berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: success
+                  nama:
+                      type: string
+                      example: Agregat sebaran fasilitas kesehatan negeri
+                  sektor_id:
+                    type: integer
+                    example: 3
+                  antar_waktu_id:
+                    type: integer
+                    example: 3
+                  opd_provinsi_id:
+                    type: integer
+                    example: 2
+                  statuss:
+                    type: string
+                    example: public
+        '401':
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 401
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthorized               
+  /indikator/{id}:
+    get:
+      tags:
+        - Indikator
+      summary: Mendapatkan detail indikator berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari indikator yang akan ditampilkan
+      responses:
+        '200':
+          description: Berhasil mendapatkan detail indikator
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: success
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 4
+                      nama:
+                        type: string
+                        example: Agregat sebaran fasilitas kesehatan negeri
+                      sektor_id:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          nama:
+                            type: string
+                            example: kesehatan
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: 2024-10-08T01:12:51.000000Z
+                          updated_at:
+                            type: string
+                            format: date-time
+                            example: 2024-10-08T01:12:51.000000Z
+                      antar_waktu_id:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          tahun:
+                            type: string
+                            example: 2025
+                          nama:
+                            type: string
+                            example: Triwulan
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: 2024-10-08T01:12:26.000000Z
+                          updated_at:
+                            type: string
+                            format: date-time
+                            example: 2024-10-08T01:12:26.000000Z
+                      opd_provinsi_id:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: Dinas Kesehatan
+                          lokasi:
+                            type: string
+                            example: Jl. Kesehatan No. 1
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: 2024-10-07T02:28:10.000000Z
+                          updated_at:
+                            type: string
+                            format: date-time
+                            example: 2024-10-07T02:28:10.000000Z
+                      status:
+                        type: string
+                        example: public
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: 2024-10-08T01:21:16.000000Z
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: 2024-10-08T01:21:16.000000Z
+        '401':
+          description: Bad request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 401
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: Unauthorized
+    patch:
+      tags:
+        - Indikator
+      summary: Memperbarui indikator yang ada
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari indikator yang akan diperbarui
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nama:
+                  type: string
+                  example: "Agregat sebaran fasilitas kesehatan negeri"
+                sektor_id:
+                  type: integer
+                  example: 3
+                antar_waktu_id:
+                  type: integer
+                  example: 3
+                opd_provinsi_id:
+                  type: integer
+                  example: 2
+                status:
+                  type: string
+                  example: "public"
+      responses:
+        '200':
+          description: Indikator berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      nama:
+                        type: string
+                        example: "Sebaran jumlah penduduk perempuan"
+                      sektor_id:
+                        type: integer
+                        example: 1
+                      antar_waktu_id:
+                        type: integer
+                        example: 1
+                      opd_provinsi_id:
+                        type: integer
+                        example: 1
+                      status:
+                        type: string
+                        example: "pending"
+        '401':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 400
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+
+    delete:
+      tags:
+        - Indikator
+      summary: Menghapus indikator
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari indikator yang akan dihapus
+      responses:
+        '200':
+          description: Indikator berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        '401':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 404
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+  /indikator/delete-multi:
+    delete:
+      tags:
+        - Indikator
+      summary: Menghapus beberapa indikator sekaligus
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Beberapa indikator berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        '401':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 404
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
