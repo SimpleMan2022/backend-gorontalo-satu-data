@@ -20,7 +20,7 @@ class OpdProvinsiController extends Controller
             $perPage = $request->per_page ?? 10;
             $data = OpdProvinsi::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData(
+                return $this->successResponseWithDataIndex(
                     $data, 
                     OpdProvinsiResource::collection($data),
                     'success', 
@@ -36,7 +36,7 @@ class OpdProvinsiController extends Controller
         }
     }
 
-    
+
 
     public function store(Request $request)
     {
@@ -46,7 +46,6 @@ class OpdProvinsiController extends Controller
                 'lokasi' => 'required'
             ]);
 
-            // Mengubah menjadi huruf kecil
             OpdProvinsi::create($validated);
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
@@ -110,7 +109,7 @@ class OpdProvinsiController extends Controller
             // Menghapus data sektor sesuai request $sektor
             $opd_provinsi = OpdProvinsi::find($id);
             $opd_provinsi->delete();
-            return $this->successResponse('successfully deleted data', Response::HTTP_OK);
+            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

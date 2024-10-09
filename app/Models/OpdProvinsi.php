@@ -34,4 +34,8 @@ class OpdProvinsi extends Model
     {
         return $this->hasMany(ArtikelKawasan::class);
     }
+
+    public function pivot_opd_sektor() {
+        return $this->hasMany(PivotOpdSektor::class);
+    }
 }
