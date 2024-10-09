@@ -1,0 +1,36 @@
+name: 🚀 Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🛠️ Checkout Code
+        uses: actions/checkout@v2
+
+      - name: 🔑 Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      - name: 🌍 Deploy to VPS
+        run: |
+          echo "🔄 Pulling latest changes from the repository..."
+          ssh -o StrictHostKeyChecking=no {{ secrets.SSH_USERNAME }}@{{ secrets.SSH_HOST }} "
+            cd /var/www/backend-gsd && 
+            git pull origin main && 
+            echo '📦 Installing dependencies...' && 
+            composer install --optimize-autoloader --no-dev && 
+            echo '🛠️ Running migrations...' && 
+            php artisan migrate --force && 
+            echo '🗂️ Caching configuration...' && 
+            php artisan config:cache && 
+            echo '🚀 Caching routes...' && 
+            php artisan route:cache
+          "
+          echo "✅ Deployment completed successfully!"
