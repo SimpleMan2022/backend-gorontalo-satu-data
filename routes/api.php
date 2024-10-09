@@ -126,6 +126,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
         // Route::get("", "index");
         Route::post("", "store");
+        Route::patch("/edit/{id}", "update");
     });
 
     Route::prefix('opd_kabupaten')->controller(OpdKabupatenController::class)->group(function () {

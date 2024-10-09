@@ -8,7 +8,6 @@ use App\Models\Sektor;
 use App\Http\Resources\SektorResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 
@@ -95,20 +94,19 @@ class SektorController extends Controller
 
             $data = Sektor::find($sektor);
 
-            if($data) {
+            if ($data) {
                 $data->update($req);
                 return $this->successResponseWithData(
                     SektorResource::make($data),
                     'success',
                     Response::HTTP_OK
                 );
-            }else {
+            } else {
                 return $this->errorResponse(
                     'Data tidak ditemukan',
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
             }
-
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
@@ -141,7 +139,8 @@ class SektorController extends Controller
         }
     }
 
-    public function multiDestroy() {
+    public function multiDestroy()
+    {
         try {
             // Menghapus data sektor sesuai request $sektor
             $id = request('id');
