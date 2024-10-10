@@ -1300,7 +1300,7 @@ paths:
                     example: "Data tidak ditemukan"
 
   paths:
-  /user_opd_provinsi:
+  /user-opd-provinsi:
     get:
       tags:
         - user opd provinsi
@@ -1462,7 +1462,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /user_opd_provinsi/{id}:
+  /user-opd-provinsi/{id}:
     get:
       tags:
         - user opd provinsi
@@ -1652,7 +1652,7 @@ paths:
                     type: string
                     example: "Data tidak ditemukan"
 
-  /user_opd_kabupaten:
+  /user-opd-kabupaten:
     get:
       tags:
         - user opd kabupaten
@@ -1796,7 +1796,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /user_opd_kabupaten/{id}:
+  /user-opd-kabupaten/{id}:
     get:
       tags:
         - user opd kabupaten
@@ -1991,7 +1991,7 @@ paths:
                   message:
                     type: string
                     example: "Data tidak ditemukan"
-  /opd_provinsi:
+  /opd-provinsi:
     get:
       tags:
         - opd provinsi
@@ -2111,7 +2111,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /opd_provinsi/{id}:
+  /opd-provinsi/{id}:
     get:
       tags:
         - opd provinsi
@@ -2283,7 +2283,7 @@ paths:
                     type: string
                     example: "Data tidak ditemukan"
 
-  /opd_kabupaten:
+  /opd-kabupaten:
     get:
       tags:
         - opd kabupaten
@@ -2425,7 +2425,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /opd_kabupaten/{id}:
+  /opd-kabupaten/{id}:
     get:
       tags:
         - opd kabupaten
