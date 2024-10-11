@@ -20,7 +20,7 @@ class SektorController extends Controller
     {
         try {
             // Memanggil data dan request PerPage
-            $per_page = $request->perPage ?? 10;
+            $per_page = $request->per_page ?? 10;
             $data = Sektor::orderBy('created_at', 'desc')->paginate($per_page);
 
             // Mengecek apabila terdapat data

@@ -7,10 +7,12 @@ use Shapefile\ShapefileException;
 use Shapefile\ShapefileReader;
 use App\Http\Traits\ApiResponse;
 use App\Models\ArtikelKawasan;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Str;
 use ZipArchive;
 
 class ArtikelKawasanController extends Controller
@@ -198,155 +200,160 @@ class ArtikelKawasanController extends Controller
             'opd_provinsi_id' => 'required|exists:opd_provinsi,id',
         ]);
 
-        // Cari artikel berdasarkan ID
-        $artikel = ArtikelKawasan::findOrFail($id);
+        // Temukan artikel kawasan berdasarkan id
+        $artikelKawasan = ArtikelKawasan::findOrFail($id);
 
         // Inisialisasi variabel tempDir
         $tempDir = null;
 
         try {
-            // Jika file diunggah
-            if ($request->hasFile('shapefile_zip')) {
+            // Jika file geojson diunggah langsung
+            if ($request->file('shapefile_zip') && $request->file('shapefile_zip')->getClientOriginalExtension() === 'geojson') {
                 // Hapus file lama jika ada
-                if ($artikel->file && Storage::exists($artikel->file)) {
-                    Storage::delete($artikel->file);
+                if ($artikelKawasan->file) {
+                    Storage::delete($artikelKawasan->file);
                 }
 
-                // Jika file geojson diunggah langsung
-                if ($request->file('shapefile_zip')->getClientOriginalExtension() === 'geojson') {
-                    $geojsonFile = $request->file('shapefile_zip');
-                    $geojsonFilename = uniqid('geojson_') . '.geojson';
-                    $geojsonPath = 'geojson/' . $geojsonFilename;
-                    Storage::putFileAs('geojson', $geojsonFile, $geojsonFilename);
+                // Simpan file GeoJSON langsung ke penyimpanan
+                $geojsonFile = $request->file('shapefile_zip');
+                $geojsonFilename = uniqid('geojson_') . '.geojson';
+                $geojsonPath = 'geojson/' . $geojsonFilename;
+                Storage::putFileAs('geojson', $geojsonFile, $geojsonFilename);
 
-                    // Update data artikel
-                    $artikel->update([
-                        'judul' => $validate['judul'],
-                        'konten' => $validate['konten'],
-                        'status' => $validate['status'],
-                        'opd_provinsi_id' => $validate['opd_provinsi_id'],
-                        'file' => $geojsonPath,
-                    ]);
+                // Update data artikel kawasan di database
+                $artikelKawasan->update([
+                    'judul' => $validate['judul'],
+                    'konten' => $validate['konten'],
+                    'status' => $validate['status'],
+                    'opd_provinsi_id' => $validate['opd_provinsi_id'],
+                    'file' => $geojsonPath,
+                ]);
 
-                    return $this->successResponse('Artikel Kawasan berhasil diperbarui', 200);
-                }
-
-                // Jika file zip diunggah
-                if ($request->file('shapefile_zip')->getClientOriginalExtension() === 'zip') {
-                    // Buat direktori sementara
-                    $tempDir = storage_path('app/temp/' . uniqid('shapefile_'));
-                    if (!File::exists($tempDir)) {
-                        File::makeDirectory($tempDir, 0755, true);
-                    }
-
-                    // Simpan file zip ke direktori sementara
-                    $zipFile = $request->file('shapefile_zip');
-                    $zipPath = $tempDir . '/' . $zipFile->getClientOriginalName();
-                    $zipFile->move($tempDir, $zipFile->getClientOriginalName());
-
-                    // Ekstrak file zip
-                    $zip = new ZipArchive;
-                    if ($zip->open($zipPath) === TRUE) {
-                        $zip->extractTo($tempDir);
-                        $zip->close();
-                    } else {
-                        return $this->errorResponse('Gagal mengekstrak file zip.', 400);
-                    }
-
-                    // Hapus file zip setelah ekstraksi
-                    unlink($zipPath);
-
-                    // Cari file shapefile (.shp, .shx, .dbf, .prj, .cpg)
-                    $shpPath = $shxPath = $dbfPath = $prjPath = $cpgPath = null;
-
-                    foreach (glob($tempDir . '/*') as $file) {
-                        $extension = pathinfo($file, PATHINFO_EXTENSION);
-                        switch (strtolower($extension)) {
-                            case 'shp':
-                                $shpPath = $file;
-                                break;
-                            case 'shx':
-                                $shxPath = $file;
-                                break;
-                            case 'dbf':
-                                $dbfPath = $file;
-                                break;
-                            case 'prj':
-                                $prjPath = $file;
-                                break;
-                            case 'cpg':
-                                $cpgPath = $file;
-                                break;
-                            default:
-                                Log::info("File tambahan ditemukan: " . $file);
-                                break;
-                        }
-                    }
-
-                    // Validasi file .shp, .shx, dan .dbf
-                    if (!$shpPath || !$shxPath || !$dbfPath) {
-                        return $this->errorResponse('File .shp, .shx, atau .dbf tidak ditemukan.', 400);
-                    }
-
-                    // Inisialisasi ShapefileReader
-                    $shapefile = new ShapefileReader($shpPath, [
-                        'dbf_encoding' => $cpgPath ? trim(file_get_contents($cpgPath)) : 'UTF-8',
-                    ]);
-
-                    // Jika file .prj ada, set proyeksi
-                    if ($prjPath) {
-                        $projection = trim(file_get_contents($prjPath));
-                    }
-
-                    // Konversi ke GeoJSON
-                    $geojson = ['type' => 'FeatureCollection', 'features' => []];
-                    while ($record = $shapefile->fetchRecord()) {
-                        if ($record->isDeleted()) {
-                            continue;
-                        }
-                        $geometry = json_decode($record->getGeoJSON());
-                        $properties = $record->getDataArray();
-
-                        $feature = [
-                            'type' => 'Feature',
-                            'geometry' => $geometry,
-                            'properties' => $properties,
-                        ];
-
-                        $geojson['features'][] = $feature;
-                    }
-
-                    // Pastikan ShapefileReader tidak memegang handle file
-                    unset($shapefile);
-                    gc_collect_cycles();
-
-                    // Simpan GeoJSON
-                    $geojsonFilename = uniqid('geojson_') . '.geojson';
-                    $geojsonPath = 'geojson/' . $geojsonFilename;
-                    Storage::put($geojsonPath, json_encode($geojson, JSON_PRETTY_PRINT));
-
-                    // Update artikel
-                    $artikel->update([
-                        'judul' => $validate['judul'],
-                        'konten' => $validate['konten'],
-                        'status' => $validate['status'],
-                        'opd_provinsi_id' => $validate['opd_provinsi_id'],
-                        'file' => $geojsonPath,
-                    ]);
-
-                    return $this->successResponse('Artikel Kawasan berhasil diperbarui', 200);
-                }
+                return $this->successResponse('Artikel Kawasan berhasil diperbarui', 200);
             }
 
-            // Update data jika tidak ada file baru yang diunggah
-            $artikel->update([
+            // Jika file zip diunggah
+            if ($request->hasFile('shapefile_zip')) {
+                // Hapus file lama jika ada
+                if ($artikelKawasan->file) {
+                    Storage::delete($artikelKawasan->file);
+                }
+
+                // Buat direktori sementara
+                $tempDir = storage_path('app/temp/' . uniqid('shapefile_'));
+                if (!File::exists($tempDir)) {
+                    File::makeDirectory($tempDir, 0755, true);
+                }
+
+                // Simpan file zip ke direktori sementara
+                $zipFile = $request->file('shapefile_zip');
+                $zipPath = $tempDir . '/' . $zipFile->getClientOriginalName();
+                $zipFile->move($tempDir, $zipFile->getClientOriginalName());
+
+                // Ekstrak file zip
+                $zip = new ZipArchive;
+                if ($zip->open($zipPath) === TRUE) {
+                    $zip->extractTo($tempDir);
+                    $zip->close();
+                } else {
+                    return $this->errorResponse('Gagal mengekstrak file zip.', 400);
+                }
+
+                // Hapus file zip setelah ekstraksi
+                unlink($zipPath);
+
+                // Cari file shapefile (.shp, .shx, .dbf, .prj, .cpg)
+                $shpPath = $shxPath = $dbfPath = $prjPath = $cpgPath = null;
+
+                foreach (glob($tempDir . '/*') as $file) {
+                    $extension = pathinfo($file, PATHINFO_EXTENSION);
+                    switch (strtolower($extension)) {
+                        case 'shp':
+                            $shpPath = $file;
+                            break;
+                        case 'shx':
+                            $shxPath = $file;
+                            break;
+                        case 'dbf':
+                            $dbfPath = $file;
+                            break;
+                        case 'prj':
+                            $prjPath = $file;
+                            break;
+                        case 'cpg':
+                            $cpgPath = $file;
+                            break;
+                        default:
+                            Log::info("File tambahan ditemukan: " . $file);
+                            break;
+                    }
+                }
+
+                // Validasi bahwa file .shp, .shx, dan .dbf ada
+                if (!$shpPath || !$shxPath || !$dbfPath) {
+                    return $this->errorResponse('File .shp, .shx, atau .dbf tidak ditemukan.', 400);
+                }
+
+                // Inisialisasi ShapefileReader dengan file .shp
+                $shapefile = new ShapefileReader($shpPath, [
+                    'dbf_encoding' => $cpgPath ? trim(file_get_contents($cpgPath)) : 'UTF-8',
+                ]);
+
+                // Jika file .prj ada, set proyeksi
+                if ($prjPath) {
+                    $projection = trim(file_get_contents($prjPath));
+                }
+
+                // Mulai konversi ke GeoJSON
+                $geojson = ['type' => 'FeatureCollection', 'features' => []];
+
+                while ($record = $shapefile->fetchRecord()) {
+                    if ($record->isDeleted()) {
+                        continue;
+                    }
+
+                    $geometry = json_decode($record->getGeoJSON());
+                    $properties = $record->getDataArray();
+
+                    $feature = [
+                        'type' => 'Feature',
+                        'geometry' => $geometry,
+                        'properties' => $properties,
+                    ];
+
+                    $geojson['features'][] = $feature;
+                }
+
+                // Pastikan ShapefileReader tidak memegang handle file
+                unset($shapefile);
+                gc_collect_cycles(); // Memicu garbage collection
+
+                // Simpan GeoJSON ke penyimpanan
+                $geojsonFilename = uniqid('geojson_') . '.geojson';
+                $geojsonPath = 'geojson/' . $geojsonFilename;
+                Storage::put($geojsonPath, json_encode($geojson, JSON_PRETTY_PRINT));
+
+                // Update artikel kawasan dengan data baru
+                $artikelKawasan->update([
+                    'judul' => $validate['judul'],
+                    'konten' => $validate['konten'],
+                    'status' => $validate['status'],
+                    'opd_provinsi_id' => $validate['opd_provinsi_id'],
+                    'file' => $geojsonPath,
+                ]);
+
+                return $this->successResponse('Artikel Kawasan berhasil diperbarui', 200);
+            }
+
+            // Update data lain jika file tidak diunggah
+            $artikelKawasan->update([
                 'judul' => $validate['judul'],
                 'konten' => $validate['konten'],
                 'status' => $validate['status'],
                 'opd_provinsi_id' => $validate['opd_provinsi_id'],
             ]);
 
-            return $this->successResponse('Artikel Kawasan berhasil diperbarui tanpa file baru', 200);
+            return $this->successResponse('Artikel Kawasan berhasil diperbarui', 200);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal diperbarui', 400);
         } catch (ShapefileException $e) {
@@ -360,8 +367,43 @@ class ArtikelKawasanController extends Controller
             if ($tempDir && File::exists($tempDir)) {
                 if (!File::deleteDirectory($tempDir)) {
                     Log::error("Gagal menghapus direktori sementara: " . $tempDir);
+                } else {
+                    Log::info("Direktori sementara berhasil dihapus: " . $tempDir);
                 }
             }
+        }
+    }
+
+    public function destroy($id)
+    {
+        try {
+            // Cari artikel berdasarkan ID
+            $artikelKawasan = ArtikelKawasan::findOrFail($id);
+
+            // Hapus file yang terkait jika ada
+            if ($artikelKawasan->file) {
+                // Cek apakah file yang disimpan merupakan GeoJSON
+                if (Str::endsWith($artikelKawasan->file, '.geojson')) {
+                    // Hapus file GeoJSON dari penyimpanan
+                    if (Storage::exists($artikelKawasan->file)) {
+                        Storage::delete($artikelKawasan->file);
+                    } else {
+                        Log::warning('File GeoJSON tidak ditemukan: ' . $artikelKawasan->file);
+                    }
+                } else {
+                    Log::warning('Format file tidak dikenali: ' . $artikelKawasan->file);
+                }
+            }
+
+            // Hapus artikel dari database
+            $artikelKawasan->delete();
+
+            return $this->successResponse('Artikel Kawasan berhasil dihapus', 200);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Artikel Kawasan tidak ditemukan', 404);
+        } catch (\Exception $e) {
+            Log::error('Exception: ' . $e->getMessage());
+            return $this->errorResponse('Error: ' . $e->getMessage(), 500);
         }
     }
 

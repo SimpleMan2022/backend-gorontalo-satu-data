@@ -140,9 +140,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
-        // Route::get("", "index");
         Route::post("", "store");
-        Route::patch("/edit/{id}", "update");
+        Route::post("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
     });
 
     Route::prefix('opd-kabupaten')->controller(OpdKabupatenController::class)->group(function () {
@@ -169,7 +169,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
     });
-    
+
     Route::prefix('enumerator-kabupaten')->controller(EnumeratorKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");

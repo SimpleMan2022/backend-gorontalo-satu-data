@@ -233,7 +233,7 @@ class UserSeeder extends Seeder
                 'opd' => [
                     'nama' => 'Dinas Kesehatan Kabupaten Boalemo',
                     'lokasi' => 'KABUPATEN BOALEMO',
-                    
+
                 ],
                 'userOpd' => [
                     'nama' => 'Andi Wirawan',
@@ -251,14 +251,14 @@ class UserSeeder extends Seeder
             ]
         ];
 
-        foreach($opd_kabupaten_data as $data) {
+        foreach ($opd_kabupaten_data as $data) {
             // 1. Buat user
             $user_opd_kabupaten = User::create($data['user']);
             $user_opd_kabupaten->assignRole('opd_kabupaten');
 
             $kabupaten = Kabupaten::where('name', $data['opd']['lokasi'])->first();
 
-            if($kabupaten) {
+            if ($kabupaten) {
                 // 2. Buat opd kabupaten
                 $opd_kabupaten = OpdKabupaten::create([
                     'nama' => $data['opd']['nama'],
@@ -266,7 +266,7 @@ class UserSeeder extends Seeder
                     'kabupaten_id' => $kabupaten->id, // kabupaten_id dari tabel regencies
                     'opd_provinsi_id' => $opd_provinsi->id
                 ]);
-            
+
                 // 3. Buat user_opd_kabupaten dan menghubungkan user dan opd kabupaten
                 UserOpdKabupaten::create([
                     'nama' => $data['userOpd']['nama'],
