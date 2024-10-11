@@ -20,7 +20,7 @@ class SektorController extends Controller
     {
         try {
             // Memanggil data dan request PerPage
-            $per_page = $request->perPage ?? 10;
+            $per_page = $request->per_page ?? 10;
             $data = Sektor::orderBy('created_at', 'desc')->paginate($per_page);
 
             // Mengecek apabila terdapat data
@@ -94,20 +94,19 @@ class SektorController extends Controller
 
             $data = Sektor::find($sektor);
 
-            if($data) {
+            if ($data) {
                 $data->update($req);
                 return $this->successResponseWithData(
                     SektorResource::make($data),
                     'success',
                     Response::HTTP_OK
                 );
-            }else {
+            } else {
                 return $this->errorResponse(
                     'Data tidak ditemukan',
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
             }
-
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
@@ -140,7 +139,8 @@ class SektorController extends Controller
         }
     }
 
-    public function multiDestroy() {
+    public function multiDestroy()
+    {
         try {
             // Menghapus data sektor sesuai request $sektor
             $id = request('id');
