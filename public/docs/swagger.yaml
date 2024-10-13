@@ -116,21 +116,7 @@ paths:
                         type: string
                         example: "admin@example.com"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Unauthenticated"
+          $ref: "#/components/responses/UnauthorizedResponse"
   /auth/logout:
     post:
       tags:
@@ -157,22 +143,7 @@ paths:
                     type: string
                     example: "Logout berhasil"
         "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Unauthenticated"
-
+          $ref: "#/components/responses/UnauthorizedResponse"
   /sektor:
     get:
       tags:
@@ -362,7 +333,7 @@ paths:
                   message:
                     type: string
                     example: "Data tidak ditemukan"
-  /sektor/edit{id}:                  
+  /sektor/edit{id}:
     patch:
       tags:
         - Sektor
@@ -429,7 +400,7 @@ paths:
                   message:
                     type: string
                     example: "Data tidak valid"
-  /sektor/delete{id}:                  
+  /sektor/delete{id}:
     delete:
       tags:
         - Sektor
@@ -692,7 +663,7 @@ paths:
                   message:
                     type: string
                     example: "Data tidak ditemukan"
-  /antar-waktu/delete{id}:                  
+  /antar-waktu/delete{id}:
     delete:
       tags:
         - Antar Waktu
@@ -911,21 +882,7 @@ paths:
                               format: date-time
                               example: 2024-10-08T01:21:16.000000Z
         "401":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+          $ref: "#/components/responses/UnauthorizedResponse"
     post:
       tags:
         - Indikator
@@ -1111,22 +1068,8 @@ paths:
                         format: date-time
                         example: 2024-10-08T01:21:16.000000Z
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /indikator/edit{id}:                  
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /indikator/edit{id}:
     patch:
       tags:
         - Indikator
@@ -1376,21 +1319,7 @@ paths:
                               format: date-time
                               example: "2024-10-07T02:28:11.000000Z"
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+          $ref: "#/components/responses/UnauthorizedResponse"
     post:
       tags:
         - user opd provinsi
@@ -1540,7 +1469,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /user-opd-provinsi/edit/{id}:                  
+  /user-opd-provinsi/edit/{id}:
     patch:
       tags:
         - user opd provinsi
@@ -1596,22 +1525,8 @@ paths:
                     type: string
                     example: "Agen"
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /user-opd-provinsi/delete/{id}:                  
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /user-opd-provinsi/delete/{id}:
     delete:
       tags:
         - user opd provinsi
@@ -1712,21 +1627,7 @@ paths:
                           format: date-time
                           example: "2024-10-07T02:28:11.000000Z"
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+          $ref: "#/components/responses/UnauthorizedResponse"
     post:
       tags:
         - user opd kabupaten
@@ -1876,7 +1777,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /user-opd-kabupaten/edit/{id}:                  
+  /user-opd-kabupaten/edit/{id}:
     patch:
       tags:
         - user opd kabupaten
@@ -1938,22 +1839,8 @@ paths:
                     type: string
                     example: "Kanit"
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /user-opd-kabupaten/delete/{id}:                  
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /user-opd-kabupaten/delete/{id}:
     delete:
       tags:
         - user opd kabupaten
@@ -2008,7 +1895,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Berhasil mendapatkan daftar OPD Provinsi
           content:
             application/json:
@@ -2046,7 +1933,7 @@ paths:
                           type: string
                           format: date-time
                           example: "2024-10-09T12:00:00.000000Z"
-        '401':
+        "401":
           description: Tidak diotorisasi
           content:
             application/json:
@@ -2061,7 +1948,7 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: 
+                    example:
     post:
       tags:
         - opd provinsi
@@ -2103,7 +1990,7 @@ paths:
                     example: "Dinas Pendiidikan"
                   lokasi:
                     type: string
-                    example: "Jl. Pendidikan No. 1"                 
+                    example: "Jl. Pendidikan No. 1"
         "401":
           description: Tidak diotorisasi
           content:
@@ -2186,8 +2073,8 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthorized    
-  /opd-provinsi/edit/{id}:                                
+                    example: Unauthorized
+  /opd-provinsi/edit/{id}:
     patch:
       tags:
         - opd provinsi
@@ -2231,22 +2118,8 @@ paths:
                     type: string
                     example: "Jl. AgusSalim No. 5"
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /opd-provinsi/delete/{id}:                  
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /opd-provinsi/delete/{id}:
     delete:
       tags:
         - opd provinsi
@@ -2302,7 +2175,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Berhasil mendapatkan daftar OPD Kabupaten
           content:
             application/json:
@@ -2350,7 +2223,7 @@ paths:
                           type: array
                         items:
                           type: object
-        '401':
+        "401":
           description: Tidak diotorisasi
           content:
             application/json:
@@ -2365,7 +2238,7 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: 
+                    example:
     post:
       tags:
         - opd kabupaten
@@ -2419,7 +2292,7 @@ paths:
                     example: 7504
                   opd_provinsi_id:
                     type: integer
-                    example: 1                
+                    example: 1
         "401":
           description: Tidak diotorisasi
           content:
@@ -2508,8 +2381,8 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthorized     
-  /opd-kabupaten/edit/{id}:                               
+                    example: Unauthorized
+  /opd-kabupaten/edit/{id}:
     patch:
       tags:
         - opd kabupaten
@@ -2565,22 +2438,8 @@ paths:
                     type: integer
                     example: 2
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /opd-kabupaten/delete/{id}:                  
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /opd-kabupaten/delete/{id}:
     delete:
       tags:
         - opd kabupaten
@@ -2637,7 +2496,7 @@ paths:
         - BearerAuth: []
       description: Mendapatkan data berita acara beserta informasi terkait.
       responses:
-        '200':
+        "200":
           description: Berhasil mendapatkan data berita acara
           content:
             application/json:
@@ -2684,7 +2543,7 @@ paths:
                           type: string
                           format: date-time
                           example: "2024-10-10T04:58:41.000000Z"
-        '401':
+        "401":
           description: Unauthorized - Token tidak valid atau tidak ada
           content:
             application/json:
@@ -2759,7 +2618,7 @@ paths:
                     example: 4
                   Status:
                     type: string
-                    example: "pending"                
+                    example: "pending"
         "401":
           description: Tidak diotorisasi
           content:
@@ -2851,11 +2710,11 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthorized 
-  /berita-acara/edit/{id}:                  
+                    example: Unauthorized
+  /berita-acara/edit/{id}:
     patch:
       tags:
-        - berita acara 
+        - berita acara
       summary: Memperbarui berita acara  yang ada
       security:
         - BearerAuth: []
@@ -2914,22 +2773,8 @@ paths:
                     type: string
                     example: "aprrove"
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /berita-acara/delete/{id}:                  
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /berita-acara/delete/{id}:
     delete:
       tags:
         - berita acara
@@ -2979,93 +2824,93 @@ paths:
 
   /periode:
     get:
-        tags:
+      tags:
         - periode
-        summary: Dapatkan daftar periode
-        security:
-          - BearerAuth: []
-        description: Mendapatkan data periode beserta informasi terkait.
-        responses:
-          '200':
-            description: Berhasil mendapatkan data periode
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    code:
-                      type: integer
-                      example: 200
-                    status:
-                      type: boolean
-                      example: true
-                    message:
-                      type: string
-                      example: "success"
-                    data:
-                      type: object
-                      properties:
-                        pagination:
+      summary: Dapatkan daftar periode
+      security:
+        - BearerAuth: []
+      description: Mendapatkan data periode beserta informasi terkait.
+      responses:
+        "200":
+          description: Berhasil mendapatkan data periode
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: object
+                    properties:
+                      pagination:
+                        type: object
+                        properties:
+                          total:
+                            type: integer
+                            example: 1
+                          per_page:
+                            type: integer
+                            example: 10
+                          current_page:
+                            type: integer
+                            example: 1
+                          total_pages:
+                            type: integer
+                            example: 1
+                      data:
+                        type: array
+                        items:
                           type: object
                           properties:
-                            total:
+                            id:
                               type: integer
                               example: 1
-                            per_page:
-                              type: integer
-                              example: 10
-                            current_page:
+                            nama:
+                              type: string
+                              example: "periode 1"
+                            tanggal_mulai:
+                              type: string
+                              format: date
+                              example: "2024-01-12"
+                            tanggal_selesai:
+                              type: string
+                              format: date
+                              example: "2024-03-15"
+                            opd_provinsi_id:
                               type: integer
                               example: 1
-                            total_pages:
-                              type: integer
-                              example: 1
-                        data:
-                          type: array
-                          items:
-                            type: object
-                            properties:
-                              id:
-                                type: integer
-                                example: 1
-                              nama:
-                                type: string
-                                example: "periode 1"
-                              tanggal_mulai:
-                                type: string
-                                format: date
-                                example: "2024-01-12"
-                              tanggal_selesai:
-                                type: string
-                                format: date
-                                example: "2024-03-15"
-                              opd_provinsi_id:
-                                type: integer
-                                example: 1
-                              created_at:
-                                type: string
-                                format: date-time
-                                example: "2024-10-11T06:09:00.000000Z"
-                              updated_at:
-                                type: string
-                                format: date-time
-                                example: "2024-10-11T06:09:00.000000Z"
-          '401':
-            description: Unauthorized 
-            content:
-              application/json:
-                schema:
-                  type: object
-                  properties:
-                    code:
-                      type: integer
-                      example: 401
-                    status:
-                      type: boolean
-                      example: false
-                    message:
-                      type: string
-                      example: "Unauthorized"
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-11T06:09:00.000000Z"
+                            updated_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-11T06:09:00.000000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 401
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Unauthorized"
     post:
       tags:
         - periode
@@ -3129,7 +2974,7 @@ paths:
                     example: "2024-03-15"
                   opd_provinsi_id:
                     type: integer
-                    example: 4                
+                    example: 4
         "401":
           description: Tidak diotorisasi
           content:
@@ -3159,7 +3004,7 @@ paths:
           required: true
           schema:
             type: integer
-          description: ID dari periode 
+          description: ID dari periode
       responses:
         "200":
           description: Berhasil mendapatkan detail periode
@@ -3221,10 +3066,10 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /periode/edit/{id}:                  
+  /periode/edit/{id}:
     patch:
       tags:
-        - periode 
+        - periode
       summary: Memperbarui periode yang ada
       security:
         - BearerAuth: []
@@ -3278,22 +3123,8 @@ paths:
                     type: integer
                     example: 1
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /periode/delete/{id}:                                    
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /periode/delete/{id}:
     delete:
       tags:
         - periode
@@ -3349,7 +3180,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Berhasil mendapatkan data variabel
           content:
             application/json:
@@ -3457,7 +3288,7 @@ paths:
                               type: string
                               format: date-time
                               example: "2024-10-12T03:32:28.000000Z"
-        '401':
+        "401":
           description: Unauthorized
           content:
             application/json:
@@ -3526,7 +3357,7 @@ paths:
                     example: "fasilitas rumah sakit"
                   tipe:
                     type: string
-                    example: "string"               
+                    example: "string"
         "401":
           description: Tidak diotorisasi
           content:
@@ -3551,7 +3382,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Berhasil mendapatkan data variabel berdasarkan id indikator
           content:
             application/json:
@@ -3659,7 +3490,7 @@ paths:
                               type: string
                               format: date-time
                               example: "2024-10-12T03:32:28.000000Z"
-        '401':
+        "401":
           description: Unauthorized
           content:
             application/json:
@@ -3675,7 +3506,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /variabel/{id}:                  
+  /variabel/{id}:
     get:
       tags:
         - variabel
@@ -3748,11 +3579,11 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: Unauthorized  
-  /variabel/edit{id}:                  
+                    example: Unauthorized
+  /variabel/edit{id}:
     patch:
       tags:
-        - variabel 
+        - variabel
       summary: Memperbarui variabel yang ada
       security:
         - BearerAuth: []
@@ -3765,7 +3596,7 @@ paths:
               properties:
                 indikator_id:
                   type: integer
-                  example:  2
+                  example: 2
                 nama:
                   type: string
                   example: "kualitas layanan"
@@ -3791,7 +3622,7 @@ paths:
                     example: true
                   indikator_id:
                     type: integer
-                    example:  1
+                    example: 1
                   nama:
                     type: string
                     example: "kualitas layanan"
@@ -3802,25 +3633,11 @@ paths:
                     type: integer
                     example: 0
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized 
+          $ref: "#/components/responses/UnauthorizedResponse"
   /variabel/tukar-posisi/{id}:
     patch:
       tags:
-        - variabel 
+        - variabel
       summary: Memperbarui variabel dengan menukar posisi
       security:
         - BearerAuth: []
@@ -3833,7 +3650,7 @@ paths:
               properties:
                 indikator_id:
                   type: integer
-                  example:  2
+                  example: 2
                 nama:
                   type: string
                   example: "kualitas layanan"
@@ -3862,7 +3679,7 @@ paths:
                     example: Data berhasil diperbarui
                   indikator_id:
                     type: integer
-                    example:  1
+                    example: 1
                   nama:
                     type: string
                     example: "kualitas layanan"
@@ -3873,22 +3690,8 @@ paths:
                     type: integer
                     example: 0
         "401":
-          description: Bad request
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized                     
-  /variabel/delete/{id}:                                       
+          $ref: "#/components/responses/UnauthorizedResponse"
+  /variabel/delete/{id}:
     delete:
       tags:
         - variabel
@@ -3944,7 +3747,7 @@ paths:
       security:
         - BearerAuth: []
       responses:
-        '200':
+        "200":
           description: Berhasil mendapatkan data subjek
           content:
             application/json:
@@ -3997,7 +3800,7 @@ paths:
                               type: string
                               format: date-time
                               example: "2024-10-13T00:33:23.000000Z"
-        '401':
+        "401":
           description: Unauthorized
           content:
             application/json:
@@ -4060,7 +3863,7 @@ paths:
                     example: 4
                   nama:
                     type: string
-                    example: menurut usia 1-5 bulan              
+                    example: menurut usia 1-5 bulan
         "401":
           description: Tidak diotorisasi
           content:
@@ -4077,7 +3880,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /subjek/multi-store:                  
+  /subjek/multi-store:
     post:
       tags:
         - subjek
@@ -4112,7 +3915,7 @@ paths:
                     nama:
                       type: string
                       example: menurut usia 6-12 bulan
-                 
+
       responses:
         "201":
           description: subjek berhasil ditambahkan
@@ -4147,7 +3950,7 @@ paths:
                         example: 4
                       nama:
                         type: string
-                        example: menurut usia 6-12 bulan              
+                        example: menurut usia 6-12 bulan
         "401":
           description: Tidak diotorisasi
           content:
@@ -4164,7 +3967,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /subjek/{id}:                  
+  /subjek/{id}:
     get:
       tags:
         - subjek
@@ -4210,9 +4013,9 @@ paths:
                         format: date-time
                         example: "2024-10-13T00:33:23.000000Z"
                       updated_at:
-                         type: string
-                         format: date-time
-                         example: "2024-10-13T00:33:23.000000Z"
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
         "401":
           description: Tidak diotorisasi
           content:
@@ -4229,7 +4032,7 @@ paths:
                   message:
                     type: string
                     example: Unauthorized
-  /subjek/delete/{id}:                                       
+  /subjek/delete/{id}:
     delete:
       tags:
         - subjek
@@ -4275,10 +4078,28 @@ paths:
                     example: false
                   message:
                     type: string
-                    example: "Data tidak ditemukan"                                    
+                    example: "Data tidak ditemukan"
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
+
+  responses:
+    UnauthorizedResponse:
+      description: Unauthorized
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              code:
+                type: number
+                example: 401
+              status:
+                type: boolean
+                example: false
+              message:
+                type: string
+                example: "Unauthenticated"

@@ -14,23 +14,6 @@ class AuthController extends Controller
 {
   use ApiResponse;
 
-  public function create(Request $request)
-  {
-    // $validated = $request->validated();
-    $validated = $request->validate([
-      'username' => 'required',
-      'email' => 'required',
-      'password' => 'required',
-    ]);
-    $validated['password'] = Hash::make($validated['password']);
-    $user = User::create($validated);
-    return $this->successResponseWithData(
-      $user,
-      'success',
-      Response::HTTP_OK
-    );
-  }
-
   public function login(Request $request)
   {
     try {
@@ -47,7 +30,7 @@ class AuthController extends Controller
 
       return $this->successResponseWithData(
         $data,
-        'success',
+        'Login berhasil',
         Response::HTTP_OK
       );
     } catch (Exception $e) {
@@ -61,7 +44,7 @@ class AuthController extends Controller
     // return $request->user();
     return $this->successResponseWithData(
       $request->user(),
-      'success',
+      'Data pengguna berhasil diambil',
       Response::HTTP_OK
     );
   }
@@ -71,7 +54,7 @@ class AuthController extends Controller
     $request->user()->tokens()->delete();
 
     return $this->successResponse(
-      'success',
+      'Logout berhasil',
       Response::HTTP_OK
     );
   }
