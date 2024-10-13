@@ -28,13 +28,13 @@ class SektorController extends Controller
                 return $this->successResponseWithDataIndex(
                     $data,
                     SektorResource::collection($data),
-                    'success',
+                    'Data sektor berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
                 return $this->errorResponse(
                     'Data masih kosong',
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    Response::HTTP_NOT_FOUND
                 );
             }
         } catch (Exception $e) {
@@ -47,14 +47,16 @@ class SektorController extends Controller
         try {
             // Membuat validasi
             $req = $request->validate([
-                'nama' => 'required'
+                'nama' => 'required|min:3'
             ]);
 
-            $sektor = Sektor::create($req);
-            return $this->successResponseWithData($sektor, 'Data berhasil dibuat', Response::HTTP_CREATED);
+            Sektor::create($req);
+            return $this->successResponse(
+                'Data sektor berhasil dibuat',
+                Response::HTTP_CREATED
+            );
         } catch (ValidationException $e) {
-            // Handle validation errors
-            return $this->errorResponse($e->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
+            return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -70,13 +72,13 @@ class SektorController extends Controller
             if ($data) {
                 return $this->successResponseWithData(
                     SektorResource::make($data),
-                    'success',
+                    'Data sektor berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
                 return $this->errorResponse(
                     'Data tidak ditemukan',
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    Response::HTTP_NOT_FOUND
                 );
             }
         } catch (Exception $e) {
@@ -96,15 +98,14 @@ class SektorController extends Controller
 
             if ($data) {
                 $data->update($req);
-                return $this->successResponseWithData(
-                    SektorResource::make($data),
-                    'success',
+                return $this->successResponse(
+                    'Data sektor berhasil diubah',
                     Response::HTTP_OK
                 );
             } else {
                 return $this->errorResponse(
                     'Data tidak ditemukan',
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    Response::HTTP_NOT_FOUND
                 );
             }
         } catch (ModelNotFoundException $e) {
@@ -129,11 +130,11 @@ class SektorController extends Controller
             } else {
                 return $this->errorResponse(
                     'Data tidak ditemukan',
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    Response::HTTP_NOT_FOUND
                 );
             }
 
-            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
+            return $this->successResponse('Data sektor berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -142,14 +143,20 @@ class SektorController extends Controller
     public function multiDestroy()
     {
         try {
-            // Menghapus data sektor sesuai request $sektor
             $id = request('id');
             $ids = explode(",", $id);
-            $sekor = Sektor::whereIn('id', $ids)->delete();
 
-            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
-        } catch (ModelNotFoundException $e) {
-            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+            $sektors = Sektor::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $sektors);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            Sektor::whereIn('id', $sektors)->delete();
+
+            return $this->successResponse('Data sektor berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

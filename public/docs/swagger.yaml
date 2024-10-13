@@ -61,23 +61,13 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 400
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Login Gagal"
-                  data:
-                    type: object
-                    properties:
-                      username:
-                        type: string
-                        example: "The username field is required"
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /auth/me:
     get:
       tags:
@@ -116,7 +106,11 @@ paths:
                         type: string
                         example: "admin@example.com"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /auth/logout:
     post:
       tags:
@@ -143,7 +137,11 @@ paths:
                     type: string
                     example: "Logout berhasil"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /sektor:
     get:
       tags:
@@ -168,25 +166,12 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "success"
+                    example: "Data sektor berhasil diambil"
                   data:
                     type: object
                     properties:
                       pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: number
-                            example: 1
-                          per_page:
-                            type: number
-                            example: 10
-                          current_page:
-                            type: number
-                            example: 1
-                          total_pages:
-                            type: number
-                            example: 1
+                        $ref: "#/components/schemas/Pagination"
                       data:
                         type: array
                         items:
@@ -201,22 +186,18 @@ paths:
                             created_at:
                               type: string
                               example: "07 October 2024"
-        "500":
-          description: Bad Request
+        "404":
+          description: Data sektor masih kosong
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 400
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data masih kosong"
+                $ref: "#/components/schemas/DataNotFoundResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
     post:
       tags:
         - Sektor
@@ -250,32 +231,19 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "data berhasil dibuat"
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 1
-                      nama:
-                        type: string
-                        example: "Pendidikan"
+                    example: "data sektor berhasil dibuat"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 400
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data tidak ditemukan"
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /sektor/{id}:
     get:
       tags:
@@ -307,7 +275,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "succes"
+                    example: "Data sektor berhasil diambil"
                   data:
                     type: object
                     properties:
@@ -317,22 +285,18 @@ paths:
                       nama:
                         type: string
                         example: "Pendidikan"
-        "404":
-          description: Sektor tidak ditemukan
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 404
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data tidak ditemukan"
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /sektor/edit{id}:
     patch:
       tags:
@@ -360,7 +324,7 @@ paths:
                   example: "Infrastruktur"
       responses:
         "200":
-          description: Sektor berhasil diperbarui
+          description: Data sektor berhasil diubah
           content:
             application/json:
               schema:
@@ -374,32 +338,25 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data berhasil diperbarui"
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 1
-                      nama:
-                        type: string
-                        example: "Infrastruktur"
+                    example: "Data sektor berhasil diubah"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 400
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data tidak valid"
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /sektor/delete{id}:
     delete:
       tags:
@@ -431,9 +388,37 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data berhasil dihapus"
+                    example: "Data sektor berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
         "404":
-          description: Sektor tidak ditemukan
+          description: Data sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /sektor/multi-delete?id={id},{id}:
+    delete:
+      tags:
+        - Sektor
+      summary: Menghapus banyak sektor
+      description: API untuk menghapus banyak sektor berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1,2
+      responses:
+        "200":
+          description: Sektor berhasil dihapus
           content:
             application/json:
               schema:
@@ -441,14 +426,25 @@ paths:
                 properties:
                   code:
                     type: number
-                    example: 404
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Unauthenticated"
-
+                    example: "Data sektor berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /antar-waktu:
     get:
       tags:
@@ -4080,26 +4076,97 @@ paths:
                     type: string
                     example: "Data tidak ditemukan"
 components:
+  schemas:
+    Pagination:
+      type: object
+      properties:
+        total:
+          type: number
+          example: 1
+        per_page:
+          type: number
+          example: 10
+        current_page:
+          type: number
+          example: 1
+        total_pages:
+          type: number
+          example: 1
+
+    UnauthorizedResponse:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 401
+        status:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Akses tidak diizinkan. Silakan masuk terlebih dahulu."
+
+    EmptyDataResponse:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 404
+        status:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Data masih kosong"
+
+    DataNotFoundResponse:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 404
+        status:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Data tidak ditemukan"
+
+    MultiDataNotFoundResponse:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 404
+        status:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Data dengan ID berikut tidak ditemukan: 6, 4"
+
+    BadRequestResponse:
+      type: object
+      properties:
+        code:
+          type: number
+          example: 400
+        status:
+          type: boolean
+          example: false
+        message:
+          type: string
+          example: "Data gagal dibuat"
+        errors:
+          type: object
+          additionalProperties:
+            type: array
+            items:
+              type: string
+              example: "The nama field must be at least 3 characters."
+
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
       bearerFormat: JWT
-
-  responses:
-    UnauthorizedResponse:
-      description: Unauthorized
-      content:
-        application/json:
-          schema:
-            type: object
-            properties:
-              code:
-                type: number
-                example: 401
-              status:
-                type: boolean
-                example: false
-              message:
-                type: string
-                example: "Unauthenticated"
