@@ -27,11 +27,10 @@ Route::prefix("auth")->controller(AuthController::class)->group(function () {
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-
     // Auth Route
     Route::controller(AuthController::class)->group(function () {
-        Route::get("me", "getUser");
-        Route::post("logout", "logout");
+        Route::get("auth/me", "getUser");
+        Route::post("auth/logout", "logout");
     });
 
     // Sektor Route
