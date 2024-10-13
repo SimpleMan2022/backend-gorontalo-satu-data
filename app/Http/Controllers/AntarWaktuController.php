@@ -55,7 +55,7 @@ class AntarWaktuController extends Controller
                 'nama' => 'required'
             ]);
             $antar_waktu->update($validated);
-            return $this->successResponse('Data sektor berhasil diubah', Response::HTTP_OK);
+            return $this->successResponse('Data antar waktu berhasil diubah', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {

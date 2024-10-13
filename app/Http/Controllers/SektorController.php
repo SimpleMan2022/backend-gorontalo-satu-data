@@ -16,7 +16,7 @@ class SektorController extends Controller
     // Memanggil Traits Api Response
     use ApiResponse;
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             // Memanggil data dan request PerPage

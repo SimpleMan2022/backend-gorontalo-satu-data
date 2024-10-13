@@ -150,6 +150,9 @@ paths:
       description: API untuk mendapatkan semua data sektor
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
       responses:
         "200":
           description: Detail sektor berhasil diambil
@@ -453,6 +456,9 @@ paths:
       description: API untuk mendapatkan semua data antar waktu
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
       responses:
         "200":
           description: Detail antar waktu berhasil diambil
@@ -474,20 +480,7 @@ paths:
                     type: object
                     properties:
                       pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: number
-                            example: 1
-                          per_page:
-                            type: number
-                            example: 10
-                          current_page:
-                            type: number
-                            example: 1
-                          total_pages:
-                            type: number
-                            example: 1
+                        $ref: "#/components/schemas/Pagination"
                       data:
                         type: array
                         items:
@@ -505,22 +498,18 @@ paths:
                             created_at:
                               type: string
                               example: "07 October 2024"
-        "500":
+        "401":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 400
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data masih kosong"
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data antar waktu masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
         - Antar Waktu
@@ -557,35 +546,19 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "data berhasil dibuat"
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 1
-                      tahun:
-                        type: string
-                        example: "2024"
-                      nama:
-                        type: string
-                        example: "Triwulan 1"
+                    example: "data antar waktu berhasil dibuat"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 400
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data tidak ditemukan"
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /antar-waktu/edit{id}:
     patch:
       tags:
@@ -630,35 +603,25 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data berhasil diperbarui"
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 1
-                      tahun:
-                        type: string
-                        example: "2024"
-                      nama:
-                        type: string
-                        example: "Triwulan 2"
+                    example: "Data antar waktu berhasil diubah"
         "400":
           description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 400
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data tidak ditemukan"
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data antar waktu tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /antar-waktu/delete{id}:
     delete:
       tags:
@@ -690,24 +653,20 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data berhasil dihapus"
-        "404":
-          description: Antar waktu tidak ditemukan
+                    example: "Data antar waktu berhasil dihapus"
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 404
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data tidak ditemukan"
-  /antarwaktu/multi-delete?{id},{id}:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data antar waktu tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /antarwaktu/multi-delete?id={id},{id}:
     delete:
       tags:
         - Antar Waktu
@@ -721,7 +680,7 @@ paths:
           required: true
           schema:
             type: integer
-            example: 1
+            example: 1,2
       responses:
         "200":
           description: Antar waktu berhasil dihapus
@@ -738,24 +697,19 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data berhasil dihapus"
-        "404":
-          description: Antar waktu tidak ditemukan
+                    example: "Data antar waktu berhasil dihapus"
+        "401":
+          description: Unauthorized
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 404
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data tidak ditemukan"
-
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data antar waktu tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /indikator:
     get:
       tags:
@@ -763,6 +717,9 @@ paths:
       summary: Mendapatkan daftar indikator
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
       responses:
         "200":
           description: Berhasil mendapatkan daftar indikator
@@ -4164,6 +4121,26 @@ components:
             items:
               type: string
               example: "The nama field must be at least 3 characters."
+
+  parameters:
+    PageParam:
+      name: page
+      in: query
+      description: Halaman yang akan diambil
+      required: false
+      schema:
+        type: integer
+        default: 1
+        example: 1
+    PerPageParam:
+      name: per_page
+      in: query
+      description: Jumlah data per halaman
+      required: false
+      schema:
+        type: integer
+        default: 10
+        example: 10
 
   securitySchemes:
     BearerAuth:
