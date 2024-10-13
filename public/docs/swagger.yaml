@@ -720,6 +720,27 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - name: sektor_id
+          in: query
+          description: Filter berdasarkan ID sektor
+          required: false
+          schema:
+            type: integer
+            example: 9
+        - name: opd_provinsi_id
+          in: query
+          description: Filter berdasarkan ID OPD Provinsi
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: antar_waktu_id
+          in: query
+          description: Filter berdasarkan ID Antar Waktu
+          required: false
+          schema:
+            type: integer
+            example: 6
       responses:
         "200":
           description: Berhasil mendapatkan daftar indikator
@@ -736,25 +757,12 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: "Data indikator berhasil diambil"
                   data:
                     type: object
                     properties:
                       pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 1
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 1
-                          total_pages:
-                            type: integer
-                            example: 1
+                        $ref: "#/components/schemas/Pagination"
                       data:
                         type: array
                         items:
@@ -762,80 +770,67 @@ paths:
                           properties:
                             id:
                               type: integer
-                              example: 4
+                              example: 7
                             nama:
                               type: string
-                              example: Agregat sebaran fasilitas kesehatan negeri
-                            sektor_id:
+                              example: "Sebaran Jumlah Rumah Sakit dengan kondisi bangunan sedang"
+                            sektor:
                               type: object
                               properties:
                                 id:
                                   type: integer
-                                  example: 3
+                                  example: 9
                                 nama:
                                   type: string
-                                  example: kesehatan
-                                created_at:
-                                  type: string
-                                  format: date-time
-                                  example: 2024-10-08T01:12:51.000000Z
-                                updated_at:
-                                  type: string
-                                  format: date-time
-                                  example: 2024-10-08T01:12:51.000000Z
-                            antar_waktu_id:
+                                  example: "kesehatan"
+                            antar_waktu:
                               type: object
                               properties:
                                 id:
                                   type: integer
-                                  example: 3
+                                  example: 6
                                 tahun:
                                   type: string
-                                  example: 2025
+                                  example: "2022"
                                 nama:
                                   type: string
-                                  example: Triwulan
-                                created_at:
-                                  type: string
-                                  format: date-time
-                                  example: 2024-10-08T01:12:26.000000Z
-                                updated_at:
-                                  type: string
-                                  format: date-time
-                                  example: 2024-10-08T01:12:26.000000Z
-                            opd_provinsi_id:
+                                  example: "Triwulan 5"
+                            opd_provinsi:
                               type: object
                               properties:
                                 id:
                                   type: integer
-                                  example: 2
+                                  example: 1
                                 nama:
                                   type: string
-                                  example: Dinas Kesehatan
+                                  example: "Dinas Pendidikan"
                                 lokasi:
                                   type: string
-                                  example: Jl. Kesehatan No. 1
-                                created_at:
-                                  type: string
-                                  format: date-time
-                                  example: 2024-10-07T02:28:10.000000Z
-                                updated_at:
-                                  type: string
-                                  format: date-time
-                                  example: 2024-10-07T02:28:10.000000Z
+                                  example: "Jl. Pendidikan No. 1"
                             status:
                               type: string
-                              example: public
+                              example: "pending"
                             created_at:
                               type: string
                               format: date-time
-                              example: 2024-10-08T01:21:16.000000Z
+                              example: "2024-10-13T12:30:11.000000Z"
                             updated_at:
                               type: string
                               format: date-time
-                              example: 2024-10-08T01:21:16.000000Z
+                              example: "2024-10-13T12:30:11.000000Z"
+
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data indikator masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
         - Indikator
@@ -880,38 +875,19 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "data berhasil dibuat"
-                  nama:
-                    type: string
-                    example: Agregat sebaran fasilitas kesehatan negeri
-                  sektor_id:
-                    type: integer
-                    example: 3
-                  antar_waktu_id:
-                    type: integer
-                    example: 3
-                  opd_provinsi_id:
-                    type: integer
-                    example: 2
-                  statuss:
-                    type: string
-                    example: public
-        "401":
-          description: Tidak diotorisasi
+                    example: "Data indikator berhasil dibuat"
+        "400":
+          description: Bad Request
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /indikator/{id}:
     get:
       tags:
@@ -942,86 +918,72 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data indikator berhasil diambil
                   data:
                     type: object
                     properties:
                       id:
                         type: integer
-                        example: 4
+                        example: 7
                       nama:
                         type: string
-                        example: Agregat sebaran fasilitas kesehatan negeri
-                      sektor_id:
+                        example: "Sebaran Jumlah Rumah Sakit dengan kondisi bangunan sedang"
+                      sektor:
                         type: object
                         properties:
                           id:
                             type: integer
-                            example: 3
+                            example: 9
                           nama:
                             type: string
-                            example: kesehatan
-                          created_at:
-                            type: string
-                            format: date-time
-                            example: 2024-10-08T01:12:51.000000Z
-                          updated_at:
-                            type: string
-                            format: date-time
-                            example: 2024-10-08T01:12:51.000000Z
-                      antar_waktu_id:
+                            example: "kesehatan"
+                      antar_waktu:
                         type: object
                         properties:
                           id:
                             type: integer
-                            example: 3
+                            example: 6
                           tahun:
                             type: string
-                            example: 2025
+                            example: "2022"
                           nama:
                             type: string
-                            example: Triwulan
-                          created_at:
-                            type: string
-                            format: date-time
-                            example: 2024-10-08T01:12:26.000000Z
-                          updated_at:
-                            type: string
-                            format: date-time
-                            example: 2024-10-08T01:12:26.000000Z
-                      opd_provinsi_id:
+                            example: "Triwulan 5"
+                      opd_provinsi:
                         type: object
                         properties:
                           id:
                             type: integer
-                            example: 2
+                            example: 1
                           nama:
                             type: string
-                            example: Dinas Kesehatan
+                            example: "Dinas Pendidikan"
                           lokasi:
                             type: string
-                            example: Jl. Kesehatan No. 1
-                          created_at:
-                            type: string
-                            format: date-time
-                            example: 2024-10-07T02:28:10.000000Z
-                          updated_at:
-                            type: string
-                            format: date-time
-                            example: 2024-10-07T02:28:10.000000Z
+                            example: "Jl. Pendidikan No. 1"
                       status:
                         type: string
-                        example: public
+                        example: "pending"
                       created_at:
                         type: string
                         format: date-time
-                        example: 2024-10-08T01:21:16.000000Z
+                        example: "2024-10-13T12:30:11.000000Z"
                       updated_at:
                         type: string
                         format: date-time
-                        example: 2024-10-08T01:21:16.000000Z
+                        example: "2024-10-13T12:30:11.000000Z"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /indikator/edit{id}:
     patch:
       tags:
@@ -1074,30 +1036,52 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data berhasil diperbarui"
-                  data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 1
-                      nama:
-                        type: string
-                        example: "Sebaran jumlah penduduk perempuan"
-                      sektor_id:
-                        type: integer
-                        example: 1
-                      antar_waktu_id:
-                        type: integer
-                        example: 1
-                      opd_provinsi_id:
-                        type: integer
-                        example: 1
-                      status:
-                        type: string
-                        example: "pending"
-        "401":
+                    example: "Data berhasil diubah"
+        "400":
           description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /indikator/{id}/status:
+    patch:
+      tags:
+        - Indikator
+      summary: Memperbarui status indikator berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari indikator yang akan diperbarui
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "public"
+      responses:
+        "200":
+          description: Stats indikator berhasil diubah
           content:
             application/json:
               schema:
@@ -1105,14 +1089,32 @@ paths:
                 properties:
                   code:
                     type: number
-                    example: 400
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Data tidak ditemukan"
-  /indikator/delete{id}:
+                    example: "Data berhasil diubah"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /indikator/delete/{id}:
     delete:
       tags:
         - Indikator
@@ -1144,22 +1146,18 @@ paths:
                     type: string
                     example: "Data berhasil dihapus"
         "401":
-          description: Bad Request
+          description: Unauthorized
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 404
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data tidak ditemukan"
-  /indikator/delete-multi:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /indikator/multi-delete?id={id},{id}:
     delete:
       tags:
         - Indikator
@@ -1184,21 +1182,17 @@ paths:
                     type: string
                     example: "Data berhasil dihapus"
         "401":
-          description: Bad Request
+          description: Unauthorized
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 404
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Data tidak ditemukan"
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
 
   paths:
   /user-opd-provinsi:

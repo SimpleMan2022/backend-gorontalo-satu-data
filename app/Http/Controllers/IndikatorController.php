@@ -19,7 +19,22 @@ class IndikatorController extends Controller
     {
         try {
             $perPage = $request->per_page ?? 10;
-            $data = Indikator::orderBy('created_at', 'desc')->paginate($perPage);
+
+            $indikatorQuery = Indikator::orderBy('created_at', 'desc');
+
+            if ($sektorId = $request->query('sektor_id')) {
+                $indikatorQuery->where('sektor_id', $sektorId);
+            }
+
+            if ($antarWaktuId = $request->query('antar_waktu_id')) {
+                $indikatorQuery->where('antar_waktu_id', $antarWaktuId);
+            }
+
+            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
+                $indikatorQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+
+            $data = $indikatorQuery->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
