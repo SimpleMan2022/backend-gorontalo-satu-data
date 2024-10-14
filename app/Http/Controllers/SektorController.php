@@ -16,11 +16,11 @@ class SektorController extends Controller
     // Memanggil Traits Api Response
     use ApiResponse;
 
-    public function index()
+    public function index(Request $request)
     {
         try {
             // Memanggil data dan request PerPage
-            $per_page = $request->perPage ?? 10;
+            $per_page = $request->per_page ?? 10;
             $data = Sektor::orderBy('created_at', 'desc')->paginate($per_page);
 
             // Mengecek apabila terdapat data
