@@ -36,6 +36,31 @@ class PeriodeController extends Controller
         }
     }
 
+    public function aktif()
+    {
+        try {
+            $now = date('Y-m-d');
+            $periode = Periode::where('tanggal_mulai', '<=', $now)
+                ->where('tanggal_selesai', '>=', $now)
+                ->first();
+
+            if (Periode::where('tanggal_mulai', '=', $now)
+                ->where('tanggal_selesai', '=', $now)
+                ->exists()) {
+                return $this->errorResponse('Terdapat periode yang memiliki tanggal mulai dan tanggal selesai yang sama', Response::HTTP_CONFLICT);
+            }
+            
+
+            if ($periode) {
+                return $this->successResponseWithData(PeriodeResource::make($periode), 'Data periode yang sedang aktif', Response::HTTP_OK);
+            } else {
+                return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function show($id)
     {
         try {
