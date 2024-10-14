@@ -34,4 +34,19 @@ class Enumerator extends Model
     public function pivot_enumerator_indikator() {
         return $this->hasMany(PivotEnumeratorIndikator::class);
     }
+
+    
+    protected $appends = ['enumerator_level'];
+
+    public function getEnumeratorLevelAttribute() {
+        if ($this->enumerator_provinsi->isNotEmpty()) {
+            return 'provinsi';
+        }
+
+        if ($this->enumerator_kabupaten->isNotEmpty()) {
+            return 'kabupaten';
+        }
+
+        return null;
+    }
 }

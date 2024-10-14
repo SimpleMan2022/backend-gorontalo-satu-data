@@ -17,8 +17,8 @@ use App\Http\Controllers\IndikatorController;
 use App\Http\Controllers\VariabelController;
 use App\Http\Controllers\SubjekController;
 use App\Http\Controllers\PivotOpdSektorController;
+use App\Http\Controllers\HasilDataController;
 use App\Http\Controllers\PivotEnumeratorIndikatorController;
-use App\Models\BeritaAcara;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
@@ -71,6 +71,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // Periode
     Route::prefix('periode')->controller(PeriodeController::class)->group(function () {
         Route::get("", "index");
+        Route::get("/aktif", "aktif");
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
@@ -195,6 +196,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
     });
+
+    Route::prefix('hasil-data')->controller(HasilDataController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+
 });
 
 Route::get('/docs', function () {

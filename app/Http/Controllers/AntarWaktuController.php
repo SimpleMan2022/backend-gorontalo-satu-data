@@ -32,7 +32,7 @@ class AntarWaktuController extends Controller
     {
         try {
             $validated = $request->validate([
-                'tahun' => 'required|numeric|digits:4|unique:antar_waktu',
+                'tahun' => 'required|numeric|digits:4',
                 'nama' => 'required'
             ]);
             AntarWaktu::create($validated);
