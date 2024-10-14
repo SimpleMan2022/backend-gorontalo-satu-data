@@ -39,13 +39,13 @@ trait ApiResponse
         self::$response1['data'] = $data;
         return response()->json(self::$response1, self::$response1['code']);
     }
-    public static function errorResponseWithData($data = null, $message = null, $code = 400)
+    public static function errorResponseWithData($errors = null, $message = null, $code = 400)
     {
-        self::$response1['code'] = $code;
-        self::$response1['status'] = false;
-        self::$response1['message'] = $message;
-        self::$response1['data'] = $data;
-        return response()->json(self::$response1, self::$response1['code']);
+        self::$response2['code'] = $code;
+        self::$response2['status'] = false;
+        self::$response2['message'] = $message;
+        self::$response2['errors'] = $errors;
+        return response()->json(self::$response2, self::$response2['code']);
     }
     public static function successResponse($message = null, $code = 200)
     {

@@ -19,7 +19,7 @@ class OpdKabupatenController extends Controller
             $perPage = $request->per_page ?? 10;
             $data = OpdKabupaten::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData(
+                return $this->successResponseWithDataIndex(
                     $data,
                     OpdKabupatenResource::collection($data),
                     'success', 
@@ -41,7 +41,7 @@ class OpdKabupatenController extends Controller
             $perPage = $request->per_page ?? 10;
             $data = OpdKabupaten::where('opd_provinsi_id',$opd_provinsi)->orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData(
+                return $this->successResponseWithDataIndex(
                     $data,
                     OpdKabupatenResource::collection($data),
                     'success', 

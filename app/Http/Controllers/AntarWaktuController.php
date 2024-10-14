@@ -21,9 +21,7 @@ class AntarWaktuController extends Controller
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithData($data, 'success', Response::HTTP_OK);
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -38,7 +36,7 @@ class AntarWaktuController extends Controller
                 'nama' => 'required'
             ]);
             AntarWaktu::create($validated);
-            return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
+            return $this->successResponse('Data antar waktu berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
@@ -57,7 +55,7 @@ class AntarWaktuController extends Controller
                 'nama' => 'required'
             ]);
             $antar_waktu->update($validated);
-            return $this->successResponse('Data berhasil diubah', Response::HTTP_OK);
+            return $this->successResponse('Data antar waktu berhasil diubah', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
@@ -72,7 +70,7 @@ class AntarWaktuController extends Controller
         try {
             $antar_waktu = AntarWaktu::findOrFail($id);
             $antar_waktu->delete();
-            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
+            return $this->successResponse('Data antar waktu berhasil dihapus', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (Exception $e) {
@@ -80,16 +78,23 @@ class AntarWaktuController extends Controller
         }
     }
 
-    public function multiDestroy() {
+    public function multiDestroy()
+    {
         try {
-            // Menghapus data sektor sesuai request $sektor
             $id = request('id');
             $ids = explode(",", $id);
-            $antar_waktu = AntarWaktu::whereIn('id', $ids)->delete();
 
-            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
-        } catch (ModelNotFoundException $e) {
-            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+            $antar_waktu = AntarWaktu::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $antar_waktu);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            AntarWaktu::whereIn('id', $antar_waktu)->delete();
+
+            return $this->successResponse('Data antar waktu berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

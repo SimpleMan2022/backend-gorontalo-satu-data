@@ -15,21 +15,35 @@ class IndikatorController extends Controller
 {
     use ApiResponse;
 
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         try {
             $perPage = $request->per_page ?? 10;
-            $data = Indikator::orderBy('created_at', 'desc')->paginate($perPage);
+
+            $indikatorQuery = Indikator::orderBy('created_at', 'desc');
+
+            if ($sektorId = $request->query('sektor_id')) {
+                $indikatorQuery->where('sektor_id', $sektorId);
+            }
+
+            if ($antarWaktuId = $request->query('antar_waktu_id')) {
+                $indikatorQuery->where('antar_waktu_id', $antarWaktuId);
+            }
+
+            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
+                $indikatorQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+
+            $data = $indikatorQuery->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
                     IndikatorResource::collection($data),
-                    'success',
+                    'Data indikator berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -45,13 +59,11 @@ class IndikatorController extends Controller
                 return $this->successResponseWithDataIndex(
                     $data,
                     IndikatorResource::collection($data),
-                    'success',
+                    'Data indikator berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -68,13 +80,11 @@ class IndikatorController extends Controller
                 return $this->successResponseWithDataIndex(
                     $data,
                     IndikatorResource::collection($data),
-                    'success',
+                    'Data indikator berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -91,13 +101,11 @@ class IndikatorController extends Controller
                 return $this->successResponseWithDataIndex(
                     $data,
                     IndikatorResource::collection($data),
-                    'success',
+                    'Data indikator berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -115,9 +123,9 @@ class IndikatorController extends Controller
                 'status' => 'required',
             ]);
 
-            $indikator = Indikator::create($validated);
+            Indikator::create($validated);
 
-            return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
+            return $this->successResponse('Data indikator berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
@@ -135,13 +143,14 @@ class IndikatorController extends Controller
             if ($data) {
                 return $this->successResponseWithData(
                     IndikatorResource::make($data),
-                    'success',
+                    'Data indikator berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data tidak ditemukan.'
-                ]);
+                return $this->errorResponse(
+                    'Data tidak ditemukan',
+                    Response::HTTP_NOT_FOUND
+                );
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -159,9 +168,29 @@ class IndikatorController extends Controller
                 'status' => 'required',
             ]);
 
-            $indikator = Indikator::find($id)->update($validated);
+            $indikator = Indikator::findOrFail($id);
+            $indikator->update($validated);
+            return $this->successResponse('Data berhasil diubah', Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal diperbarui', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
-            return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
+    public function updateStatus(Request $request, $id)
+    {
+        try {
+            $validated = $request->validate([
+                'status' => 'required|in:public,private,pending',
+            ]);
+
+            $indikator = Indikator::findOrFail($id);
+            $indikator->update($validated);
+
+            return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
@@ -175,7 +204,8 @@ class IndikatorController extends Controller
     {
         try {
             // Menghapus data sektor sesuai request $sektor
-            Indikator::find($id)->delete();
+            $indikator = Indikator::findOrFail($id);
+            $indikator->delete();
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
@@ -184,16 +214,23 @@ class IndikatorController extends Controller
         }
     }
 
-    public function multiDestroy() {
+    public function multiDestroy()
+    {
         try {
-            // Menghapus data sektor sesuai request $sektor
             $id = request('id');
             $ids = explode(",", $id);
-            $indikator = Indikator::whereIn('id', $ids)->delete();
 
-            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
-        } catch (ModelNotFoundException $e) {
-            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+            $indikator = Indikator::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $indikator);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            Indikator::whereIn('id', $indikator)->delete();
+
+            return $this->successResponse('Data indikator berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

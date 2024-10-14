@@ -16,6 +16,8 @@ use App\Http\Controllers\OpdKabupatenController;
 use App\Http\Controllers\IndikatorController;
 use App\Http\Controllers\VariabelController;
 use App\Http\Controllers\SubjekController;
+use App\Http\Controllers\PivotOpdSektorController;
+use App\Http\Controllers\PivotEnumeratorIndikatorController;
 use App\Models\BeritaAcara;
 use Illuminate\Support\Facades\Route;
 
@@ -25,11 +27,10 @@ Route::prefix("auth")->controller(AuthController::class)->group(function () {
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-
     // Auth Route
     Route::controller(AuthController::class)->group(function () {
-        Route::get("me", "getUser");
-        Route::post("logout", "logout");
+        Route::get("auth/me", "getUser");
+        Route::post("auth/logout", "logout");
     });
 
     // Sektor Route
@@ -61,6 +62,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/by-opd/{opd_provinsi}", "byOpdProvinsi");
         Route::get("/{id}", "show");
         Route::get("/{id}", "show");
+        Route::patch("/{id}/status", "updateStatus");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
@@ -85,6 +87,16 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/delete-pivot/{id}", "destroyPivot");
+    });
+
+    // Subjek
+    Route::prefix('pivot-enumerator-indikator')->controller(PivotEnumeratorIndikatorController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::post("/multi-store", "multiStore");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
     });
 
     Route::prefix('variabel')->controller(VariabelController::class)->group(function () {
@@ -127,8 +139,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
-        // Route::get("", "index");
         Route::post("", "store");
+        Route::post("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
     });
 
     Route::prefix('opd-kabupaten')->controller(OpdKabupatenController::class)->group(function () {
@@ -155,7 +168,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
     });
-    
+
     Route::prefix('enumerator-kabupaten')->controller(EnumeratorKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
@@ -166,6 +179,17 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix('enumerator-provinsi')->controller(EnumeratorProvinsiController::class)->group(function () {
         Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+    });
+
+
+    Route::prefix('pivot-opd-sektor')->controller(PivotOpdSektorController::class)->group(function () {
+        Route::get("", "index");
+        Route::get("/by-opd/{id}", "byOpd");
+        Route::get("/by-sektor/{id}", "bySektor");
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");

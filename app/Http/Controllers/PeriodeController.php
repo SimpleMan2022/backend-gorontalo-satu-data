@@ -15,21 +15,21 @@ class PeriodeController extends Controller
 {
     use ApiResponse;
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $per_page = $request->perPage ?? 10;
+            $per_page = $request->per_page ?? 10;
             $data = Periode::orderBy('created_at', 'desc')->paginate($per_page);
 
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
                     PeriodeResource::collection($data),
-                    'success',
+                    'Data periode berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return $this->errorResponse('Data masih kosong.', Response::HTTP_NOT_FOUND);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -73,9 +73,9 @@ class PeriodeController extends Controller
             $periode = Periode::findOrFail($id);
             $validated = $request->validate([
                 'nama' => 'required',
-                'tanggal_mulai' => 'required',
-                'tanggal_selesai' => 'required',
-                'opd_provinsi_id' => 'required'
+                'tanggal_mulai' => 'required|date',
+                'tanggal_selesai' => 'required|date',
+                'opd_provinsi_id' => 'required|numeric'
             ]);
 
             $periode->update($validated);
@@ -100,16 +100,23 @@ class PeriodeController extends Controller
         }
     }
 
-    public function multiDestroy() {
+    public function multiDestroy()
+    {
         try {
-            // Menghapus data sektor sesuai request $sektor
             $id = request('id');
             $ids = explode(",", $id);
-            $periode = Periode::whereIn('id', $ids)->delete();
 
-            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
-        } catch (ModelNotFoundException $e) {
-            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+            $periode = Periode::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $periode);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            Periode::whereIn('id', $periode)->delete();
+
+            return $this->successResponse('Data periode berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

@@ -24,7 +24,7 @@ return Application::configure(basePath: dirname(__DIR__))
                 return response()->json([
                     'code' => 401,
                     'status' => false,
-                    'message' => 'Unauthenticated',
+                    'message' => 'Akses tidak diizinkan. Silakan masuk terlebih dahulu.',
                 ], 401);
             }
         });
