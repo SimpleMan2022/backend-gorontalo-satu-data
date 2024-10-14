@@ -17,7 +17,7 @@ class SektorResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
-            'created_at' => $this->created_at->format('d F Y')
+            'created_at' => $this->created_at,
         ];
     }
 }

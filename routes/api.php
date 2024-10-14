@@ -27,11 +27,10 @@ Route::prefix("auth")->controller(AuthController::class)->group(function () {
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-
     // Auth Route
     Route::controller(AuthController::class)->group(function () {
-        Route::get("me", "getUser");
-        Route::post("logout", "logout");
+        Route::get("auth/me", "getUser");
+        Route::post("auth/logout", "logout");
     });
 
     // Sektor Route
@@ -40,7 +39,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::patch("/edit/{sektor}", "update");
-        Route::delete("/delete/{sektor}", "destroy");
+        Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
 
@@ -63,7 +62,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/by-opd/{opd_provinsi}", "byOpdProvinsi");
         Route::get("/{id}", "show");
         Route::get("/{id}", "show");
-        Route::patch("/update-status/{id}", "updateStatus");
+        Route::patch("/{id}/status", "updateStatus");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
@@ -140,8 +139,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
-        // Route::get("", "index");
         Route::post("", "store");
+        Route::post("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
     });
 
     Route::prefix('opd-kabupaten')->controller(OpdKabupatenController::class)->group(function () {
@@ -168,7 +168,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
     });
-    
+
     Route::prefix('enumerator-kabupaten')->controller(EnumeratorKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");

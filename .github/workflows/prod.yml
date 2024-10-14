@@ -1,0 +1,41 @@
+name: 🚀 Deploy to VPS
+
+on:
+  push:
+    branches:
+      - main # Trigger deployment on push to 'main'
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. Checkout the latest code from the repository
+      - name: 🛠️ Checkout Code
+        uses: actions/checkout@v2
+
+      # 2. Setup SSH for connecting to the VPS
+      - name: 🔑 Setup SSH Agent
+        uses: webfactory/ssh-agent@v0.5.3
+        with:
+          ssh-private-key: ${{ secrets.SSH_PRIVATE_KEY }}
+
+      # 3. Run the deployment on the VPS
+      - name: 🌍 Deploy to VPS
+        run: |
+          echo "🔄 Pulling latest changes from the repository on the VPS..."
+          ssh -o StrictHostKeyChecking=no ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} "
+            cd /var/www/backend-gsd &&
+            git fetch --all &&
+            git reset --hard origin/main &&  # Clean any local changes
+            git pull origin main &&  # Pull the latest changes
+            echo '📦 Installing dependencies...' &&
+            composer install --optimize-autoloader --no-dev &&
+            echo '🛠️ Running migrations...' &&
+            php artisan migrate --force &&
+            echo '🗂️ Caching configuration and routes...' &&
+            php artisan config:cache &&
+            php artisan route:cache
+          "  # Ensure that this line ends without a comment
+      - name: ✅ Deployment successful
+        run: echo "✅ Deployment completed successfully!"

@@ -20,7 +20,7 @@ class OpdSeeder extends Seeder
                 'lokasi' => 'Jl. Pendidikan No. 1'
             ],
             [
-                'nama' => 'Dinas Kesehatan',
+                'nama' => 'Dinas Komunikasi dan Informatika',
                 'lokasi' => 'Jl. Kesehatan No. 1'
             ],
             [
@@ -41,7 +41,7 @@ class OpdSeeder extends Seeder
                 'opd_provinsi_id' => 1,
             ],
             [
-                'nama' => 'Dinas Kesehatan Kabupaten Bone Bolango',
+                'nama' => 'Dinas Komunikasi dan Informatika Kabupaten Bone Bolango',
                 'lokasi' => 'Jl. Kesehatan No. 12',
                 'kabupaten_id' => 7504,
                 'opd_provinsi_id' => 2,

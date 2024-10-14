@@ -8,32 +8,21 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;
 use Exception;
+use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
   use ApiResponse;
 
-  public function create(Request $request)
-  {
-    // $validated = $request->validated();
-    $validated = $request->validate([
-      'username' => 'required',
-      'email' => 'required',
-      'password' => 'required',
-    ]);
-    $validated['password'] = Hash::make($validated['password']);
-    $user = User::create($validated);
-    return $this->successResponseWithData(
-      $user,
-      'success',
-      Response::HTTP_OK
-    );
-  }
-
   public function login(Request $request)
   {
     try {
+      $validate = $request->validate([
+        'username' => 'required',
+        'password' => 'required|min:8'
+      ]);
+
       if (!Auth::attempt($request->only('username', 'password'))) {
         return $this->errorResponse('Terdapat kesalahan kredensial.', Response::HTTP_UNAUTHORIZED);
       }
@@ -47,10 +36,11 @@ class AuthController extends Controller
 
       return $this->successResponseWithData(
         $data,
-        'success',
+        'Login berhasil',
         Response::HTTP_OK
       );
-    } catch (Exception $e) {
+    } catch (ValidationException $e) {
+      return $this->errorResponseWithData($e->errors(), 'Login gagal', Response::HTTP_BAD_REQUEST);
       return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
@@ -61,7 +51,7 @@ class AuthController extends Controller
     // return $request->user();
     return $this->successResponseWithData(
       $request->user(),
-      'success',
+      'Data pengguna berhasil diambil',
       Response::HTTP_OK
     );
   }
@@ -71,7 +61,7 @@ class AuthController extends Controller
     $request->user()->tokens()->delete();
 
     return $this->successResponse(
-      'success',
+      'Logout berhasil',
       Response::HTTP_OK
     );
   }
