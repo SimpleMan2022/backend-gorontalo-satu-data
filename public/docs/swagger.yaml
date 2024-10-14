@@ -404,7 +404,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
-  /sektor/multi-delete?id={id},{id}:
+  /sektor/multi-delete:
     delete:
       tags:
         - Sektor
@@ -414,11 +414,15 @@ paths:
         - BearerAuth: []
       parameters:
         - name: id
-          in: path
+          in: query
           required: true
           schema:
-            type: integer
-            example: 1,2
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
       responses:
         "200":
           description: Sektor berhasil dihapus
@@ -666,7 +670,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
-  /antarwaktu/multi-delete?id={id},{id}:
+  /antar-waktu/multi-delete:
     delete:
       tags:
         - Antar Waktu
@@ -676,11 +680,15 @@ paths:
         - BearerAuth: []
       parameters:
         - name: id
-          in: path
+          in: query
           required: true
           schema:
-            type: integer
-            example: 1,2
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
       responses:
         "200":
           description: Antar waktu berhasil dihapus
@@ -690,7 +698,7 @@ paths:
                 type: object
                 properties:
                   code:
-                    type: number
+                    type: integer
                     example: 200
                   status:
                     type: boolean
@@ -1157,13 +1165,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
-  /indikator/multi-delete?id={id},{id}:
+  /indikator/multi-delete:
     delete:
       tags:
         - Indikator
       summary: Menghapus beberapa indikator sekaligus
       security:
         - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
       responses:
         "200":
           description: Beberapa indikator berhasil dihapus
@@ -3095,7 +3114,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
-  /periode/multi-delete?id={id},{id}:
+  /periode/multi-delete:
     delete:
       tags:
         - Periode
@@ -3105,11 +3124,15 @@ paths:
         - BearerAuth: []
       parameters:
         - name: id
-          in: path
+          in: query
           required: true
           schema:
-            type: integer
-            example: 1,2
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
       responses:
         "200":
           description: periode berhasil dihapus
@@ -3979,7 +4002,7 @@ paths:
                   message:
                     type: string
                     example: "Data tidak ditemukan"
-  /subjek/multi-delete?id={id},{id}:
+  /subjek/multi-delete:
     delete:
       tags:
         - Subjek
@@ -3989,11 +4012,15 @@ paths:
         - BearerAuth: []
       parameters:
         - name: id
-          in: path
+          in: query
           required: true
           schema:
-            type: integer
-            example: 1,2
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
       responses:
         "200":
           description: subjek berhasil dihapus
