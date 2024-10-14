@@ -2772,11 +2772,14 @@ paths:
   /periode:
     get:
       tags:
-        - periode
+        - Periode
       summary: Dapatkan daftar periode
       security:
         - BearerAuth: []
       description: Mendapatkan data periode beserta informasi terkait.
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
       responses:
         "200":
           description: Berhasil mendapatkan data periode
@@ -2793,7 +2796,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "success"
+                    example: "Data periode berhasil diambil"
                   data:
                     type: object
                     properties:
@@ -2819,10 +2822,10 @@ paths:
                           properties:
                             id:
                               type: integer
-                              example: 1
+                              example: 4
                             nama:
                               type: string
-                              example: "periode 1"
+                              example: "periode 3"
                             tanggal_mulai:
                               type: string
                               format: date
@@ -2830,37 +2833,40 @@ paths:
                             tanggal_selesai:
                               type: string
                               format: date
-                              example: "2024-03-15"
+                              example: "2024-01-12"
                             opd_provinsi_id:
-                              type: integer
-                              example: 1
+                              type: object
+                              properties:
+                                nama:
+                                  type: string
+                                  example: "Dinas Komunikasi dan Informatika"
+                                lokasi:
+                                  type: string
+                                  example: "Jl. Kesehatan No. 1"
                             created_at:
                               type: string
                               format: date-time
-                              example: "2024-10-11T06:09:00.000000Z"
+                              example: "2024-10-14T01:39:25.000000Z"
                             updated_at:
                               type: string
                               format: date-time
-                              example: "2024-10-11T06:09:00.000000Z"
+                              example: "2024-10-14T01:39:25.000000Z"
+
         "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Unauthorized"
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
-        - periode
+        - Periode
       summary: Menambahkan periode baru
       security:
         - BearerAuth: []
@@ -2871,9 +2877,6 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: integer
-                  example: 1
                 nama:
                   type: string
                   example: "periode 1"
@@ -2904,44 +2907,24 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  id:
-                    type: integer
-                    example: 1
-                  nama:
-                    type: string
-                    example: "periode 5"
-                  tanggal_mulai:
-                    type: string
-                    format: date
-                    example: "2022-09-27"
-                  tanggal_selesai:
-                    type: string
-                    format: date
-                    example: "2024-03-15"
-                  opd_provinsi_id:
-                    type: integer
-                    example: 4
+                    example: Data berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
   /periode/{id}:
     get:
       tags:
-        - periode
+        - Periode
       summary: Mendapatkan detail periode berdasarkan ID
       security:
         - BearerAuth: []
@@ -2960,63 +2943,53 @@ paths:
               schema:
                 type: object
                 properties:
-                  code:
+                  id:
                     type: integer
-                    example: 200
-                  status:
-                    type: boolean
-                    example: true
-                  message:
+                    example: 4
+                  nama:
                     type: string
-                    example: Data berhasil diubah
-                  data:
+                    example: "periode 3"
+                  tanggal_mulai:
+                    type: string
+                    format: date
+                    example: "2024-01-12"
+                  tanggal_selesai:
+                    type: string
+                    format: date
+                    example: "2024-01-12"
+                  opd_provinsi_id:
                     type: object
                     properties:
-                      id:
-                        type: integer
-                        example: 1
                       nama:
                         type: string
-                        example: "periode 1"
-                      tanggal_mulai:
+                        example: "Dinas Komunikasi dan Informatika"
+                      lokasi:
                         type: string
-                        format: date
-                        example: "2024-01-12"
-                      tanggal_selesai:
-                        type: string
-                        format: date
-                        example: "2024-03-15"
-                      opd_provinsi_id:
-                        type: integer
-                        example: 1
-                      created_at:
-                        type: string
-                        format: date-time
-                        example: "2024-10-07T02:28:11.000000Z"
-                      updated_at:
-                        type: string
-                        format: date-time
-                        example: "2024-10-07T02:28:11.000000Z"
+                        example: "Jl. Kesehatan No. 1"
+                  created_at:
+                    type: string
+                    format: date-time
+                    example: "2024-10-14T01:39:25.000000Z"
+                  updated_at:
+                    type: string
+                    format: date-time
+                    example: "2024-10-14T01:39:25.000000Z"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /periode/edit/{id}:
     patch:
       tags:
-        - periode
+        - Periode
       summary: Memperbarui periode yang ada
       security:
         - BearerAuth: []
@@ -3058,23 +3031,31 @@ paths:
                   nama:
                     type: string
                     example: "periode 1"
-                  tanggal_mulai:
+                  message:
                     type: string
-                    format: date
-                    example: "2024-01-12"
-                  tanggal_selesai:
-                    type: string
-                    format: date
-                    example: "2024-03-15"
-                  opd_provinsi_id:
-                    type: integer
-                    example: 1
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /periode/delete/{id}:
     delete:
       tags:
-        - periode
+        - Periode
       summary: Menghapus periode berdasarkan id
       security:
         - BearerAuth: []
@@ -3103,7 +3084,35 @@ paths:
                     type: string
                     example: "Data berhasil dihapus"
         "401":
-          description: Bad Request
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /periode/multi-delete?id={id},{id}:
+    delete:
+      tags:
+        - Periode
+      summary: Menghapus banyak periode
+      description: API untuk menghapus banyak periode berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1,2
+      responses:
+        "200":
+          description: periode berhasil dihapus
           content:
             application/json:
               schema:
@@ -3111,14 +3120,25 @@ paths:
                 properties:
                   code:
                     type: number
-                    example: 404
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Data tidak ditemukan"
-
+                    example: "Data periode berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data periode tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /variabel:
     get:
       tags:
