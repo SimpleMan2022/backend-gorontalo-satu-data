@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\SubjekResource;
 use Illuminate\Http\Request;
 use App\Models\{Subjek, PivotIndikatorSubjek};
-// use App\Http\Resources\SubjekResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -15,20 +15,20 @@ class SubjekController extends Controller
 {
     use ApiResponse;
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = Subjek::orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = Subjek::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData(
+                return $this->successResponseWithDataIndex(
                     $data,
-                    'success',
+                    SubjekResource::collection($data),
+                    'Data subjek berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -64,9 +64,11 @@ class SubjekController extends Controller
             }
 
             return $this->successResponse(
-                'success',
+                'Data subjek berhasil dibuat',
                 Response::HTTP_OK
             );
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -89,15 +91,17 @@ class SubjekController extends Controller
                 ]);
 
                 return $this->successResponse(
-                    'success',
+                    'Data subjek berhasil dibuat',
                     Response::HTTP_OK
                 );
             } else {
                 return $this->errorResponse(
-                    'failed',
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    'Data sudah ada',
+                    Response::HTTP_BAD_REQUEST
                 );
             }
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -113,57 +117,58 @@ class SubjekController extends Controller
             if ($data) {
                 return $this->successResponseWithData(
                     $data,
-                    'success',
+                    'Data subjek berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data tidak ditemukan.'
-                ]);
+                return $this->errorResponse(
+                    'Data tidak ditemukan',
+                    Response::HTTP_NOT_FOUND
+                );
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         try {
             // Membuat Validasi
             $req = $request->validate([
                 'nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
-                'indikator_id' => 'required|integer|exists:indikator,id',  // Validasi setiap 'indikator_id' di dalam array sebagai integer dan harus ada di tabel 'indikators'
             ]);
 
-            $data = Subjek::find($id);
+            $subjek = Subjek::find($id);
 
-            if($data) {
-                $data->update($req);
-                return $this->successResponseWithData(
-                    SubjekResource::make($data),
-                    'success',
+            if ($subjek) {
+                $subjek->update($req);
+                return $this->successResponse(
+                    'Data subjek berhasil diubah',
                     Response::HTTP_OK
                 );
-            }else {
+            } else {
                 return $this->errorResponse(
                     'Data tidak ditemukan',
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    Response::HTTP_NOT_FOUND
                 );
             }
-
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
-        }catch (ValidationException $e) {
+        } catch (ValidationException $e) {
             // Handle validation errors
             return $this->errorResponse($e->errors(), Response::HTTP_UNPROCESSABLE_ENTITY);
-        }catch( Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function destroy($id) {
+    public function destroy($id)
+    {
         try {
             // Menghapus data sektor sesuai request $sektor
-            Subjek::find($id)->delete();
+            $subjek = Subjek::findOrFail($id);
+            $subjek->delete();
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
@@ -176,7 +181,8 @@ class SubjekController extends Controller
     {
         try {
             // Menghapus data sektor sesuai request $sektor
-            PivotIndikatorSubjek::find($id)->delete();
+            $pivot = PivotIndikatorSubjek::findOrFail($id);
+            $pivot->delete();
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
