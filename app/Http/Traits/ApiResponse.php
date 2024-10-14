@@ -20,14 +20,12 @@ trait ApiResponse
         self::$response1['code'] = $code;
         self::$response1['status'] = true;
         self::$response1['message'] = $message;
-        self::$response1['data'] = [
-            'pagination' => [
-                'total' => $data_model->total(),
-                'per_page' => $data_model->perPage(),
-                'current_page' => $data_model->currentPage(),
-                'total_pages' => $data_model->lastPage(),
-            ],
-            'data' => $data_resource
+        self::$response1['data'] = $data_resource;
+        self::$response1['pagination'] = [
+            'current_page' => $data_model->currentPage(),
+            'per_page' => $data_model->perPage(),
+            'total' => $data_model->total(),
+            'last_page' => $data_model->lastPage()
         ];
         return response()->json(self::$response1, self::$response1['code']);
     }
