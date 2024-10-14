@@ -32,16 +32,31 @@ class BeritaAcaraController extends Controller
     public function store(Request $request)
     {
         try {
+            // Validate request
             $validated = $request->validate([
-                'nama' => 'required',
-                'opd_kabupaten_id' => 'required',
-                'file' => 'required',
-                'indikator_id' => 'required',
+                'nama' => 'required|string',
+                'opd_kabupaten_id' => 'required|integer',
+                'file' => 'required|file|mimes:pdf|max:20480', // Restrict file to only PDF
+                'indikator_id' => 'required|integer',
                 'status' => 'required'
             ]);
 
-            // Mengubah menjadi huruf kecil
+            // Handle file upload (PDF only)
+            if ($request->hasFile('file')) {
+                $timestamp = now()->format('Ymd_His');
+                $originalName = $request->file('file')->getClientOriginalName();
+                $lowercaseName = strtolower(str_replace(' ', '_', pathinfo($originalName, PATHINFO_FILENAME)));
+                $fileName = "berita_acara_{$timestamp}.pdf";
+                $filePath = $request->file('file')->storeAs('berita_acara', $fileName);
+                $validated['file'] = $filePath;
+            }
+
+            // Convert 'nama' to lowercase before saving
+            $validated['nama'] = strtolower($validated['nama']);
+
+            // Create BeritaAcara record
             BeritaAcara::create($validated);
+
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
@@ -90,7 +105,7 @@ class BeritaAcaraController extends Controller
 
             $berita_acara = BeritaAcara::find($id);
             $berita_acara->update($validated);
-            
+
             return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);

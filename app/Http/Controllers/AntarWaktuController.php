@@ -51,7 +51,7 @@ class AntarWaktuController extends Controller
         try {
             $antar_waktu = AntarWaktu::findOrFail($id);
             $validated = $request->validate([
-                'tahun' => 'required|numeric|digits:4|unique:antar_waktu,tahun,' . $id,
+                'tahun' => 'required|numeric|digits:4,' . $id,
                 'nama' => 'required'
             ]);
             $antar_waktu->update($validated);
