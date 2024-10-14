@@ -15,10 +15,11 @@ class SubjekController extends Controller
 {
     use ApiResponse;
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = Subjek::orderBy('created_at', 'desc')->paginate(10);
+            $perPage = $request->per_page ?? 10;
+            $data = Subjek::orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
@@ -63,7 +64,7 @@ class SubjekController extends Controller
             }
 
             return $this->successResponse(
-                'success',
+                'Data subjek berhasil dibuat',
                 Response::HTTP_OK
             );
         } catch (ValidationException $e) {

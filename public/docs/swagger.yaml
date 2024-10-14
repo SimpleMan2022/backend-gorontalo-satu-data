@@ -3709,10 +3709,13 @@ paths:
   /subjek:
     get:
       tags:
-        - subjek
+        - Subjek
       summary: Mendapatkan semua data subjek
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
       responses:
         "200":
           description: Berhasil mendapatkan data subjek
@@ -3729,63 +3732,44 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data subjek berhasil diambil
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 1
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 1
-                          total_pages:
-                            type: integer
-                            example: 1
-                      data:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 2
-                            nama:
-                              type: string
-                              example: menurut usia 1-5 bulan
-                            created_at:
-                              type: string
-                              format: date-time
-                              xample: "2024-10-13T00:33:23.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-13T00:33:23.000000Z"
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        nama:
+                          type: string
+                          example: menurut usia 1-5 bulan
+                        created_at:
+                          type: string
+                          format: date-time
+                          xample: "2024-10-13T00:33:23.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+
         "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
-        - subjek
+        - Subjek
       summary: Menambahkan subjek baru
       security:
         - BearerAuth: []
@@ -3796,9 +3780,6 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: integer
-                  example: 1
                 indikator_id:
                   type: integer
                   example: 4
@@ -3821,36 +3802,24 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  id:
-                    type: integer
-                    example: 1
-                  indikator_id:
-                    type: integer
-                    example: 4
-                  nama:
-                    type: string
-                    example: menurut usia 1-5 bulan
+                    example: Data berhasil dibuat
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+
   /subjek/multi-store:
     post:
       tags:
-        - subjek
+        - Subjek
       summary: Menambahkan lebih dari 1 subjek sekaligus
       security:
         - BearerAuth: []
@@ -3859,29 +3828,19 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                id:
-                  type: integer
-                  example: 1
-                indikator_id:
-                  type: integer
-                  example: 4
-                nama:
-                  type: string
-                  example: menurut usia 1-5 bulan
-                schema:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 1
-                    indikator_id:
-                      type: integer
-                      example: 4
-                    nama:
-                      type: string
-                      example: menurut usia 6-12 bulan
+              type: array
+              items:
+                type: object
+                properties:
+                  nama:
+                    type: string
+                    example: rumah sakit
+                  indikator_id:
+                    type: integer
+                    example: 9
+                required:
+                  - nama
+                  - indikator_id
 
       responses:
         "201":
@@ -3899,45 +3858,23 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  id:
-                    type: integer
-                    example: 1
-                  indikator_id:
-                    type: integer
-                    example: 4
-                  nama:
-                    type: string
-                    example: menurut usia 1-5 bulan
-                  schema:
-                    type: object
-                    properties:
-                      indikator_id:
-                        type: integer
-                        example: 4
-                      nama:
-                        type: string
-                        example: menurut usia 6-12 bulan
+                    example: data subjek berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /subjek/{id}:
     get:
       tags:
-        - subjek
+        - Subjek
       summary: Mendapatkan detail subjek
       description: API untuk mendapatkan detail subjek berdasarkan ID
       security:
@@ -3965,7 +3902,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "succes"
+                    example: "Data subjek berhasil diambil"
                   data:
                     type: object
                     properties:
@@ -3988,21 +3925,17 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /subjek/delete/{id}:
     delete:
       tags:
-        - subjek
+        - Subjek
       summary: Menghapus subjek berdasarkan id
       security:
         - BearerAuth: []
@@ -4046,6 +3979,50 @@ paths:
                   message:
                     type: string
                     example: "Data tidak ditemukan"
+  /subjek/multi-delete?id={id},{id}:
+    delete:
+      tags:
+        - Subjek
+      summary: Menghapus banyak subjek
+      description: API untuk menghapus banyak subjek berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1,2
+      responses:
+        "200":
+          description: subjek berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data subjek berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data subjek tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
 components:
   schemas:
     Pagination:

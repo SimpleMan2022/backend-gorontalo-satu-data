@@ -44,7 +44,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     // Antar Waktu
-    Route::prefix('antarwaktu')->controller(AntarWaktuController::class)->group(function () {
+    Route::prefix('antar-waktu')->controller(AntarWaktuController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
         // Route::get("/{id}", "show");
