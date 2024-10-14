@@ -27,11 +27,10 @@ Route::prefix("auth")->controller(AuthController::class)->group(function () {
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
-
     // Auth Route
     Route::controller(AuthController::class)->group(function () {
-        Route::get("me", "getUser");
-        Route::post("logout", "logout");
+        Route::get("auth/me", "getUser");
+        Route::post("auth/logout", "logout");
     });
 
     // Sektor Route
@@ -63,7 +62,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/by-opd/{opd_provinsi}", "byOpdProvinsi");
         Route::get("/{id}", "show");
         Route::get("/{id}", "show");
-        Route::patch("/update-status/{id}", "updateStatus");
+        Route::patch("/{id}/status", "updateStatus");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
