@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Indikator, Sektor, AntarWaktu, OpdProvinsi};
+use App\Models\{Indikator};
 use App\Http\Resources\IndikatorResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
@@ -35,68 +35,6 @@ class IndikatorController extends Controller
             }
 
             $data = $indikatorQuery->paginate($perPage);
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex(
-                    $data,
-                    IndikatorResource::collection($data),
-                    'Data indikator berhasil diambil',
-                    Response::HTTP_OK
-                );
-            } else {
-                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
-            }
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public function bySektor($sektor)
-    {
-        try {
-            $perPage = $request->per_page ?? 10;
-            $data = Indikator::where('sektor_id', $sektor)->orderBy('created_at', 'desc')->paginate($perPage);
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex(
-                    $data,
-                    IndikatorResource::collection($data),
-                    'Data indikator berhasil diambil',
-                    Response::HTTP_OK
-                );
-            } else {
-                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
-            }
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-    public function byAntarWaktu($antar_waktu)
-    {
-        try {
-            $perPage = $request->per_page ?? 10;
-            $data = Indikator::where('antar_waktu_id', $antar_waktu)->orderBy('created_at', 'desc')->paginate($perPage);
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex(
-                    $data,
-                    IndikatorResource::collection($data),
-                    'Data indikator berhasil diambil',
-                    Response::HTTP_OK
-                );
-            } else {
-                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
-            }
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-
-    public function byOpdProvinsi($opd_provinsi)
-    {
-        try {
-            $perPage = $request->per_page ?? 10;
-            $data = Indikator::where('opd_provinsi_id', $opd_provinsi)->orderBy('created_at', 'desc')->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
