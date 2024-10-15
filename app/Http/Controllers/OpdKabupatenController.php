@@ -13,44 +13,31 @@ use Illuminate\Http\Request;
 class OpdKabupatenController extends Controller
 {
     use ApiResponse;
-    public function index()
+    public function index(Request $request)
     {
         try {
             $perPage = $request->per_page ?? 10;
-            $data = OpdKabupaten::orderBy('created_at', 'desc')->paginate($perPage);
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex(
-                    $data,
-                    OpdKabupatenResource::collection($data),
-                    'success', 
-                    Response::HTTP_OK
-                );
-            } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
-            }
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
 
-    public function byOpdProvinsi($opd_provinsi)
-    {
-        try {
-            $perPage = $request->per_page ?? 10;
-            $data = OpdKabupaten::where('opd_provinsi_id',$opd_provinsi)->orderBy('created_at', 'desc')->paginate($perPage);
+            $opdQuery = OpdKabupaten::orderBy('created_at', 'desc');
+
+            if ($kab_id = $request->query('kabupaten_id')) {
+                $opdQuery->where('kabupaten_id', $kab_id);
+            }
+
+            if ($opdProvId = $request->query('opd_provinsi_id')) {
+                $opdQuery->where('opd_provinsi_id', $opdProvId);
+            }
+
+            $data = $opdQuery->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
                     OpdKabupatenResource::collection($data),
-                    'success', 
+                    'Data OPD Kabupaten berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -117,7 +104,7 @@ class OpdKabupatenController extends Controller
 
             $opd_kabupaten = OpdKabupaten::find($id);
             $opd_kabupaten->update($validated);
-            
+
             return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
