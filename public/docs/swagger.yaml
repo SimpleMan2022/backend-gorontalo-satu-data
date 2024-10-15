@@ -171,24 +171,22 @@ paths:
                     type: string
                     example: "Data sektor berhasil diambil"
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        $ref: "#/components/schemas/Pagination"
-                      data:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 2
-                            nama:
-                              type: string
-                              example: "Kesehatan"
-                            created_at:
-                              type: string
-                              example: "07 October 2024"
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        nama:
+                          type: string
+                          example: "Kesehatan"
+                        created_at:
+                          type: string
+                          example: "07 October 2024"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+
         "404":
           description: Data sektor masih kosong
           content:
@@ -481,27 +479,24 @@ paths:
                     type: string
                     example: "success"
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        $ref: "#/components/schemas/Pagination"
-                      data:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 2
-                            tahun:
-                              type: string
-                              example: "2024"
-                            nama:
-                              type: string
-                              example: "Triwulan 2"
-                            created_at:
-                              type: string
-                              example: "07 October 2024"
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        tahun:
+                          type: string
+                          example: "2024"
+                        nama:
+                          type: string
+                          example: "Triwulan 2"
+                        created_at:
+                          type: string
+                          example: "07 October 2024"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Bad Request
           content:
@@ -767,65 +762,62 @@ paths:
                     type: string
                     example: "Data indikator berhasil diambil"
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        $ref: "#/components/schemas/Pagination"
-                      data:
-                        type: array
-                        items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 7
+                        nama:
+                          type: string
+                          example: "Sebaran Jumlah Rumah Sakit dengan kondisi bangunan sedang"
+                        sektor:
                           type: object
                           properties:
                             id:
                               type: integer
-                              example: 7
+                              example: 9
                             nama:
                               type: string
-                              example: "Sebaran Jumlah Rumah Sakit dengan kondisi bangunan sedang"
-                            sektor:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                  example: 9
-                                nama:
-                                  type: string
-                                  example: "kesehatan"
-                            antar_waktu:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                  example: 6
-                                tahun:
-                                  type: string
-                                  example: "2022"
-                                nama:
-                                  type: string
-                                  example: "Triwulan 5"
-                            opd_provinsi:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                  example: 1
-                                nama:
-                                  type: string
-                                  example: "Dinas Pendidikan"
-                                lokasi:
-                                  type: string
-                                  example: "Jl. Pendidikan No. 1"
-                            status:
+                              example: "kesehatan"
+                        antar_waktu:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 6
+                            tahun:
                               type: string
-                              example: "pending"
-                            created_at:
+                              example: "2022"
+                            nama:
                               type: string
-                              format: date-time
-                              example: "2024-10-13T12:30:11.000000Z"
-                            updated_at:
+                              example: "Triwulan 5"
+                        opd_provinsi:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
                               type: string
-                              format: date-time
-                              example: "2024-10-13T12:30:11.000000Z"
+                              example: "Dinas Pendidikan"
+                            lokasi:
+                              type: string
+                              example: "Jl. Pendidikan No. 1"
+                        status:
+                          type: string
+                          example: "pending"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T12:30:11.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T12:30:11.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
 
         "401":
           description: Unauthorized
@@ -2817,60 +2809,43 @@ paths:
                     type: string
                     example: "Data periode berhasil diambil"
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 1
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 1
-                          total_pages:
-                            type: integer
-                            example: 1
-                      data:
-                        type: array
-                        items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 4
+                        nama:
+                          type: string
+                          example: "periode 3"
+                        tanggal_mulai:
+                          type: string
+                          format: date
+                          example: "2024-01-12"
+                        tanggal_selesai:
+                          type: string
+                          format: date
+                          example: "2024-01-12"
+                        opd_provinsi_id:
                           type: object
                           properties:
-                            id:
-                              type: integer
-                              example: 4
                             nama:
                               type: string
-                              example: "periode 3"
-                            tanggal_mulai:
+                              example: "Dinas Komunikasi dan Informatika"
+                            lokasi:
                               type: string
-                              format: date
-                              example: "2024-01-12"
-                            tanggal_selesai:
-                              type: string
-                              format: date
-                              example: "2024-01-12"
-                            opd_provinsi_id:
-                              type: object
-                              properties:
-                                nama:
-                                  type: string
-                                  example: "Dinas Komunikasi dan Informatika"
-                                lokasi:
-                                  type: string
-                                  example: "Jl. Kesehatan No. 1"
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-14T01:39:25.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-14T01:39:25.000000Z"
-
+                              example: "Jl. Kesehatan No. 1"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-14T01:39:25.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-14T01:39:25.000000Z"
+                  Pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Unauthorized
           content:
