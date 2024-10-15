@@ -137,6 +137,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
@@ -204,7 +205,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
     });
-
 });
 
 Route::get('/docs', function () {
