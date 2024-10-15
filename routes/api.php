@@ -135,7 +135,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
-        Route::patch("/edit/{id}", "update");
+        Route::post("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });

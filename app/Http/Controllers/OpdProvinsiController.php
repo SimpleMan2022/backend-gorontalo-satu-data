@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\ConvertImage;
 use App\Http\Traits\ApiResponse;
 use App\Models\OpdProvinsi;
 use Exception;
@@ -10,6 +11,7 @@ use Symfony\Component\HttpFoundation\Response;
 use App\Http\Resources\OpdProvinsiResource;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class OpdProvinsiController extends Controller
 {
@@ -41,8 +43,26 @@ class OpdProvinsiController extends Controller
         try {
             $validated = $request->validate([
                 'nama' => 'required',
+                'logo' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'lokasi' => 'required'
             ]);
+
+            $logoPath = $request->file('logo')->store('logo', 'public');
+            $extension = $request->file('logo')->getClientOriginalExtension();
+
+            if (strtolower($extension) !== 'webp') {
+                $webpPath = storage_path('app/public/logo/' . pathinfo($logoPath, PATHINFO_FILENAME) . '.webp');
+
+                ConvertImage::convertImageToWebP(storage_path('app/public/' . $logoPath), $webpPath);
+
+                // Simpan path WebP ke database
+                $validated['logo'] = 'logo/' . basename($webpPath);
+
+                Storage::disk('public')->delete($logoPath);
+            } else {
+                $validated['logo'] = $logoPath;
+            }
+
 
             OpdProvinsi::create($validated);
             return $this->successResponse('Data OPD Provinsi berhasil dibuat', Response::HTTP_CREATED);
@@ -79,10 +99,34 @@ class OpdProvinsiController extends Controller
         try {
             $validated = $request->validate([
                 'nama' => 'required',
+                'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'lokasi' => 'required',
             ]);
 
             $opd_provinsi = OpdProvinsi::findOrFail($id);
+
+            if ($request->hasFile('logo')) {
+                $logoPath = $request->file('logo')->store('logo', 'public');
+                $extension = $request->file('logo')->getClientOriginalExtension();
+
+                if (strtolower($extension) !== 'webp') {
+                    $webpPath = storage_path('app/public/logo/' . pathinfo($logoPath, PATHINFO_FILENAME) . '.webp');
+
+                    ConvertImage::convertImageToWebP(storage_path('app/public/' . $logoPath), $webpPath);
+
+                    $validated['logo'] = 'logo/' . basename($webpPath);
+
+                    Storage::disk('public')->delete($logoPath);
+                } else {
+                    $validated['logo'] = $logoPath;
+                }
+
+                // Hapus logo lama jika ada
+                if ($opd_provinsi->logo && $opd_provinsi->logo !== $validated['logo']) {
+                    Storage::disk('public')->delete($opd_provinsi->logo);
+                }
+            }
+
             $opd_provinsi->update($validated);
 
             return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
@@ -98,9 +142,13 @@ class OpdProvinsiController extends Controller
     public function destroy(string $id)
     {
         try {
-
             // Menghapus data sektor sesuai request $sektor
             $opd_provinsi = OpdProvinsi::findOrFail($id);
+
+            if ($opd_provinsi->logo) {
+                Storage::disk('public')->delete($opd_provinsi->logo);
+            }
+
             $opd_provinsi->delete();
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
@@ -122,6 +170,13 @@ class OpdProvinsiController extends Controller
 
             if (!empty($notFoundIds)) {
                 return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            foreach ($opd_provinsi as $id) {
+                $opd = OpdProvinsi::find($id);
+                if ($opd && $opd->logo) {
+                    Storage::disk('public')->delete($opd->logo);
+                }
             }
 
             OpdProvinsi::whereIn('id', $opd_provinsi)->delete();
