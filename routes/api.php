@@ -4,6 +4,7 @@ use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnumeratorController;
 use App\Http\Controllers\EnumeratorKabupatenController;
 use App\Http\Controllers\EnumeratorProvinsiController;
@@ -218,6 +219,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
+
+    Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {
+        Route::get("/admin", "AdminView");
+        Route::get("/admin/chart-donut", "ChartDonut");
+        Route::get("/admin/chart-bar", "ChartBar");
+    });
+
 });
 
 Route::get('/docs', function () {
