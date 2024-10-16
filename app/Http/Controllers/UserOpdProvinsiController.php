@@ -196,4 +196,26 @@ class UserOpdProvinsiController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function multiDestroy()
+    {
+        try {
+            $id = request('id');
+            $ids = explode(",", $id);
+
+            $UserOpdProvinsi = UserOpdProvinsi::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $UserOpdProvinsi);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            UserOpdProvinsi::whereIn('id', $UserOpdProvinsi)->delete();
+
+            return $this->successResponse('Data Opd Provinsi berhasil dihapus', Response::HTTP_OK);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }
