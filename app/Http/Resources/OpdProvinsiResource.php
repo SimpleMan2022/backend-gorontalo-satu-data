@@ -17,6 +17,7 @@ class OpdProvinsiResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
+            'logo' => $this->logo,
             'lokasi' => $this->lokasi,
             'created_at' => $this->created_at,
             'updated_at' => $this->created_at

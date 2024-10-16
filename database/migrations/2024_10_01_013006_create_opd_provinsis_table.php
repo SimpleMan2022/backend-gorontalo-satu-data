@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('opd_provinsi', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
+            $table->string('logo')->nullable();
             $table->string('lokasi');
             $table->timestamps();
         });

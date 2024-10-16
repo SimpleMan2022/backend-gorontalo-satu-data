@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Helpers\ConvertImage;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Models\Sektor;
 use App\Http\Resources\SektorResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
+use Illuminate\Support\Facades\Storage;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 
@@ -46,11 +48,28 @@ class SektorController extends Controller
     {
         try {
             // Membuat validasi
-            $req = $request->validate([
-                'nama' => 'required|min:3'
+            $validated = $request->validate([
+                'nama' => 'required|min:3',
+                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
             ]);
 
-            Sektor::create($req);
+            $logoPath = $request->file('logo')->store('logo', 'public');
+            $extension = $request->file('logo')->getClientOriginalExtension();
+
+            if (strtolower($extension) !== 'webp') {
+                $webpPath = storage_path('app/public/logo/' . pathinfo($logoPath, PATHINFO_FILENAME) . '.webp');
+
+                ConvertImage::convertImageToWebP(storage_path('app/public/' . $logoPath), $webpPath);
+
+                // Simpan path WebP ke database
+                $validated['logo'] = 'logo/' . basename($webpPath);
+
+                Storage::disk('public')->delete($logoPath);
+            } else {
+                $validated['logo'] = $logoPath;
+            }
+
+            Sektor::create($validated);
             return $this->successResponse(
                 'Data sektor berhasil dibuat',
                 Response::HTTP_CREATED
@@ -90,14 +109,38 @@ class SektorController extends Controller
     {
         try {
             // Membuat Validasi
-            $req = $request->validate([
-                'nama' => 'required'
+            $validated = $request->validate([
+                'nama' => 'required',
+                'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
             ]);
 
             $data = Sektor::find($sektor);
 
             if ($data) {
-                $data->update($req);
+
+                if ($request->hasFile('logo')) {
+                    $logoPath = $request->file('logo')->store('logo', 'public');
+                    $extension = $request->file('logo')->getClientOriginalExtension();
+
+                    if (strtolower($extension) !== 'webp') {
+                        $webpPath = storage_path('app/public/logo/' . pathinfo($logoPath, PATHINFO_FILENAME) . '.webp');
+
+                        ConvertImage::convertImageToWebP(storage_path('app/public/' . $logoPath), $webpPath);
+
+                        $validated['logo'] = 'logo/' . basename($webpPath);
+
+                        Storage::disk('public')->delete($logoPath);
+                    } else {
+                        $validated['logo'] = $logoPath;
+                    }
+
+                    // Hapus logo lama jika ada
+                    if ($data->logo && $data->logo !== $validated['logo']) {
+                        Storage::disk('public')->delete($data->logo);
+                    }
+                }
+
+                $data->update($validated);
                 return $this->successResponse(
                     'Data sektor berhasil diubah',
                     Response::HTTP_OK
@@ -126,6 +169,9 @@ class SektorController extends Controller
             $data = Sektor::find($id);
 
             if ($data) {
+                if ($data->logo) {
+                    Storage::disk('public')->delete($data->logo);
+                }
                 $data->delete();
             } else {
                 return $this->errorResponse(
@@ -152,6 +198,13 @@ class SektorController extends Controller
 
             if (!empty($notFoundIds)) {
                 return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            foreach ($sektors as $id) {
+                $data = Sektor::find($id);
+                if ($data && $data->logo) {
+                    Storage::disk('public')->delete($data->logo);
+                }
             }
 
             Sektor::whereIn('id', $sektors)->delete();

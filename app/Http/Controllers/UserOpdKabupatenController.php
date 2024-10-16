@@ -20,17 +20,17 @@ class UserOpdKabupatenController extends Controller
     use ApiResponse;
     public function index()
     {
-        try{
+        try {
             $perPage = $request->per_page ?? 10;
             $data = UserOpdKabupaten::orderBy('created_at', 'desc')->paginate($perPage);
-            if ($data->isNotEmpty()){
+            if ($data->isNotEmpty()) {
                 return $this->successResponseWithData(
                     $data,
                     UserOpdKabupatenResource::collection($make),
-                    'success', 
+                    'success',
                     Response::HTTP_OK
                 );
-            }else {
+            } else {
                 return response()->json([
                     'message' => 'Data masih kosong.'
                 ]);
@@ -38,7 +38,7 @@ class UserOpdKabupatenController extends Controller
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }    
+    }
 
     /**
      * Show the form for creating a new resource.
@@ -78,8 +78,8 @@ class UserOpdKabupatenController extends Controller
             $validated['password'] = Hash::make('gsdmakro123');
             $user = User::create($validated);
             $user->assignRole('opd_kabupaten');
-            if ($user){
-                
+            if ($user) {
+
                 UserOpdKabupaten::create([
                     'nama' => $request->nama,
                     'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
@@ -100,21 +100,21 @@ class UserOpdKabupatenController extends Controller
      */
     public function show(string $id)
     {
-        try{
+        try {
             $data = UserOpdKabupaten::find($id);
 
-            if($data){
+            if ($data) {
                 return $this->successResponseWithData(
                     UserOpdKabupatenResource::make($data),
                     'success',
                     Response::HTTP_OK
                 );
-            } else{
+            } else {
                 return response()->json([
                     'message' => 'Data tidak ditemukan.'
                 ]);
             }
-        } catch(Exception $e){
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -175,16 +175,16 @@ class UserOpdKabupatenController extends Controller
             // $validated['password'] = Hash::make($request->password);
             $user = User::find($user_opd_kabupaten->user_id);
             $user->update($validated);
-            if ($user){
-                
+            if ($user) {
+
                 $opd_kabupaten = OpdKabupaten::find($user_opd_kabupaten->opd_kabupaten_id);
 
                 $opd_kabupaten->update([
                     'nama' => $request->nama_opd,
                     'lokasi' => $request->lokasi_opd,
                 ]);
-                
-                if ($opd_kabupaten){
+
+                if ($opd_kabupaten) {
 
                     $user_opd_kabupaten->update([
                         'nama' => $request->nama,

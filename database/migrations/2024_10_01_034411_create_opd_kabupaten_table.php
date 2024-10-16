@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('opd_kabupaten', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
+            $table->string('logo')->nullable();
             $table->string('lokasi');
             $table->foreignId('kabupaten_id')->references('id')->on('regencies')->onDelete('cascade');
             $table->foreignId('opd_provinsi_id')->references('id')->on('opd_provinsi')->onDelete('cascade');

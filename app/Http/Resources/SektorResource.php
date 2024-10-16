@@ -17,6 +17,7 @@ class SektorResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
+            'logo' => $this->logo,
             'created_at' => $this->created_at,
         ];
     }
