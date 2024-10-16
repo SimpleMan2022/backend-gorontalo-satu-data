@@ -2,18 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use App\Models\Sektor;
 use App\Models\Subjek;
-use App\Http\Resources\SektorResource;
 use App\Http\Traits\ApiResponse;
 use App\Models\AntarWaktu;
 use App\Models\Indikator;
 use App\Models\User;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Validation\ValidationException;
 
 class DashboardController extends Controller
 {
@@ -28,13 +25,26 @@ class DashboardController extends Controller
             $total_user = User::count();
             $total_antar_waktu = AntarWaktu::count();
 
-            return response()->json([
-                'message' => 'Total data berhasil diambil',
+            $data = [
                 'total_sektor' => $total_sektor,
                 'total_subjek' => $total_subjek,
                 'total_user' => $total_user,
                 'total_antar_waktu' => $total_antar_waktu
-            ], Response::HTTP_OK);
+            ];
+
+            return $this->successResponseWithData(
+                $data,
+                'success', 
+                Response::HTTP_OK
+            );
+
+            // return response()->json([
+            //     'message' => 'Total data berhasil diambil',
+            //     'total_sektor' => $total_sektor,
+            //     'total_subjek' => $total_subjek,
+            //     'total_user' => $total_user,
+            //     'total_antar_waktu' => $total_antar_waktu
+            // ], Response::HTTP_OK);
 
         } catch (Exception $e) {
             return response()->json([
@@ -78,11 +88,20 @@ class DashboardController extends Controller
                 ]
             ];
 
-            return response()->json($status_counts, Response::HTTP_OK);
+            return $this->successResponseWithData(
+                $status_counts,
+                'success',
+                Response::HTTP_OK
+            );
+
         } catch (Exception $e) {
-            return response()->json(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(
+                $e->getMessage(),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
+
 
     public function ChartBar(Request $request)
     {
@@ -105,31 +124,18 @@ class DashboardController extends Controller
                     ];
                 });
 
-            // Return the data as a JSON response
-            return response()->json([
-                'message' => 'Data untuk bar chart berhasil diambil',
-                'data' => $data
-            ], Response::HTTP_OK);
+            // Use the successResponseWithData method from ApiResponse trait
+            return $this->successResponseWithData(
+                $data,
+                'success',
+                Response::HTTP_OK
+            );
 
         } catch (Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(
+                $e->getMessage(),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
