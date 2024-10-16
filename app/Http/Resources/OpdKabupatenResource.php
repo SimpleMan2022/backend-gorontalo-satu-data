@@ -17,6 +17,7 @@ class OpdKabupatenResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
+            'logo' => $this->logo,
             'lokasi' => $this->lokasi,
             'kabupaten' => $this->kabupaten,
             'opd_provinsi' => $this->opd_provinsi->only('id', 'nama', 'lokasi'),
