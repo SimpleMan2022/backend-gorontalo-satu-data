@@ -158,4 +158,26 @@ class EnumeratorKabupatenController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function multiDestroy()
+    {
+        try {
+            $id = request('id');
+            $ids = explode(",", $id);
+
+            $enumerator_kabupaten = EnumeratorKabupaten::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $enumerator_kabupaten);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            EnumeratorKabupaten::whereIn('id', $enumerator_kabupaten)->delete();
+
+            return $this->successResponse('Data enumerator kabupaten berhasil dihapus', Response::HTTP_OK);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

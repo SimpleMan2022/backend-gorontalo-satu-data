@@ -165,4 +165,26 @@ class VariabelController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function multiDestroy()
+    {
+        try {
+            $id = request('id');
+            $ids = explode(",", $id);
+
+            $variabel = Variabel::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $variabel);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            Variabel::whereIn('id', $variabel)->delete();
+
+            return $this->successResponse('Data variabel berhasil dihapus', Response::HTTP_OK);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

@@ -88,6 +88,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/delete-pivot/{id}", "destroyPivot");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     // Subjek
@@ -98,6 +99,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('variabel')->controller(VariabelController::class)->group(function () {
@@ -109,6 +111,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::get("byOpdProvinsi/{id}", "byOpdProvinsi");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     // User Opd Provinsi
@@ -120,6 +123,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
         Route::get("byOpdKabupaten/{id}", "byOpdKabupaten");
         Route::get("by-opd-provinsi/{id}", "byOpdProvinsi");
+        Route::delete("/multi-delete", "multiDestroy");
     });
     // User Opd Kabupaten
     Route::prefix('user-opd-kabupaten')->controller(UserOpdKabupatenController::class)->group(function () {
@@ -129,6 +133,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::get("by-opd-kabupaten/{id}", "byOpdKabupaten");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('opd-provinsi')->controller(OpdProvinsiController::class)->group(function () {
@@ -137,12 +142,14 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
         Route::post("", "store");
         Route::post("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('opd-kabupaten')->controller(OpdKabupatenController::class)->group(function () {
@@ -152,6 +159,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::get("by-opd-provinsi/{opd_provinsi}", "byOpdKabupaten");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('berita-acara')->controller(BeritaAcaraController::class)->group(function () {
@@ -160,6 +168,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('enumerator')->controller(EnumeratorController::class)->group(function () {
@@ -168,6 +177,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('enumerator-kabupaten')->controller(EnumeratorKabupatenController::class)->group(function () {
@@ -176,6 +186,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('enumerator-provinsi')->controller(EnumeratorProvinsiController::class)->group(function () {
@@ -184,6 +195,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
 
@@ -195,6 +207,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
     Route::prefix('hasil-data')->controller(HasilDataController::class)->group(function () {
@@ -203,6 +216,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
     });
 
 });
