@@ -150,4 +150,26 @@ class PivotOpdSektorController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function multiDestroy()
+    {
+        try {
+            $id = request('id');
+            $ids = explode(",", $id);
+
+            $pivot = PivotOpdSektor::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $pivot);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            PivotOpdSektor::whereIn('id', $pivot)->delete();
+
+            return $this->successResponse('Data pivot Opd sektor berhasil dihapus', Response::HTTP_OK);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 }

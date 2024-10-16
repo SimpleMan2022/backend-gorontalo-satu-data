@@ -23,11 +23,11 @@ class UserOpdKabupatenController extends Controller
         try {
             $perPage = $request->per_page ?? 10;
             $data = UserOpdKabupaten::orderBy('created_at', 'desc')->paginate($perPage);
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithData(
+            if ($data->isNotEmpty()){
+                return $this->successResponseWithDataIndex(
                     $data,
-                    UserOpdKabupatenResource::collection($make),
-                    'success',
+                    UserOpdKabupatenResource::collection($data),
+                    'success', 
                     Response::HTTP_OK
                 );
             } else {
@@ -213,6 +213,28 @@ class UserOpdKabupatenController extends Controller
             $user_opd_kabupaten = UserOpdKabupaten::find($id);
             $user_opd_kabupaten->delete();
             return $this->successResponse('successfully deleted data', Response::HTTP_OK);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function multiDestroy()
+    {
+        try {
+            $id = request('id');
+            $ids = explode(",", $id);
+
+            $user_opd_kabupaten = UserOpdKabupaten::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $user_opd_kabupaten);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            UserOpdKabupaten::whereIn('id', $user_opd_kabupaten)->delete();
+
+            return $this->successResponse('Data user Opd Kabupaten berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

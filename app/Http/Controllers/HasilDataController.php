@@ -21,7 +21,7 @@ class HasilDataController extends Controller
         try {
             $perPage = $request->per_page ?? 10;
 
-            $hasilQuery = HasilData::orderBy('created_at', 'desc');
+            $hasilQuery = HasilData::orderBy('created_at', 'desc')->paginate($perPage);
 
             if ($sektorId = $request->query('rekap_hasil_id')) {
                 $hasilQuery->where('rekap_hasil_id', $sektorId);
@@ -157,6 +157,28 @@ class HasilDataController extends Controller
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function multiDestroy()
+    {
+        try {
+            $id = request('id');
+            $ids = explode(",", $id);
+
+            $hasil_data = HasilData::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $hasil_data);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            HasilData::whereIn('id', $hasil_data)->delete();
+
+            return $this->successResponse('Hasil data berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

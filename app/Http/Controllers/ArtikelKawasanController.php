@@ -13,6 +13,8 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Str;
+use Exception;
+use Symfony\Component\HttpFoundation\Response;
 use ZipArchive;
 
 class ArtikelKawasanController extends Controller
@@ -404,6 +406,28 @@ class ArtikelKawasanController extends Controller
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             return $this->errorResponse('Error: ' . $e->getMessage(), 500);
+        }
+    }
+
+    public function multiDestroy()
+    {
+        try {
+            $id = request('id');
+            $ids = explode(",", $id);
+
+            $artikelKawasan = ArtikelKawasan::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $artikelKawasan);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            ArtikelKawasan::whereIn('id', $artikelKawasan)->delete();
+
+            return $this->successResponse('Artikel kawasan berhasil dihapus', Response::HTTP_OK);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
