@@ -50,26 +50,16 @@ class SektorController extends Controller
             // Membuat validasi
             $validated = $request->validate([
                 'nama' => 'required|min:3',
-                'logo' => 'required|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                'logo' => [
+                    'required',
+                    'url', // Validasi bahwa input adalah URL
+                    'regex:/^https?:\/\/.+\.(webp)$/i' // Validasi format .webp di URL
+                ]
             ]);
 
-            $logoPath = $request->file('logo')->store('logo', 'public');
-            $extension = $request->file('logo')->getClientOriginalExtension();
-
-            if (strtolower($extension) !== 'webp') {
-                $webpPath = storage_path('app/public/logo/' . pathinfo($logoPath, PATHINFO_FILENAME) . '.webp');
-
-                ConvertImage::convertImageToWebP(storage_path('app/public/' . $logoPath), $webpPath);
-
-                // Simpan path WebP ke database
-                $validated['logo'] = 'logo/' . basename($webpPath);
-
-                Storage::disk('public')->delete($logoPath);
-            } else {
-                $validated['logo'] = $logoPath;
-            }
-
+            // Simpan data sektor
             Sektor::create($validated);
+
             return $this->successResponse(
                 'Data sektor berhasil dibuat',
                 Response::HTTP_CREATED
@@ -80,6 +70,8 @@ class SektorController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+
 
     public function show($id)
     {
@@ -111,35 +103,16 @@ class SektorController extends Controller
             // Membuat Validasi
             $validated = $request->validate([
                 'nama' => 'required',
-                'logo' => 'nullable|image|mimes:jpeg,png,jpg,gif,svg|max:2048'
+                'logo' => [
+                    'nullable',
+                    'url', // Validasi bahwa input adalah URL
+                    'regex:/^https?:\/\/.+\.(webp)$/i' // Validasi format .webp di URL
+                ]
             ]);
 
             $data = Sektor::find($sektor);
 
             if ($data) {
-
-                if ($request->hasFile('logo')) {
-                    $logoPath = $request->file('logo')->store('logo', 'public');
-                    $extension = $request->file('logo')->getClientOriginalExtension();
-
-                    if (strtolower($extension) !== 'webp') {
-                        $webpPath = storage_path('app/public/logo/' . pathinfo($logoPath, PATHINFO_FILENAME) . '.webp');
-
-                        ConvertImage::convertImageToWebP(storage_path('app/public/' . $logoPath), $webpPath);
-
-                        $validated['logo'] = 'logo/' . basename($webpPath);
-
-                        Storage::disk('public')->delete($logoPath);
-                    } else {
-                        $validated['logo'] = $logoPath;
-                    }
-
-                    // Hapus logo lama jika ada
-                    if ($data->logo && $data->logo !== $validated['logo']) {
-                        Storage::disk('public')->delete($data->logo);
-                    }
-                }
-
                 $data->update($validated);
                 return $this->successResponse(
                     'Data sektor berhasil diubah',
@@ -169,9 +142,6 @@ class SektorController extends Controller
             $data = Sektor::find($id);
 
             if ($data) {
-                if ($data->logo) {
-                    Storage::disk('public')->delete($data->logo);
-                }
                 $data->delete();
             } else {
                 return $this->errorResponse(
@@ -198,13 +168,6 @@ class SektorController extends Controller
 
             if (!empty($notFoundIds)) {
                 return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
-            }
-
-            foreach ($sektors as $id) {
-                $data = Sektor::find($id);
-                if ($data && $data->logo) {
-                    Storage::disk('public')->delete($data->logo);
-                }
             }
 
             Sektor::whereIn('id', $sektors)->delete();
