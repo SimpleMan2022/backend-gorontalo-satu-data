@@ -183,7 +183,7 @@ paths:
                           example: "Kesehatan"
                         logo:
                           type: string
-                          example: "logo/uoVnS7q4X1ktmhGPprwn5XZarDo9W6WnXKxZdces.webp"
+                          example: "http://gsd/foto.webp"
                         created_at:
                           type: string
                           example: "2024-10-16T01:32:59.000000Z"
@@ -212,7 +212,7 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
@@ -221,8 +221,7 @@ paths:
                   example: "Pendidikan"
                 logo:
                   type: string
-                  format: binary
-                  description: Logo sektor dalam bentuk file dengan format .jpg, .jpeg, .png, .webp
+                  example: "http://gsd/foto.webp"
       responses:
         "201":
           description: Sektor berhasil ditambahkan
@@ -295,7 +294,7 @@ paths:
                         example: "Pendidikan"
                       logo:
                         type: string
-                        example: "logo/c3ZfvPNkceM3RXRyV92omaPrK4J2xmN4kSv5xGqB.webp"
+                        example: "http://gsd/foto.webp"
                       created_at:
                         type: string
                         example: "2024-10-16T01:41:07.000000Z"
@@ -329,7 +328,7 @@ paths:
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               properties:
@@ -338,8 +337,7 @@ paths:
                   example: "Pendidikan"
                 logo:
                   type: string
-                  format: binary
-                  description: Logo sektor dalam bentuk file dengan format .jpg, .jpeg, .png, .webp
+                  example: "http://gsd/foto.webp"
       responses:
         "200":
           description: Data sektor berhasil diubah
