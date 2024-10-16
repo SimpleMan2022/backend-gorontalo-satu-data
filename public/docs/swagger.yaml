@@ -171,24 +171,25 @@ paths:
                     type: string
                     example: "Data sektor berhasil diambil"
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        $ref: "#/components/schemas/Pagination"
-                      data:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 2
-                            nama:
-                              type: string
-                              example: "Kesehatan"
-                            created_at:
-                              type: string
-                              example: "07 October 2024"
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        nama:
+                          type: string
+                          example: "Kesehatan"
+                        logo:
+                          type: string
+                          example: "logo/uoVnS7q4X1ktmhGPprwn5XZarDo9W6WnXKxZdces.webp"
+                        created_at:
+                          type: string
+                          example: "2024-10-16T01:32:59.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+
         "404":
           description: Data sektor masih kosong
           content:
@@ -211,13 +212,17 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 nama:
                   type: string
                   example: "Pendidikan"
+                logo:
+                  type: string
+                  format: binary
+                  description: Logo sektor dalam bentuk file dengan format .jpg, .jpeg, .png, .webp
       responses:
         "201":
           description: Sektor berhasil ditambahkan
@@ -288,6 +293,12 @@ paths:
                       nama:
                         type: string
                         example: "Pendidikan"
+                      logo:
+                        type: string
+                        example: "logo/c3ZfvPNkceM3RXRyV92omaPrK4J2xmN4kSv5xGqB.webp"
+                      created_at:
+                        type: string
+                        example: "2024-10-16T01:41:07.000000Z"
         "401":
           description: Unauthorized
           content:
@@ -318,13 +329,17 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 nama:
                   type: string
-                  example: "Infrastruktur"
+                  example: "Pendidikan"
+                logo:
+                  type: string
+                  format: binary
+                  description: Logo sektor dalam bentuk file dengan format .jpg, .jpeg, .png, .webp
       responses:
         "200":
           description: Data sektor berhasil diubah
@@ -481,27 +496,24 @@ paths:
                     type: string
                     example: "success"
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        $ref: "#/components/schemas/Pagination"
-                      data:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 2
-                            tahun:
-                              type: string
-                              example: "2024"
-                            nama:
-                              type: string
-                              example: "Triwulan 2"
-                            created_at:
-                              type: string
-                              example: "07 October 2024"
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        tahun:
+                          type: string
+                          example: "2024"
+                        nama:
+                          type: string
+                          example: "Triwulan 2"
+                        created_at:
+                          type: string
+                          example: "07 October 2024"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Bad Request
           content:
@@ -767,65 +779,62 @@ paths:
                     type: string
                     example: "Data indikator berhasil diambil"
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        $ref: "#/components/schemas/Pagination"
-                      data:
-                        type: array
-                        items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 7
+                        nama:
+                          type: string
+                          example: "Sebaran Jumlah Rumah Sakit dengan kondisi bangunan sedang"
+                        sektor:
                           type: object
                           properties:
                             id:
                               type: integer
-                              example: 7
+                              example: 9
                             nama:
                               type: string
-                              example: "Sebaran Jumlah Rumah Sakit dengan kondisi bangunan sedang"
-                            sektor:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                  example: 9
-                                nama:
-                                  type: string
-                                  example: "kesehatan"
-                            antar_waktu:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                  example: 6
-                                tahun:
-                                  type: string
-                                  example: "2022"
-                                nama:
-                                  type: string
-                                  example: "Triwulan 5"
-                            opd_provinsi:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                  example: 1
-                                nama:
-                                  type: string
-                                  example: "Dinas Pendidikan"
-                                lokasi:
-                                  type: string
-                                  example: "Jl. Pendidikan No. 1"
-                            status:
+                              example: "kesehatan"
+                        antar_waktu:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 6
+                            tahun:
                               type: string
-                              example: "pending"
-                            created_at:
+                              example: "2022"
+                            nama:
                               type: string
-                              format: date-time
-                              example: "2024-10-13T12:30:11.000000Z"
-                            updated_at:
+                              example: "Triwulan 5"
+                        opd_provinsi:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
                               type: string
-                              format: date-time
-                              example: "2024-10-13T12:30:11.000000Z"
+                              example: "Dinas Pendidikan"
+                            lokasi:
+                              type: string
+                              example: "Jl. Pendidikan No. 1"
+                        status:
+                          type: string
+                          example: "pending"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T12:30:11.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T12:30:11.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
 
         "401":
           description: Unauthorized
@@ -1856,7 +1865,7 @@ paths:
   /opd-provinsi:
     get:
       tags:
-        - opd provinsi
+        - OPD Provinsi
       summary: Mendapatkan semua daftar opd provinsi
       security:
         - BearerAuth: []
@@ -1888,6 +1897,9 @@ paths:
                         nama:
                           type: string
                           example: "Dinas Pendidikan"
+                        logo:
+                          type: string
+                          example: "logo/mlEQBf5WMGN7Ac4dASPYBxdF4uiQw13jAeoyM5yI.webp"
                         lokasi:
                           type: string
                           example: "Jl. Pendidikan No. 1"
@@ -1904,33 +1916,27 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example:
+                $ref: "#/components/schemas/UnauthorizedResponse"
     post:
       tags:
-        - opd provinsi
+        - OPD Provinsi
       summary: Menambahkan opd provinsi baru
       security:
         - BearerAuth: []
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 nama:
                   type: string
-                  example: "Dinas Pendidikan"
+                  example: "Kominfo Provinsi Gorontalo"
+                logo:
+                  type: string
+                  format: binary
+                  description: Logo sektor dalam bentuk file dengan format .jpg, .jpeg, .png, .webp
                 lokasi:
                   type: string
                   example: "Jl. Pendidikan No. 1"
@@ -1957,26 +1963,22 @@ paths:
                   lokasi:
                     type: string
                     example: "Jl. Pendidikan No. 1"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /opd-provinsi/{id}:
     get:
       tags:
-        - opd provinsi
+        - OPD Provinsi
       summary: Mendapatkan detail opd provinsi berdasarkan ID
       security:
         - BearerAuth: []
@@ -2013,6 +2015,9 @@ paths:
                       nama:
                         type: string
                         example: "Dinas Pendidikan"
+                      logo:
+                        type: string
+                        example: "logo/mlEQBf5WMGN7Ac4dASPYBxdF4uiQw13jAeoyM5yI.webp"
                       lokasi:
                         type: string
                         example: "Jl. Pendidikan No. 1"
@@ -2029,37 +2034,37 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /opd-provinsi/edit/{id}:
     patch:
       tags:
-        - opd provinsi
+        - OPD Provinsi
       summary: Memperbarui opd provinsi yang ada
       security:
         - BearerAuth: []
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 nama:
                   type: string
-                  example: "Dinas Kesehatan"
+                  example: "Kominfo Provinsi Gorontalo"
+                logo:
+                  type: string
+                  format: binary
+                  description: Logo sektor dalam bentuk file dengan format .jpg, .jpeg, .png, .webp
                 lokasi:
                   type: string
-                  example: "Jl. AgusSalim No. 5"
+                  example: "Jl. Pendidikan No. 1"
       responses:
         "201":
           description: opd provinsi berhasil diperbarui
@@ -2076,19 +2081,29 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data berhasil diperbarui
-                  nama:
-                    type: string
-                    example: "Dinas Kesehatan"
-                  lokasi:
-                    type: string
-                    example: "Jl. AgusSalim No. 5"
+                    example: Data OPD Provinsi berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /opd-provinsi/delete/{id}:
     delete:
       tags:
-        - opd provinsi
+        - OPD Provinsi
       summary: Menghapus opd provinsi berdasarkan id
       security:
         - BearerAuth: []
@@ -2132,11 +2147,59 @@ paths:
                   message:
                     type: string
                     example: "Data tidak ditemukan"
+  /opd-provinsi/multi-delete:
+    delete:
+      tags:
+        - OPD Provinsi
+      summary: Menghapus banyak opd provinsi
+      description: API untuk menghapus banyak opd provinsi berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: OPD Provinsi berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
 
   /opd-kabupaten:
     get:
       tags:
-        - opd kabupaten
+        - OPD Kabupaten
       summary: Mendapatkan semua daftar opd kabupaten
       security:
         - BearerAuth: []
@@ -2156,7 +2219,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data OPD Kabupaten berhasil diambil
                   data:
                     type: array
                     items:
@@ -2168,15 +2231,36 @@ paths:
                         nama:
                           type: string
                           example: "Dinas Pendidikan Kabupaten Bone Bolango"
+                        logo:
+                          type: string
+                          example: "logo/mlEQBf5WMGN7Ac4dASPYBxdF4uiQw13jAeoyM5yI.webp"
                         lokasi:
                           type: string
                           example: "Jl. Pendidikan No. 12"
-                        kabupaten_id:
-                          type: integer
-                          example: 7504
-                        opd_provinsi_id:
-                          type: integer
-                          example: 1
+                        kabupaten:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 7504
+                            province_id:
+                              type: integer
+                              example: 41
+                            name:
+                              type: string
+                              example: "Kabupaten Bone Bolango"
+                        opd_provinsi:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Dinas Pendidikan Provinsi Gorontalo"
+                            lokasi:
+                              type: string
+                              example: "Jl. Pendidikan No. 1"
                         created_at:
                           type: string
                           format: date-time
@@ -2185,48 +2269,40 @@ paths:
                           type: string
                           format: date-time
                           example: "2024-10-07T02:28:10.000000Z"
-                        data:
-                          type: array
-                        items:
-                          type: object
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example:
+                $ref: "#/components/schemas/UnauthorizedResponse"
     post:
       tags:
-        - opd kabupaten
+        - OPD Kabupaten
       summary: Menambahkan opd kabupaten baru
       security:
         - BearerAuth: []
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 nama:
                   type: string
-                  example: "Dinas Pendidikan Kabupaten Bone Bolango "
+                  example: "Kominfo Provinsi Kabupaten Bone Bolango"
+                logo:
+                  type: string
+                  format: binary
+                  description: Logo sektor dalam bentuk file dengan format .jpg, .jpeg, .png, .webp
                 lokasi:
                   type: string
-                  example: "Jl. Pendidikan No. 12"
+                  example: "Jl. Pendidikan No. 1"
                 kabupaten_id:
                   type: integer
-                  example: 7504
+                  example: 0912
                 opd_provinsi_id:
                   type: integer
                   example: 1
@@ -2246,39 +2322,23 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  nama:
-                    type: string
-                    example: "Dinas Pendidikan Kabupaten Bone Bolango"
-                  lokasi:
-                    type: string
-                    example: "Jl. Pendidikan No. 12"
-                  kabupaten_id:
-                    type: integer
-                    example: 7504
-                  opd_provinsi_id:
-                    type: integer
-                    example: 1
+                    example: Data OPD Kabupaten berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /opd-kabupaten/{id}:
     get:
       tags:
-        - opd kabupaten
+        - OPD Kabupaten
       summary: Mendapatkan detail opd kabupaten berdasarkan ID
       security:
         - BearerAuth: []
@@ -2315,65 +2375,86 @@ paths:
                       nama:
                         type: string
                         example: "Dinas Pendidikan Kabupaten Bone Bolango"
+                      logo:
+                        type: string
+                        example: "logo/mlEQBf5WMGN7Ac4dASPYBxdF4uiQw13jAeoyM5yI.webp"
                       lokasi:
                         type: string
-                        example: "Jl. Pendidikan No. 1"
-                      kabupaten_id:
-                        type: integer
-                        example: 7504
-                      opd_provinsi_id:
-                        type: integer
-                        example: 1
+                        example: "Jl. Pendidikan No. 12"
+                      kabupaten:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 7504
+                          province_id:
+                            type: integer
+                            example: 41
+                          name:
+                            type: string
+                            example: "Kabupaten Bone Bolango"
+                      opd_provinsi:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nama:
+                            type: string
+                            example: "Dinas Pendidikan Provinsi Gorontalo"
+                          lokasi:
+                            type: string
+                            example: "Jl. Pendidikan No. 1"
                       created_at:
                         type: string
                         format: date-time
-                        example: "2024-10-07T02:28:11.000000Z"
+                        example: "2024-10-07T02:28:10.000000Z"
                       updated_at:
                         type: string
                         format: date-time
-                        example: "2024-10-07T02:28:11.000000Z"
+                        example: "2024-10-07T02:28:10.000000Z"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /opd-kabupaten/edit/{id}:
     patch:
       tags:
-        - opd kabupaten
+        - OPD Kabupaten
       summary: Memperbarui opd kabupaten yang ada
       security:
         - BearerAuth: []
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
                 nama:
                   type: string
-                  example: "Dinas Kesehatan kabupaten telaga"
+                  example: "Kominfo Provinsi Kabupaten Bone Bolango"
+                logo:
+                  type: string
+                  format: binary
+                  description: Logo sektor dalam bentuk file dengan format .jpg, .jpeg, .png, .webp
                 lokasi:
                   type: string
-                  example: "Jl. perlimaan No. 3"
+                  example: "Jl. Pendidikan No. 1"
                 kabupaten_id:
                   type: integer
-                  example: 23
+                  example: 0912
                 opd_provinsi_id:
                   type: integer
-                  example: 2
+                  example: 1
       responses:
         "201":
           description: opd kabupaten berhasil diperbarui
@@ -2390,25 +2471,29 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data berhasil diperbarui
-                  nama:
-                    type: string
-                    example: "Dinas Kesehatan kabupaten telaga"
-                  lokasi:
-                    type: string
-                    example: "Jl. perlimaan No. 3"
-                  kabupaten_id:
-                    type: integer
-                    example: 23
-                  opd_provinsi_id:
-                    type: integer
-                    example: 2
+                    example: Data OPD Kabupaten berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /opd-kabupaten/delete/{id}:
     delete:
       tags:
-        - opd kabupaten
+        - OPD Kabupaten
       summary: Menghapus opd kabupaten berdasarkan id
       security:
         - BearerAuth: []
@@ -2436,8 +2521,41 @@ paths:
                   message:
                     type: string
                     example: "Data berhasil dihapus"
+
         "401":
-          description: Bad Request
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /opd-kabupaten/multi-delete:
+    delete:
+      tags:
+        - OPD Kabupaten
+      summary: Menghapus banyak opd kabupaten
+      description: API untuk menghapus banyak opd kabupaten berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: OPD Kabupaten berhasil dihapus
           content:
             application/json:
               schema:
@@ -2445,13 +2563,25 @@ paths:
                 properties:
                   code:
                     type: number
-                    example: 404
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Data tidak ditemukan"
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
 
   /berita-acara:
     get:
@@ -2817,60 +2947,43 @@ paths:
                     type: string
                     example: "Data periode berhasil diambil"
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 1
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 1
-                          total_pages:
-                            type: integer
-                            example: 1
-                      data:
-                        type: array
-                        items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 4
+                        nama:
+                          type: string
+                          example: "periode 3"
+                        tanggal_mulai:
+                          type: string
+                          format: date
+                          example: "2024-01-12"
+                        tanggal_selesai:
+                          type: string
+                          format: date
+                          example: "2024-01-12"
+                        opd_provinsi_id:
                           type: object
                           properties:
-                            id:
-                              type: integer
-                              example: 4
                             nama:
                               type: string
-                              example: "periode 3"
-                            tanggal_mulai:
+                              example: "Dinas Komunikasi dan Informatika"
+                            lokasi:
                               type: string
-                              format: date
-                              example: "2024-01-12"
-                            tanggal_selesai:
-                              type: string
-                              format: date
-                              example: "2024-01-12"
-                            opd_provinsi_id:
-                              type: object
-                              properties:
-                                nama:
-                                  type: string
-                                  example: "Dinas Komunikasi dan Informatika"
-                                lokasi:
-                                  type: string
-                                  example: "Jl. Kesehatan No. 1"
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-14T01:39:25.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-14T01:39:25.000000Z"
-
+                              example: "Jl. Kesehatan No. 1"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-14T01:39:25.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-14T01:39:25.000000Z"
+                  Pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Unauthorized
           content:
