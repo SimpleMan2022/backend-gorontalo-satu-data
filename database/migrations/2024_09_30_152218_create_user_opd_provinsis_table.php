@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('user_opd_provinsi', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->integer('opd_provinsi_id');
-            $table->integer('user_id');
+            $table->foreignId('opd_provinsi_id')->references('id')->on('opd_provinsi')->onDelete('cascade');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('jabatan');
             $table->timestamps();
         });
