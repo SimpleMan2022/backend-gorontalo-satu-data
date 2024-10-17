@@ -54,7 +54,7 @@ class UserOpdProvinsiController extends Controller
                 'nama' => 'required',
                 // 'password' => 'required',
                 'opd_provinsi_id' => 'required',
-                'user_jabatan' => 'required',
+                'jabatan' => 'required',
             ]);
 
             if (User::where('email', $validated['email'])->exists()) {
@@ -78,7 +78,7 @@ class UserOpdProvinsiController extends Controller
                     'nama' => $request->nama,
                     'opd_provinsi_id' => $validated["opd_provinsi_id"],
                     'user_id' => $user->id,
-                    'jabatan' => $request->user_jabatan,
+                    'jabatan' => $request->jabatan,
                 ]);
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
