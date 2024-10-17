@@ -9,6 +9,7 @@ use App\Http\Traits\ApiResponse;
 use App\Models\AntarWaktu;
 use App\Models\Indikator;
 use App\Models\User;
+use App\Models\Variabel;
 use Exception;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -37,15 +38,6 @@ class DashboardController extends Controller
                 'success', 
                 Response::HTTP_OK
             );
-
-            // return response()->json([
-            //     'message' => 'Total data berhasil diambil',
-            //     'total_sektor' => $total_sektor,
-            //     'total_subjek' => $total_subjek,
-            //     'total_user' => $total_user,
-            //     'total_antar_waktu' => $total_antar_waktu
-            // ], Response::HTTP_OK);
-
         } catch (Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()
@@ -136,6 +128,33 @@ class DashboardController extends Controller
                 $e->getMessage(),
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
+        }
+    }
+
+    public function OpdView(Request $request)
+    {
+        try {
+            $total_variabel = Variabel::count();
+            $total_indikator = Indikator::count();
+            $total_subjek = Subjek::count(); 
+            $total_user = User::count();
+
+            $data = [
+                'total_variabel' => $total_variabel,
+                'total_indikator' => $total_indikator,
+                'total_subjek' => $total_subjek,
+                'total_user' => $total_user,
+            ];
+
+            return $this->successResponseWithData(
+                $data,
+                'success', 
+                Response::HTTP_OK
+            );
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 }
