@@ -18,20 +18,31 @@ class PivotEnumeratorIndikatorController extends Controller
 
     public function index(Request $request) {
         try {
-            $perPage = $request->per_page ?? 20;
-            $data = PivotEnumeratorIndikator::orderBy('created_at', 'desc')->paginate($perPage);
+            $perPage = $request->per_page ?? 10;
+
+            $pivotQuery = PivotEnumeratorIndikator::orderBy('created_at', 'desc');
+
+            if ($enumeratorId = $request->query('enumerator_id')) {
+                $pivotQuery->where('enumerator_id', $enumeratorId);
+            }
+
+            if ($indikatorId = $request->query('indikatorId')) {
+                $pivotQuery->where('indikatorId', $indikatorId);
+            }
+
+
+            $data = $pivotQuery->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
-                    $data, 
+                    $data,
                     PivotEnumeratorIndikatorResource::collection($data),
-                    'success', 
+                    'Data indikator berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
+           
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
