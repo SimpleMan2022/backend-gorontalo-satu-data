@@ -225,7 +225,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/admin/chart-donut", "ChartDonut");
         Route::get("/admin/chart-bar", "ChartBar");
 
-        Route::get("/opd", "OpdView");
+        Route::get("/opd-provinsi", "OpdProvinsiView");
     });
 
 });

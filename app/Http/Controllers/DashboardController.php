@@ -131,17 +131,27 @@ class DashboardController extends Controller
         }
     }
 
-    public function OpdView(Request $request)
+    public function OpdProvinsiView(Request $request)
     {
         try {
-            $total_variabel = Variabel::count();
-            $total_indikator = Indikator::count();
-            $total_subjek = Subjek::count(); 
-            $total_user = User::count();
+            // Check if opd_provinsi_id is provided
+            $opd_provinsi_id = $request->input('opd_provinsi_id');
+            if (!$opd_provinsi_id) {
+                return response()->json([
+                    'error' => 'opd_provinsi_id is required'
+                ], Response::HTTP_BAD_REQUEST);
+            }
 
+            // Count all entries
+            $total_variabel = Variabel::count(); // Assuming Variabel does not have opd_provinsi_id
+            $total_indikator = Indikator::where('opd_provinsi_id', $opd_provinsi_id)->count(); // Filter by opd_provinsi_id
+            $total_subjek = Subjek::count(); // Assuming Subjek does not have opd_provinsi_id
+            $total_user = User::count(); // Assuming User does not have opd_provinsi_id
+
+            // Prepare data response
             $data = [
                 'total_variabel' => $total_variabel,
-                'total_indikator' => $total_indikator,
+                'total_indikator' => $total_indikator, // Only showing the count of indikator with the same opd_provinsi_id
                 'total_subjek' => $total_subjek,
                 'total_user' => $total_user,
             ];
@@ -157,4 +167,5 @@ class DashboardController extends Controller
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 }
