@@ -1614,7 +1614,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data user OPD Kabupaten berhasil diambil
                   data:
                     type: array
                     items:
@@ -1626,9 +1626,18 @@ paths:
                         nama:
                           type: string
                           example: "Agus Kurniawan"
-                        opd_provinsi_id:
-                          type: integer
-                          example: 1
+                        opd_kabupaten:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Dinas Pendidikan"
+                            lokasi:
+                              type: string
+                              example: "Jl. Pendidikan No. 1"
                         user_id:
                           type: integer
                           example: 2
