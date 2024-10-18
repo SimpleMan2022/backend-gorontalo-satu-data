@@ -14,8 +14,8 @@ return new class extends Migration
         Schema::create('user_opd_kabupaten', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->integer('opd_kabupaten_id')->references('id')->on('opd_kabupaten')->onDelete('cascade');
-            $table->integer('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreignId('opd_kabupaten_id')->references('id')->on('opd_kabupaten')->onDelete('cascade');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('jabatan');
             $table->timestamps();
         });
