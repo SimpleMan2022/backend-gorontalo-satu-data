@@ -4,6 +4,7 @@ use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnumeratorController;
 use App\Http\Controllers\EnumeratorKabupatenController;
 use App\Http\Controllers\EnumeratorProvinsiController;
@@ -19,6 +20,7 @@ use App\Http\Controllers\SubjekController;
 use App\Http\Controllers\PivotOpdSektorController;
 use App\Http\Controllers\HasilDataController;
 use App\Http\Controllers\PivotEnumeratorIndikatorController;
+use App\Http\Controllers\RekapHasilController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
@@ -62,7 +64,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/by-opd/{opd_provinsi}", "byOpdProvinsi");
         Route::get("/{id}", "show");
         Route::get("/{id}", "show");
-        Route::patch("/{id}/status", "updateStatus");
+        Route::patch("/updateStatus/{id}", "updateStatus");
+        Route::patch("/multiUpdate", "multiUpdate");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
@@ -214,10 +217,28 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
-        Route::patch("/edit/{id}", "update");
+        Route::put("/edit/{rekap_hasil_id}", "update");
+        // Route::delete("/delete/{id}", "destroy");
+    });
+
+    Route::prefix('rekap-hasil')->controller(RekapHasilController::class)->group(function () {
+        Route::get("", "index");
+        // Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::put("/multiVerifikasi", "multiUpdate");
+        Route::put("/verifikasi/{rekap_hasil_id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
+
+    Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {
+        Route::get("/admin", "AdminView");
+        Route::get("/admin/chart-donut", "ChartDonut");
+        Route::get("/admin/chart-bar", "ChartBar");
+
+        Route::get("/opd", "OpdView");
+    });
+
 });
 
 Route::get('/docs', function () {
