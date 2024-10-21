@@ -107,7 +107,9 @@ class HasilDataController extends Controller
                                 'rekap_hasil_id' => $rekap_hasil->id,
                                 'variabel_id' => $item['variabel_id'],
                                 'konten' => $file_name,
-                            ]);    
+                            ]);
+                            
+                            
                         }else {
                             return $this->errorResponse('Ukuran file maksimal 2mb', Response::HTTP_BAD_REQUEST);
                         }

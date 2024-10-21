@@ -20,11 +20,14 @@ use App\Http\Controllers\PivotOpdSektorController;
 use App\Http\Controllers\HasilDataController;
 use App\Http\Controllers\PivotEnumeratorIndikatorController;
 use App\Http\Controllers\RekapHasilController;
+use App\Http\Controllers\ForgotPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
     Route::post("register", "create");
     Route::post("login", "login")->name('login');
+    Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.reset');
+    Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
 });
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
