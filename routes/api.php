@@ -222,10 +222,12 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {
         Route::get("/admin", "AdminView");
-        Route::get("/admin/chart-donut", "ChartDonut");
-        Route::get("/admin/chart-bar", "ChartBar");
+        Route::get("/admin/chart-donut", "ChartDonutAdmin");
+        Route::get("/admin/chart-bar", "ChartBarAdmin");
 
         Route::get("/opd-provinsi", "OpdProvinsiView");
+        Route::get("/opd-provinsi/chart-donut", "ChartDonutOpdProvinsi");
+        Route::get("/opd-provinsi/chart-bar", "ChartBarOpdProvinsi");
     });
 
 });
