@@ -17,9 +17,9 @@ class BeritaAcaraResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
-            'opd_kabupaten_id' => $this->opd_kabupaten,
+            'opd_kabupaten' => $this->opd_kabupaten->only('id', 'nama', 'lokasi'),
             'file' => $this->file,
-            'indikator_id' => $this->indikator,
+            'indikator' => $this->indikator->only('id', 'nama', 'status'),
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->created_at

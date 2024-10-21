@@ -138,6 +138,32 @@ class IndikatorController extends Controller
         }
     }
 
+    public function multiUpdate(Request $request) {
+        try {
+            $validated = $request->validate([
+                '*.id' => 'required|integer|exists:indikator,id',
+                '*.status' => 'required|in:public,private,pending',
+            ]);
+
+            $ids = collect($validated)->pluck('id');
+            $indikator = Indikator::whereIn('id', $ids)->get();
+
+            foreach ($indikator as $item) {
+                $item->update([
+                    'status' => collect($validated)->where('id', $item->id)->first()['status']
+                ]);
+            }
+
+            return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal diperbarui', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function destroy($id)
     {
         try {

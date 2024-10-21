@@ -10,7 +10,6 @@ use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
-use Spatie\Permission\Models\Role;
 use App\Http\Resources\UserOpdProvinsiResource;
 
 use Illuminate\Http\Request;
@@ -19,24 +18,28 @@ use Illuminate\Support\Facades\Hash;
 class UserOpdProvinsiController extends Controller
 {
     use ApiResponse;
-    
-    public function index()
+
+    public function index(Request $request)
     {
         try {
             $perPage = $request->per_page ?? 10;
-            $data = UserOpdProvinsi::orderBy('created_at', 'desc')->paginate($perPage);
+            $userOPDQuery = UserOpdProvinsi::orderBy('created_at', 'desc');
+
+            if ($request->has('opd_provinsi_id')) {
+                $userOPDQuery->where('opd_provinsi_id', $request->opd_provinsi_id);
+            }
+
+            $data = $userOPDQuery->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
                     UserOpdProvinsiResource::collection($data),
-                    'success',
+                    'Data user OPD Provinsi berhasil diambil',
                     Response::HTTP_OK
                 );
                 // return $data;
-            }else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+            } else {
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -51,7 +54,7 @@ class UserOpdProvinsiController extends Controller
                 'nama' => 'required',
                 // 'password' => 'required',
                 'opd_provinsi_id' => 'required',
-                'user_jabatan' => 'required',
+                'jabatan' => 'required',
             ]);
 
             if (User::where('email', $validated['email'])->exists()) {
@@ -66,19 +69,19 @@ class UserOpdProvinsiController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-
-            $validated['password'] = Hash::make('gsdmakro123');
+            if (User::where('username', $validated['nama'])->get()) {
+                return $this->errorResponse('Username sudah tersedia', Response::HTTP_BAD_REQUEST);
+            }
+            $validated['password'] = Hash::make(env('PASSWORD_OPD'));
             $user = User::create($validated);
             $user->assignRole('opd_provinsi');
-            if ($user){
-                
-                    UserOpdProvinsi::create([
-                        'nama' => $request->nama,
-                        'opd_provinsi_id' => $validated["opd_provinsi_id"],
-                        'user_id' => $user->id,
-                        'jabatan' => $request->user_jabatan,
-                    ]);
-          
+            if ($user) {
+                UserOpdProvinsi::create([
+                    'nama' => $request->nama,
+                    'opd_provinsi_id' => $validated["opd_provinsi_id"],
+                    'user_id' => $user->id,
+                    'jabatan' => $request->jabatan,
+                ]);
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
@@ -92,11 +95,11 @@ class UserOpdProvinsiController extends Controller
     {
         try {
             // Mencari data user opd provinsi dengan id
-            $data = UserOpdProvinsi::find($id);
+            $data = UserOpdProvinsi::findOrFail($id);
 
             return $this->successResponseWithData(
                 UserOpdProvinsiResource::make($data),
-                'success',
+                'Data user OPD Provinsi berhasil diambil',
                 Response::HTTP_OK
             );
         } catch (ModelNotFoundException $e) {
@@ -106,43 +109,15 @@ class UserOpdProvinsiController extends Controller
         }
     }
 
-    public function byOpdProvinsi(string $id)
-    {
-        try {
-            // Retrieve all records where the OpdProvinsi ID matches
-            $data = UserOpdProvinsi::where('opd_provinsi_id', $id)->get();
-
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithData(
-                    UserOpdProvinsiResource::collection($data),
-                    'success',
-                    Response::HTTP_OK
-                );
-            } else {
-                return response()->json([
-                    'message' => 'Data tidak ditemukan.'
-                ], Response::HTTP_NOT_FOUND);
-            }
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public function edit(string $id)
-    {
-        //
-    }
-
     public function update(Request $request, string $id)
     {
         try {
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                // 'password' => 'required',
-                'nama_opd' => 'required',
-                'lokasi_opd' => 'required',
-                'user_jabatan' => 'required',
+                // 'password' => 'required',,
+                'opd_provinsi_id' => 'required',
+                'jabatan' => 'required',
             ]);
 
             $user_opd_provinsi = UserOpdProvinsi::find($id);
@@ -154,28 +129,18 @@ class UserOpdProvinsiController extends Controller
 
             // $validated['password'] = Hash::make($request->password);
             $user = User::find($user_opd_provinsi->user_id);
-            $user->update($validated);
-            if ($user){
-                
-                $opd_provinsi = OpdProvinsi::find($user_opd_provinsi->opd_provinsi_id);
-
-                $opd_provinsi->update([
-                    'nama' => $request->nama_opd,
-                    'lokasi' => $request->lokasi_opd,
+            $user->update([
+                'email' => $request->email,
+                'username' => $validated['username'],
+            ]);
+            if ($user) {
+                $user_opd_provinsi->update([
+                    'nama' => $request->nama,
+                    'opd_provinsi_id' => $request->opd_provinsi_id,
+                    'jabatan' => $request->jabatan,
                 ]);
-                
-                if ($opd_provinsi){
-                    // $user_opd_provinsi = UserOpdProvinsi::find($user_opd_provinsi->id)
-
-                    $user_opd_provinsi->update([
-                        'nama' => $request->nama,
-                        'opd_provinsi_id' => $opd_provinsi->id,
-                        'user_id' => $user->id,
-                        'jabatan' => $request->user_jabatan,
-                    ]);
-                }
             }
-            return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
+            return $this->successResponse('Data User OPD Provinsi berhasil diubah', Response::HTTP_CREATED);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
@@ -189,9 +154,13 @@ class UserOpdProvinsiController extends Controller
     {
         try {
             // Menghapus data sektor sesuai request $sektor
-            $user_opd_provinsi = UserOpdProvinsi::find($id);
+            $user_opd_provinsi = UserOpdProvinsi::findOrFail($id);
+            $user = User::find($user_opd_provinsi->user_id);
             $user_opd_provinsi->delete();
-            return $this->successResponse('successfully deleted data', Response::HTTP_OK);
+            $user->delete();
+            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_INTERNAL_SERVER_ERROR);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

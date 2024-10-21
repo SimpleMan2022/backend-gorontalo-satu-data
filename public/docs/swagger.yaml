@@ -1224,10 +1224,20 @@ paths:
   /user-opd-provinsi:
     get:
       tags:
-        - user opd provinsi
+        - User OPD Provinsi
       summary: Mendapatkan semua daftar user opd provinsi
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: opd_provinsi_id
+          in: query
+          description: Filter berdasarkan ID OPD Provinsi
+          required: false
+          schema:
+            type: integer
+            example: 1
       responses:
         "200":
           description: Berhasil mendapatkan daftar user opd provinsi
@@ -1246,26 +1256,17 @@ paths:
                     type: string
                     example: success
                   data:
-                    type: object
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 1
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 1
-                          total_pages:
-                            type: integer
-                            example: 1
-                      data:
-                        type: array
-                        items:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nama:
+                          type: string
+                          example: "Budi Santoso"
+                        opd_provinsi:
                           type: object
                           properties:
                             id:
@@ -1273,29 +1274,38 @@ paths:
                               example: 1
                             nama:
                               type: string
-                              example: "Budi Santoso"
-                            opd_provinsi_id:
-                              type: integer
-                              example: 1
-                            user_id:
-                              type: integer
-                              example: 2
-                            jabatan:
+                              example: "Dinas Pendidikan"
+                            lokasi:
                               type: string
-                              example: "Kepala Dinas"
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-07T02:28:11.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-07T02:28:11.000000Z"
+                              example: "Jl. Pendidikan No. 1"
+                        jabatan:
+                          type: string
+                          example: "Kepala Dinas"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-07T02:28:11.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-07T02:28:11.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data user opd provinsi masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
-        - user opd provinsi
+        - User OPD Provinsi
       summary: Menambahkan user opd provinsi baru
       security:
         - BearerAuth: []
@@ -1312,13 +1322,10 @@ paths:
                 nama:
                   type: string
                   example: "adi"
-                password:
-                  type: string
-                  example: "111"
                 opd_provinsi_id:
                   type: integer
                   example: 2
-                user_jabatan:
+                jabatan:
                   type: string
                   example: "staf"
       responses:
@@ -1337,42 +1344,23 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  email:
-                    type: string
-                    example: "adi@gmail.com"
-                  nama:
-                    type: string
-                    example: "adi"
-                  password:
-                    type: string
-                    example: "111"
-                  opd_provinsi_id:
-                    type: integer
-                    example: 2
-                  user_jabatan:
-                    type: string
-                    example: "staf"
+                    example: Data user OPD Provinsi berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /user-opd-provinsi/{id}:
     get:
       tags:
-        - user opd provinsi
+        - User OPD Provinsi
       summary: Mendapatkan detail user opd provinsi berdasarkan ID
       security:
         - BearerAuth: []
@@ -1409,12 +1397,18 @@ paths:
                       nama:
                         type: string
                         example: "Budi Santoso"
-                      opd_provinsi_id:
-                        type: integer
-                        example: 1
-                      user_id:
-                        type: integer
-                        example: 2
+                      opd_provinsi:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nama:
+                            type: string
+                            example: "Dinas Pendidikan"
+                          lokasi:
+                            type: string
+                            example: "Jl. Pendidikan No. 1"
                       jabatan:
                         type: string
                         example: "Kepala Dinas"
@@ -1431,24 +1425,28 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /user-opd-provinsi/edit/{id}:
     patch:
       tags:
-        - user opd provinsi
+        - User OPD Provinsi
       summary: Memperbarui user opd provinsi yang ada
       security:
         - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari user opd provinsi yang akan diperbarui
+
       requestBody:
         required: true
         content:
@@ -1458,16 +1456,16 @@ paths:
               properties:
                 email:
                   type: string
-                  example: "rosyad@gmail.com"
+                  example: "user@gmail.com"
                 nama:
                   type: string
-                  example: "rosyad"
+                  example: "user"
                 opd_provinsi_id:
                   type: integer
                   example: 2
-                user_jabatan:
+                jabatan:
                   type: string
-                  example: "Agen"
+                  example: "kepala dinas"
       responses:
         "201":
           description: user opd provinsi berhasil diperbarui
@@ -1484,25 +1482,29 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data berhasil diperbarui
-                  email:
-                    type: string
-                    example: "rosyad@gmail.com"
-                  nama:
-                    type: string
-                    example: "rosyad"
-                  opd_provinsi_id:
-                    type: integer
-                    example: 3
-                  user_jabatan:
-                    type: string
-                    example: "Agen"
+                    example: Data user OPD Provinsi berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /user-opd-provinsi/delete/{id}:
     delete:
       tags:
-        - user opd provinsi
+        - User OPD Provinsi
       summary: Menghapus user opd provinsi berdasarkan id
       security:
         - BearerAuth: []
@@ -1535,22 +1537,64 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /user-opd-provinsi/multi-delete:
+    delete:
+      tags:
+        - User OPD Provinsi
+      summary: Menghapus beberapa user opd provinsi sekaligus
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: Beberapa user opd provinsi berhasil dihapus
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
                   code:
                     type: number
-                    example: 404
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Data tidak ditemukan"
-
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /user-opd-kabupaten:
     get:
       tags:
-        - user opd kabupaten
+        - User OPD Kabupaten
       summary: Mendapatkan semua daftar user opd kabupaten
       security:
         - BearerAuth: []
@@ -1570,7 +1614,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data user OPD Kabupaten berhasil diambil
                   data:
                     type: array
                     items:
@@ -1582,12 +1626,36 @@ paths:
                         nama:
                           type: string
                           example: "Agus Kurniawan"
-                        opd_provinsi_id:
-                          type: integer
-                          example: 1
-                        user_id:
-                          type: integer
-                          example: 2
+                        opd_kabupaten:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Dinas Pendidikan"
+                            lokasi:
+                              type: string
+                              example: "Jl. Pendidikan No. 1"
+                            kabupaten:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 1
+                                nama:
+                                  type: string
+                                  example: "Kabupaten Gorontalo"
+                        opd_provinsi:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Dinas Pendidikan"
                         jabatan:
                           type: string
                           example: "Admin OPD"
@@ -1599,11 +1667,23 @@ paths:
                           type: string
                           format: date-time
                           example: "2024-10-07T02:28:11.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data user opd kabupaten masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
-        - user opd kabupaten
+        - User OPD Kabupaten
       summary: Menambahkan user opd kabupaten baru
       security:
         - BearerAuth: []
@@ -1620,13 +1700,10 @@ paths:
                 nama:
                   type: string
                   example: "Agus Kurniawan"
-                password:
-                  type: string
-                  example: "555"
                 opd_kabupaten_id:
                   type: integer
                   example: 1
-                user_jabatan:
+                jabatan:
                   type: string
                   example: "Admin OPD"
       responses:
@@ -1645,42 +1722,23 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  email:
-                    type: string
-                    example: "Komindopohuwato@gmail.com"
-                  nama:
-                    type: string
-                    example: "Agus Kurniawan"
-                  password:
-                    type: string
-                    example: "555"
-                  opd_provinsi_id:
-                    type: integer
-                    example: 2
-                  user_jabatan:
-                    type: string
-                    example: "Admin OPD"
+                    example: Data user OPD Kabupaten berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /user-opd-kabupaten/{id}:
     get:
       tags:
-        - user opd kabupaten
+        - User OPD Kabupaten
       summary: Mendapatkan detail user opd kabupaten berdasarkan ID
       security:
         - BearerAuth: []
@@ -1707,7 +1765,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data user OPD Kabupaten berhasil diambil
                   data:
                     type: object
                     properties:
@@ -1716,16 +1774,40 @@ paths:
                         example: 1
                       nama:
                         type: string
-                        example: "Budi Santoso"
-                      opd_provinsi_id:
-                        type: integer
-                        example: 1
-                      user_id:
-                        type: integer
-                        example: 2
+                        example: "Agus Kurniawan"
+                      opd_kabupaten:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nama:
+                            type: string
+                            example: "Dinas Pendidikan"
+                          lokasi:
+                            type: string
+                            example: "Jl. Pendidikan No. 1"
+                          kabupaten:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              nama:
+                                type: string
+                                example: "Kabupaten Gorontalo"
+                      opd_provinsi:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nama:
+                            type: string
+                            example: "Dinas Pendidikan"
                       jabatan:
                         type: string
-                        example: "Kepala Dinas"
+                        example: "Admin OPD"
                       created_at:
                         type: string
                         format: date-time
@@ -1739,21 +1821,17 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /user-opd-kabupaten/edit/{id}:
     patch:
       tags:
-        - user opd kabupaten
+        - User OPD Kabupaten
       summary: Memperbarui user opd kabupaten yang ada
       security:
         - BearerAuth: []
@@ -1766,19 +1844,16 @@ paths:
               properties:
                 email:
                   type: string
-                  example: "kominfokotagorontalo@gmail.com"
+                  example: "kominfopohuwato@gmail.com"
                 nama:
                   type: string
-                  example: "malik"
-                nama_opd:
-                  type: string
                   example: "Agus Kurniawan"
-                lokasi_opd:
+                opd_kabupaten_id:
+                  type: integer
+                  example: 1
+                jabatan:
                   type: string
-                  example: "kota gorontalo"
-                user_jabatan:
-                  type: string
-                  example: "Kanit"
+                  example: "Admin OPD"
       responses:
         "201":
           description: user opd kabupaten berhasil diperbarui
@@ -1795,28 +1870,29 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data berhasil diperbarui
-                  email:
-                    type: string
-                    example: "kominfokotagorontalo@gmail.com"
-                  nama:
-                    type: string
-                    example: "malik"
-                  nama_opd:
-                    type: string
-                    example: "Agus Kurniawan"
-                  lokasi_opd:
-                    type: string
-                    example: "kota gorontalo"
-                  user_jabatan:
-                    type: string
-                    example: "Kanit"
+                    example: Data user OPD Kabupaten berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /user-opd-kabupaten/delete/{id}:
     delete:
       tags:
-        - user opd kabupaten
+        - User OPD Kabupaten
       summary: Menghapus user opd kabupaten berdasarkan id
       security:
         - BearerAuth: []
@@ -1843,9 +1919,40 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data berhasil dihapus"
+                    example: "Data user OPD Kabupaten berhasil dihapus"
         "401":
-          description: Bad Request
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /user-opd-kabupaten/multi-delete:
+    delete:
+      tags:
+        - User OPD Kabupaten
+      summary: Menghapus beberapa user opd kabupaten sekaligus
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: query
+          name: id
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: Beberapa user opd kabupaten berhasil dihapus
           content:
             application/json:
               schema:
@@ -1853,13 +1960,25 @@ paths:
                 properties:
                   code:
                     type: number
-                    example: 404
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Data tidak ditemukan"
+                    example: "Data user OPD Kabupaten berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /opd-provinsi:
     get:
       tags:
@@ -2584,11 +2703,14 @@ paths:
   /berita-acara:
     get:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Dapatkan semua daftar berita acara
       security:
         - BearerAuth: []
       description: Mendapatkan data berita acara beserta informasi terkait.
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
       responses:
         "200":
           description: Berhasil mendapatkan data berita acara
@@ -2605,7 +2727,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "success"
+                    example: "Data berita acara berhasil diambil"
                   data:
                     type: array
                     items:
@@ -2617,15 +2739,33 @@ paths:
                         nama:
                           type: string
                           example: "Persetujuan data OPD Kesehatan triwulan 3 tahun 2024"
-                        opd_kabupaten_id:
-                          type: integer
-                          example: 2
+                        opd_kabupaten:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            nama:
+                              type: string
+                              example: "Dinas Kesehatan"
+                            lokasi:
+                              type: string
+                              example: "Jl. Kesehatan No. 1"
                         file:
                           type: string
-                          example: "foto"
-                        indikator_id:
-                          type: integer
-                          example: 4
+                          example: "berita_acara/berita_acara_1.pdf"
+                        indikator:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            nama:
+                              type: string
+                              example: "Sebaran Jumlah Sekolah"
+                            status:
+                              type: string
+                              example: "pending"
                         status:
                           type: string
                           example: "pending"
@@ -2637,32 +2777,30 @@ paths:
                           type: string
                           format: date-time
                           example: "2024-10-10T04:58:41.000000Z"
+                  Pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Unauthorized - Token tidak valid atau tidak ada
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Unauthorized"
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Menambahkan berita acara baru
       security:
         - BearerAuth: []
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -2672,12 +2810,13 @@ paths:
                 opd_kabupaten_id:
                   type: integer
                   example: 2
-                file:
-                  type: string
-                  example: "foto"
                 indikator_id:
                   type: integer
                   example: 4
+                file:
+                  type: string
+                  format: binary
+                  description: File berita acara dalam bentuk file dengan format .pdf
                 status:
                   type: string
                   example: "pending"
@@ -2697,42 +2836,23 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  nama:
-                    type: string
-                    example: "Persetujuan data OPD Kesehatan triwulan 3 tahun 2024"
-                  opd_kabupaten_id:
-                    type: integer
-                    example: 2
-                  file:
-                    type: string
-                    example: "foto"
-                  indikator_id:
-                    type: integer
-                    example: 4
-                  Status:
-                    type: string
-                    example: "pending"
+                    example: Data berita acara berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /berita-acara/{id}:
     get:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Mendapatkan detail berita acara berdasarkan ID
       security:
         - BearerAuth: []
@@ -2759,7 +2879,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data berita acara berhasil diambil
                   data:
                     type: object
                     properties:
@@ -2769,53 +2889,74 @@ paths:
                       nama:
                         type: string
                         example: "Persetujuan data OPD Kesehatan triwulan 3 tahun 2024"
-                      opd_kabupaten_id:
-                        type: integer
-                        example: 2
+                      opd_kabupaten:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Dinas Kesehatan"
+                          lokasi:
+                            type: string
+                            example: "Jl. Kesehatan No. 1"
                       file:
                         type: string
-                        example: "foto"
-                      indikator_id:
-                        type: integer
-                        example: 4
-                      Status:
+                        example: "berita_acara/berita_acara_1.pdf"
+                      indikator:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          nama:
+                            type: string
+                            example: "Sebaran Jumlah Sekolah"
+                          status:
+                            type: string
+                            example: "pending"
+                      status:
                         type: string
                         example: "pending"
                       created_at:
                         type: string
                         format: date-time
-                        example: "2024-10-07T02:28:11.000000Z"
+                        example: "2024-10-10T04:58:41.000000Z"
                       updated_at:
                         type: string
                         format: date-time
-                        example: "2024-10-07T02:28:11.000000Z"
+                        example: "2024-10-10T04:58:41.000000Z"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /berita-acara/edit/{id}:
-    patch:
+    post:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Memperbarui berita acara  yang ada
       security:
         - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari berita acara
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -2827,13 +2968,14 @@ paths:
                   example: 1
                 file:
                   type: string
-                  example: "dokumen"
+                  format: binary
+                  description: File berita acara dalam bentuk file dengan format .pdf
                 indikator_id:
                   type: integer
                   example: 5
                 status:
                   type: string
-                  example: "aprrove"
+                  example: "aprroved"
       responses:
         "201":
           description: berita acara berhasil diperbarui
@@ -2850,28 +2992,29 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data berhasil diperbarui
-                  nama:
-                    type: string
-                    example: "Penerimaan data dinas kesehatan triwulan 2 tahun 2025"
-                  opd_kabupaten_id:
-                    type: integer
-                    example: 1
-                  file:
-                    type: string
-                    example: "dokumen"
-                  indikator_id:
-                    type: integer
-                    example: 5
-                  Status:
-                    type: string
-                    example: "aprrove"
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /berita-acara/delete/{id}:
     delete:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Menghapus berita acara berdasarkan id
       security:
         - BearerAuth: []
@@ -2904,17 +3047,61 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /berita-acara/multi-delete:
+    delete:
+      tags:
+        - Berita Acara
+      summary: Menghapus banyak berita acara
+      description: API untuk menghapus banyak berita acara berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: Berita acara berhasil dihapus
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
                   code:
                     type: number
-                    example: 404
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Data tidak ditemukan"
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
 
   /periode:
     get:
@@ -3276,10 +3463,18 @@ paths:
   /variabel:
     get:
       tags:
-        - variabel
+        - Variabel
       summary: Mendapatkan semua data variabel
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - in: query
+          name: indikator_id
+          schema:
+            type: integer
+          description: ID dari indikator
       responses:
         "200":
           description: Berhasil mendapatkan data variabel
@@ -3296,25 +3491,10 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data variabel berhasil diambil
                   data:
                     type: object
                     properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 1
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 1
-                          total_pages:
-                            type: integer
-                            example: 1
                       data:
                         type: array
                         items:
@@ -3326,7 +3506,7 @@ paths:
                             nama:
                               type: string
                               example: fasilitas rumah sakit
-                            indikator_id:
+                            indikator:
                               type: object
                               properties:
                                 id:
@@ -3335,52 +3515,21 @@ paths:
                                 nama:
                                   type: string
                                   example: Agregat sebaran fasilitas kesehatan negeri
-                                sektor_id:
-                                  type: integer
-                                  example: 3
-                                antar_waktu_id:
-                                  type: integer
-                                  example: 3
-                                opd_provinsi_id:
-                                  type: integer
-                                  example: 2
                                 status:
                                   type: string
                                   example: public
-                                created_at:
-                                  type: string
-                                  format: date-time
-                                  example: "2024-10-08T01:21:16.000000Z"
-                                updated_at:
-                                  type: string
-                                  format: date-time
-                                  example: "2024-10-08T01:21:16.000000Z"
-                                sektor:
-                                  type: object
-                                  properties:
-                                    id:
-                                      type: integer
-                                      example: 3
-                                    nama:
-                                      type: string
-                                      example: kesehatan
-                                    created_at:
-                                      type: string
-                                      format: date-time
-                                      example: "2024-10-08T01:12:51.000000Z"
-                                    updated_at:
-                                      type: string
-                                      format: date-time
-                                      example: "2024-10-08T01:12:51.000000Z"
                             sektor:
                               type: string
                               example: kesehatan
+                            opd_provinsi:
+                              type: string
+                              example: Dinas Kesehatan Provinsi Gorontalo
                             tipe:
                               type: string
                               example: string
                             order:
                               type: integer
-                              example: 0
+                              example: 1
                             created_at:
                               type: string
                               format: date-time
@@ -3389,25 +3538,23 @@ paths:
                               type: string
                               format: date-time
                               example: "2024-10-12T03:32:28.000000Z"
+                  Pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
-        - variabel
+        - Variabel
       summary: Menambahkan variabel baru
       security:
         - BearerAuth: []
@@ -3418,18 +3565,15 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: integer
-                  example: 1
+                nama:
+                  type: string
+                  example: "Jumlah fasilitas rumah sakit"
                 indikator_id:
                   type: integer
                   example: 4
-                nama:
-                  type: string
-                  example: "fasilitas rumah sakit"
                 tipe:
                   type: string
-                  example: "string"
+                  example: string
       responses:
         "201":
           description: variabel berhasil ditambahkan
@@ -3446,171 +3590,24 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  id:
-                    type: integer
-                    example: 1
-                  indikator_id:
-                    type: integer
-                    example: 4
-                  nama:
-                    type: string
-                    example: "fasilitas rumah sakit"
-                  tipe:
-                    type: string
-                    example: "string"
+                    example: Data variabel berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /variabel/by-indikator/{id}:
-    get:
-      tags:
-        - variabel
-      summary: Mendapatkan data variabel berdasarkan id indikator
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Berhasil mendapatkan data variabel berdasarkan id indikator
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  status:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: success
-                  data:
-                    type: object
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 1
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 1
-                          total_pages:
-                            type: integer
-                            example: 1
-                      data:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 1
-                            nama:
-                              type: string
-                              example: fasilitas rumah sakit
-                            indikator_id:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                  example: 4
-                                nama:
-                                  type: string
-                                  example: Agregat sebaran fasilitas kesehatan negeri
-                                sektor_id:
-                                  type: integer
-                                  example: 3
-                                antar_waktu_id:
-                                  type: integer
-                                  example: 3
-                                opd_provinsi_id:
-                                  type: integer
-                                  example: 2
-                                status:
-                                  type: string
-                                  example: public
-                                created_at:
-                                  type: string
-                                  format: date-time
-                                  example: "2024-10-08T01:21:16.000000Z"
-                                updated_at:
-                                  type: string
-                                  format: date-time
-                                  example: "2024-10-08T01:21:16.000000Z"
-                                sektor:
-                                  type: object
-                                  properties:
-                                    id:
-                                      type: integer
-                                      example: 3
-                                    nama:
-                                      type: string
-                                      example: kesehatan
-                                    created_at:
-                                      type: string
-                                      format: date-time
-                                      example: "2024-10-08T01:12:51.000000Z"
-                                    updated_at:
-                                      type: string
-                                      format: date-time
-                                      example: "2024-10-08T01:12:51.000000Z"
-                            sektor:
-                              type: string
-                              example: kesehatan
-                            tipe:
-                              type: string
-                              example: string
-                            order:
-                              type: integer
-                              example: 0
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-12T03:32:28.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-12T03:32:28.000000Z"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
   /variabel/{id}:
     get:
       tags:
-        - variabel
+        - Variabel
       summary: Mendapatkan detail variabel
       description: API untuk mendapatkan detail variabel berdasarkan ID
       security:
@@ -3645,21 +3642,36 @@ paths:
                       id:
                         type: integer
                         example: 1
-                      indikator_id:
-                        type: integer
-                        example: 4
                       nama:
                         type: string
                         example: fasilitas rumah sakit
+                      indikator:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          nama:
+                            type: string
+                            example: Agregat sebaran fasilitas kesehatan negeri
+                          status:
+                            type: string
+                            example: public
+                      sektor:
+                        type: string
+                        example: kesehatan
+                      opd_provinsi:
+                        type: string
+                        example: Dinas Kesehatan Provinsi Gorontalo
                       tipe:
                         type: string
                         example: string
                       order:
                         type: integer
-                        example: 0
+                        example: 1
                       created_at:
                         type: string
-                        ormat: date-time
+                        format: date-time
                         example: "2024-10-12T03:32:28.000000Z"
                       updated_at:
                         type: string
@@ -3670,21 +3682,17 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /variabel/edit{id}:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /variabel/edit/{id}:
     patch:
       tags:
-        - variabel
+        - Variabel
       summary: Memperbarui variabel yang ada
       security:
         - BearerAuth: []
@@ -3695,18 +3703,15 @@ paths:
             schema:
               type: object
               properties:
-                indikator_id:
-                  type: integer
-                  example: 2
                 nama:
                   type: string
                   example: "kualitas layanan"
+                indikator_id:
+                  type: integer
+                  example: 2
                 tipe:
                   type: string
                   example: "string"
-                order:
-                  type: integer
-                  example: 0
       responses:
         "201":
           description: opd kabupaten berhasil diperbarui
@@ -3721,24 +3726,31 @@ paths:
                   status:
                     type: boolean
                     example: true
-                  indikator_id:
-                    type: integer
-                    example: 1
-                  nama:
+                  message:
                     type: string
-                    example: "kualitas layanan"
-                  tipe:
-                    type: string
-                    example: "string"
-                  order:
-                    type: integer
-                    example: 0
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /variabel/tukar-posisi/{id}:
     patch:
       tags:
-        - variabel
+        - Variabel
       summary: Memperbarui variabel dengan menukar posisi
       security:
         - BearerAuth: []
@@ -3749,15 +3761,6 @@ paths:
             schema:
               type: object
               properties:
-                indikator_id:
-                  type: integer
-                  example: 2
-                nama:
-                  type: string
-                  example: "kualitas layanan"
-                tipe:
-                  type: string
-                  example: "string"
                 order:
                   type: integer
                   example: 0
@@ -3777,25 +3780,29 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data berhasil diperbarui
-                  indikator_id:
-                    type: integer
-                    example: 1
-                  nama:
-                    type: string
-                    example: "kualitas layanan"
-                  tipe:
-                    type: string
-                    example: "string"
-                  order:
-                    type: integer
-                    example: 0
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /variabel/delete/{id}:
     delete:
       tags:
-        - variabel
+        - Variabel
       summary: Menghapus variabel berdasarkan id
       security:
         - BearerAuth: []
@@ -3828,18 +3835,61 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /variabel/multi-delete:
+    delete:
+      tags:
+        - Variabel
+      summary: Menghapus banyak variabel
+      description: API untuk menghapus banyak variabel berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: variabel berhasil dihapus
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
                   code:
                     type: number
-                    example: 404
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Data tidak ditemukan"
-
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data variabel tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /subjek:
     get:
       tags:
