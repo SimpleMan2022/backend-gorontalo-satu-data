@@ -228,6 +228,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/opd-provinsi", "OpdProvinsiView");
         Route::get("/opd-provinsi/chart-donut", "ChartDonutOpdProvinsi");
         Route::get("/opd-provinsi/chart-bar", "ChartBarOpdProvinsi");
+
+        Route::get("/opd-kabupaten", "OpdKabupatenView");
     });
 
 });

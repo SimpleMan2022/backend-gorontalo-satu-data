@@ -7,8 +7,10 @@ use App\Models\Sektor;
 use App\Models\Subjek;
 use App\Http\Traits\ApiResponse;
 use App\Models\AntarWaktu;
+use App\Models\EnumeratorKabupaten;
 use App\Models\EnumeratorProvinsi;
 use App\Models\Indikator;
+use App\Models\OpdKabupaten;
 use App\Models\PivotIndikatorSubjek;
 use App\Models\RekapHasil;
 use App\Models\User;
@@ -293,6 +295,61 @@ class DashboardController extends Controller
         }
     }
 
+    public function OpdKabupatenView(Request $request)
+    {
+        try {
+            // Check if opd_kabupaten_id is provided
+            $opd_kabupaten_id = $request->input('opd_kabupaten_id');
+            if (!$opd_kabupaten_id) {
+                return response()->json([
+                    'error' => 'opd_kabupaten_id is required'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Retrieve the opd_provinsi_id from the OpdKabupaten model
+            $opdKabupaten = OpdKabupaten::find($opd_kabupaten_id);
+            if (!$opdKabupaten) {
+                return response()->json([
+                    'error' => 'OpdKabupaten not found'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // Extract the opd_provinsi_id
+            $opd_provinsi_id = $opdKabupaten->opd_provinsi_id;
+
+            // Now proceed with the same logic using the retrieved opd_provinsi_id
+            $total_variabel = Variabel::whereHas('indikator', function($query) use ($opd_provinsi_id) {
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            })->count();
+
+            $total_indikator = Indikator::where('opd_provinsi_id', $opd_provinsi_id)->count();
+
+            // Count the id from pivot_indikator_subjek where indikator_id is related to the opd_provinsi_id
+            $total_subjek = PivotIndikatorSubjek::whereHas('indikator', function($query) use ($opd_provinsi_id) {
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            })->count('id');
+
+            $total_enumerator_kabupaten = EnumeratorKabupaten::where('opd_kabupaten_id', $opd_kabupaten_id)->count(); // Assuming User does not have opd_provinsi_id
+
+            // Prepare data response
+            $data = [
+                'total_variabel' => $total_variabel,
+                'total_indikator' => $total_indikator,
+                'total_subjek' => $total_subjek, // Count of pivot table records
+                'total_enumerator_kabupaten' => $total_enumerator_kabupaten,
+            ];
+
+            return $this->successResponseWithData(
+                $data,
+                'success', 
+                Response::HTTP_OK
+            );
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
 
 }
