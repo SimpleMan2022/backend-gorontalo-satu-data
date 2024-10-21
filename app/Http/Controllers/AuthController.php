@@ -10,6 +10,7 @@ use App\Http\Traits\ApiResponse;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
+use App\Models\ResetCodePassword;
 
 class AuthController extends Controller
 {
@@ -65,4 +66,71 @@ class AuthController extends Controller
       Response::HTTP_OK
     );
   }
+
+  public function forgotPassword(Request $request) {
+    $data = $request->validate([
+      'email' => 'required|email|exists:users',
+    ]);
+
+    // Delete all old code that user send before.
+    ResetCodePassword::where('email', $request->email)->delete();
+
+    // Generate random code
+    $data['token'] = mt_rand(100000, 999999);
+
+    // Create a new code
+    $codeData = ResetCodePassword::create($data);
+
+    // Send email to user
+    Mail::to($request->email)->send(new SendCodeResetPassword($codeData->token));
+
+    return response(['message' => trans('passwords.sent')], 200);
+  }
+
+  // public function codeCheck(Request $request) {
+  //   $request->validate([
+  //     'token' => 'required|string|exists:password_reset_tokens',
+  //   ]);
+
+  //   // find the code
+  //   $passwordReset = ResetCodePassword::firstWhere('token', $request->token);
+
+  //   // check if it does not expired: the time is one hour
+  //   if ($passwordReset->created_at > now()->addHour()) {
+  //       $passwordReset->delete();
+  //       return response(['message' => trans('passwords.code_is_expire')], 422);
+  //   }
+
+  //   return response([
+  //       'code' => $passwordReset->token,
+  //       'message' => trans('passwords.code_is_valid')
+  //   ], 200);
+  // }
+
+  // public function resetPassword(Request $request) {
+  //   $request->validate([
+  //     'token' => 'required|string|exists:password_reset_tokens',
+  //     'password' => 'required|string|min:6|confirmed',
+  //   ]);
+
+  //   // find the code
+  //   $passwordReset = ResetCodePassword::firstWhere('token', $request->token);
+
+  //   // check if it does not expired: the time is one hour
+  //   if ($passwordReset->created_at > now()->addHour()) {
+  //       $passwordReset->delete();
+  //       return response(['message' => trans('passwords.code_is_expire')], 422);
+  //   }
+
+  //   // find user's email 
+  //   $user = User::firstWhere('email', $passwordReset->email);
+
+  //   // update user password
+  //   $user->update($request->only('password'));
+
+  //   // delete current code 
+  //   $passwordReset->delete();
+
+  //   return response(['message' =>'password has been successfully reset'], 200);
+  // }
 }
