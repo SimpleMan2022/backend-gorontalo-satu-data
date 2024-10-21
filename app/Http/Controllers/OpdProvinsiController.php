@@ -16,6 +16,7 @@ use Illuminate\Support\Facades\Storage;
 class OpdProvinsiController extends Controller
 {
     use ApiResponse;
+
     public function index(Request $request)
     {
         try {

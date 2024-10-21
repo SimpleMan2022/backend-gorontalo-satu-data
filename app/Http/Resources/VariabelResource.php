@@ -17,8 +17,9 @@ class VariabelResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
-            'indikator_id' => $this->indikator,
+            'indikator' => $this->indikator->only('id', 'nama', 'status'),
             'sektor' => $this->indikator->sektor->nama,
+            'opd_provinsi' => $this->indikator->opd_provinsi->nama,
             'tipe' => $this->tipe,
             'order' => $this->order,
             'created_at' => $this->created_at,
