@@ -17,11 +17,16 @@ class UserOpdKabupatenResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
-            'opd_kabupaten_id' => $this->opd_kabupaten,
-            'user_id' => $this->user,
+            'opd_kabupaten' => [
+                'id' => $this->opd_kabupaten->id,
+                'nama' => $this->opd_kabupaten->nama,
+                'lokasi' => $this->opd_kabupaten->lokasi,
+                'kabupaten' => $this->opd_kabupaten->kabupaten ? $this->opd_kabupaten->kabupaten->only('id', 'name') : null,
+                'opd_provinsi' => $this->opd_kabupaten->opd_provinsi ? $this->opd_kabupaten->opd_provinsi->only('id', 'nama') : null,
+            ],
             'jabatan' => $this->jabatan,
             'created_at' => $this->created_at,
-            'updated_at' => $this->created_at
+            'updated_at' => $this->updated_at,
         ];
     }
 }

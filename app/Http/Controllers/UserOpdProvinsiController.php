@@ -69,7 +69,9 @@ class UserOpdProvinsiController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-
+            if (User::where('username', $validated['nama'])->get()) {
+                return $this->errorResponse('Username sudah tersedia', Response::HTTP_BAD_REQUEST);
+            }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
             $user = User::create($validated);
             $user->assignRole('opd_provinsi');

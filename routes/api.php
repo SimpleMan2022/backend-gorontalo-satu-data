@@ -4,6 +4,7 @@ use App\Http\Controllers\AntarWaktuController;
 use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\EnumeratorController;
 use App\Http\Controllers\EnumeratorKabupatenController;
 use App\Http\Controllers\EnumeratorProvinsiController;
@@ -20,12 +21,17 @@ use App\Http\Controllers\PivotOpdSektorController;
 use App\Http\Controllers\HasilDataController;
 use App\Http\Controllers\PivotEnumeratorIndikatorController;
 use App\Http\Controllers\RekapHasilController;
+use App\Http\Controllers\ForgotPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
     Route::post("register", "create");
     Route::post("login", "login")->name('login');
+    Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.reset');
+    Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
 });
+
+Route::get("opd-provinsi", [OpdProvinsiController::class, 'index']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     // Auth Route
@@ -106,13 +112,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix('variabel')->controller(VariabelController::class)->group(function () {
         Route::get("", "index");
-        Route::get("/by-indikator/{indikator}", "byIndikator");
-        Route::patch("/tukar-posisi/{id}", "tukarPosisi");
         Route::post("", "store");
         Route::get("/{id}", "show");
+        Route::patch("/tukar-posisi/{id}", "tukarPosisi");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
-        Route::get("byOpdProvinsi/{id}", "byOpdProvinsi");
         Route::delete("/multi-delete", "multiDestroy");
     });
 
@@ -139,7 +143,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::prefix('opd-provinsi')->controller(OpdProvinsiController::class)->group(function () {
-        Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::post("/edit/{id}", "update");
@@ -168,7 +171,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
-        Route::patch("/edit/{id}", "update");
+        Route::post("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
@@ -229,6 +232,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
+
+    Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {
+        Route::get("/admin", "AdminView");
+        Route::get("/admin/chart-donut", "ChartDonut");
+        Route::get("/admin/chart-bar", "ChartBar");
+
+        Route::get("/opd", "OpdView");
+    });
+
 });
 
 Route::get('/docs', function () {
