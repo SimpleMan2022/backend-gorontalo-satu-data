@@ -7,6 +7,7 @@ use App\Models\{Variabel, Indikator};
 use App\Http\Resources\VariabelResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 
@@ -14,65 +15,54 @@ class VariabelController extends Controller
 {
     use ApiResponse;
 
-    public function index() {
-        try{
-            $perpage = $request->per_page ?? 10;
-            $data = Variabel::orderBy('created_at', 'desc')->paginate($perpage);
+    public function index(Request $request)
+    {
+        try {
+            $perPage = $request->per_page ?? 10;
+            $variabelQuery = Variabel::orderBy('created_at', 'desc');
+
+            if ($indikatorId = $request->query('indikator_id')) {
+                $variabelQuery->where('indikator_id', $indikatorId);
+            }
+
+            $data = $variabelQuery->paginate($perPage);
+
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
-                    VariabelResource::collection($data), 
-                    'success', 
-                    Response::HTTP_OK);
+                    VariabelResource::collection($data),
+                    'Data variabel berhasil diambil',
+                    Response::HTTP_OK
+                );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function byIndikator($indikator) {
-        try{
-            $perpage = $request->per_page ?? 10;
-            $data = Variabel::where('indikator_id', $indikator)->orderBy('order', 'asc')->paginate($perpage);
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex(
-                    $data,
-                    VariabelResource::collection($data), 
-                    'success', 
-                    Response::HTTP_OK);
-            } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
-            }
-        }catch(Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
             $req = $request->validate([
-                'indikator_id' => 'required',
+                'indikator_id' => 'required|exists:indikator,id',
                 'nama' => 'required',
                 'tipe' => 'required',
             ]);
 
             $req['order'] = Variabel::where('indikator_id', $request->indikator_id)->count();
-
-            $variabel = Variabel::create($req);
-            return $this->successResponse('Data berhasil dibuat',Response::HTTP_CREATED);
-
-        }catch(Exception $e) {
+            Variabel::create($req);
+            return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function show($id) {
+    public function show($id)
+    {
         try {
             // Mencari data sektor dengan id
             $data = Variabel::find($id);
@@ -81,44 +71,41 @@ class VariabelController extends Controller
             if ($data) {
                 return $this->successResponseWithData(
                     $data,
-                    'success',
+                    'Data variabel berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data tidak ditemukan.'
-                ]);
+                return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
             }
-        
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         try {
             $req = $request->validate([
-                'indikator_id' => 'required',
+                'indikator_id' => 'required|exists:indikator,id',
                 'nama' => 'required',
                 'tipe' => 'required',
-                'order'=> 'required'
             ]);
-
-            // $req['order'] = Variabel::where('indikator_id', $request->indikator_id)->count();
 
             $data = Variabel::find($id);
 
-            if($data) {
+            if ($data) {
                 $data->update($req);
-                
-                return $this->successResponse('Data berhasil diperbarui',Response::HTTP_CREATED);
-            }else {
+
+                return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
+            } else {
                 return $this->errorResponse(
                     'Data tidak ditemukan',
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
             }
-        }catch(Exception $e) {
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal diubah', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -126,42 +113,45 @@ class VariabelController extends Controller
     public function tukarPosisi(Request $request, $id)
     {
         try {
-            $request->validate([
-                'indikator_id' => 'required',
-                'nama' => 'required',
-                'tipe' => 'required',
-                'order'=> 'required'
+            $validated = $request->validate([
+                'order' => 'required'
             ]);
 
             $variabel = Variabel::find($id);
-            // dd($variabel);
-    
-            
-            if($variabel) {
-                Variabel::where('order', $request->order)
+
+            if ($variabel) {
+                $variabel_tukar = Variabel::where('order', $validated['order'])
                     ->where('indikator_id', $variabel->indikator_id)
-                    ->first()
-                    ->update(['order' => $variabel->order]);
+                    ->first();
+
+                if ($variabel_tukar) {
+                    $variabel_tukar->update(['order' => $variabel->order]);
+                } else {
+                    return $this->errorResponse('Data tidak ditemukan', Response::HTTP_INTERNAL_SERVER_ERROR);
+                }
 
                 $variabel->update(['order' => $request->order]);
 
-                return $this->successResponse('Data berhasil diperbarui',Response::HTTP_CREATED);
-            }else {
+                return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
+            } else {
                 return $this->errorResponse(
                     'Data tidak ditemukan',
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
             }
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function destroy($id) {
-        try{
-            $variabel = Variabel::find($id)->delete();
+    public function destroy($id)
+    {
+        try {
+            Variabel::findOrFail($id)->delete;
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
-        }catch(Exception $e) {
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
