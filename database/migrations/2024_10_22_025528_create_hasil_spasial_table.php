@@ -11,13 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('artikel_kawasan', function (Blueprint $table) {
+        Schema::create('hasil_spasial', function (Blueprint $table) {
             $table->id();
             $table->string('judul');
             $table->string('file');
             $table->text('konten');
             $table->enum('status', ['public', 'private']);
             $table->foreignId('opd_provinsi_id')->references('id')->on('opd_provinsi')->onDelete('cascade');
+            $table->foreignId('sektor_spasial_id')->references('id')->on('sektor_spasial')->onDelete('cascade');
             $table->timestamps();
         });
     }
