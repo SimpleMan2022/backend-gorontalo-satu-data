@@ -2703,11 +2703,14 @@ paths:
   /berita-acara:
     get:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Dapatkan semua daftar berita acara
       security:
         - BearerAuth: []
       description: Mendapatkan data berita acara beserta informasi terkait.
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
       responses:
         "200":
           description: Berhasil mendapatkan data berita acara
@@ -2724,7 +2727,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "success"
+                    example: "Data berita acara berhasil diambil"
                   data:
                     type: array
                     items:
@@ -2736,15 +2739,33 @@ paths:
                         nama:
                           type: string
                           example: "Persetujuan data OPD Kesehatan triwulan 3 tahun 2024"
-                        opd_kabupaten_id:
-                          type: integer
-                          example: 2
+                        opd_kabupaten:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            nama:
+                              type: string
+                              example: "Dinas Kesehatan"
+                            lokasi:
+                              type: string
+                              example: "Jl. Kesehatan No. 1"
                         file:
                           type: string
-                          example: "foto"
-                        indikator_id:
-                          type: integer
-                          example: 4
+                          example: "berita_acara/berita_acara_1.pdf"
+                        indikator:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            nama:
+                              type: string
+                              example: "Sebaran Jumlah Sekolah"
+                            status:
+                              type: string
+                              example: "pending"
                         status:
                           type: string
                           example: "pending"
@@ -2756,32 +2777,30 @@ paths:
                           type: string
                           format: date-time
                           example: "2024-10-10T04:58:41.000000Z"
+                  Pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Unauthorized - Token tidak valid atau tidak ada
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: "Unauthorized"
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Menambahkan berita acara baru
       security:
         - BearerAuth: []
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -2791,12 +2810,13 @@ paths:
                 opd_kabupaten_id:
                   type: integer
                   example: 2
-                file:
-                  type: string
-                  example: "foto"
                 indikator_id:
                   type: integer
                   example: 4
+                file:
+                  type: string
+                  format: binary
+                  description: File berita acara dalam bentuk file dengan format .pdf
                 status:
                   type: string
                   example: "pending"
@@ -2816,42 +2836,23 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  nama:
-                    type: string
-                    example: "Persetujuan data OPD Kesehatan triwulan 3 tahun 2024"
-                  opd_kabupaten_id:
-                    type: integer
-                    example: 2
-                  file:
-                    type: string
-                    example: "foto"
-                  indikator_id:
-                    type: integer
-                    example: 4
-                  Status:
-                    type: string
-                    example: "pending"
+                    example: Data berita acara berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /berita-acara/{id}:
     get:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Mendapatkan detail berita acara berdasarkan ID
       security:
         - BearerAuth: []
@@ -2878,7 +2879,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data berita acara berhasil diambil
                   data:
                     type: object
                     properties:
@@ -2888,53 +2889,74 @@ paths:
                       nama:
                         type: string
                         example: "Persetujuan data OPD Kesehatan triwulan 3 tahun 2024"
-                      opd_kabupaten_id:
-                        type: integer
-                        example: 2
+                      opd_kabupaten:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Dinas Kesehatan"
+                          lokasi:
+                            type: string
+                            example: "Jl. Kesehatan No. 1"
                       file:
                         type: string
-                        example: "foto"
-                      indikator_id:
-                        type: integer
-                        example: 4
-                      Status:
+                        example: "berita_acara/berita_acara_1.pdf"
+                      indikator:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          nama:
+                            type: string
+                            example: "Sebaran Jumlah Sekolah"
+                          status:
+                            type: string
+                            example: "pending"
+                      status:
                         type: string
                         example: "pending"
                       created_at:
                         type: string
                         format: date-time
-                        example: "2024-10-07T02:28:11.000000Z"
+                        example: "2024-10-10T04:58:41.000000Z"
                       updated_at:
                         type: string
                         format: date-time
-                        example: "2024-10-07T02:28:11.000000Z"
+                        example: "2024-10-10T04:58:41.000000Z"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /berita-acara/edit/{id}:
-    patch:
+    post:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Memperbarui berita acara  yang ada
       security:
         - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari berita acara
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               properties:
@@ -2946,13 +2968,14 @@ paths:
                   example: 1
                 file:
                   type: string
-                  example: "dokumen"
+                  format: binary
+                  description: File berita acara dalam bentuk file dengan format .pdf
                 indikator_id:
                   type: integer
                   example: 5
                 status:
                   type: string
-                  example: "aprrove"
+                  example: "aprroved"
       responses:
         "201":
           description: berita acara berhasil diperbarui
@@ -2969,28 +2992,29 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data berhasil diperbarui
-                  nama:
-                    type: string
-                    example: "Penerimaan data dinas kesehatan triwulan 2 tahun 2025"
-                  opd_kabupaten_id:
-                    type: integer
-                    example: 1
-                  file:
-                    type: string
-                    example: "dokumen"
-                  indikator_id:
-                    type: integer
-                    example: 5
-                  Status:
-                    type: string
-                    example: "aprrove"
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /berita-acara/delete/{id}:
     delete:
       tags:
-        - berita acara
+        - Berita Acara
       summary: Menghapus berita acara berdasarkan id
       security:
         - BearerAuth: []
@@ -3023,17 +3047,61 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /berita-acara/multi-delete:
+    delete:
+      tags:
+        - Berita Acara
+      summary: Menghapus banyak berita acara
+      description: API untuk menghapus banyak berita acara berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: Berita acara berhasil dihapus
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
                   code:
                     type: number
-                    example: 404
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Data tidak ditemukan"
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data sektor tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
 
   /periode:
     get:
