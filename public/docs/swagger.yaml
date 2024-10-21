@@ -3463,10 +3463,18 @@ paths:
   /variabel:
     get:
       tags:
-        - variabel
+        - Variabel
       summary: Mendapatkan semua data variabel
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - in: query
+          name: indikator_id
+          schema:
+            type: integer
+          description: ID dari indikator
       responses:
         "200":
           description: Berhasil mendapatkan data variabel
@@ -3483,25 +3491,10 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: success
+                    example: Data variabel berhasil diambil
                   data:
                     type: object
                     properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 1
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 1
-                          total_pages:
-                            type: integer
-                            example: 1
                       data:
                         type: array
                         items:
@@ -3513,7 +3506,7 @@ paths:
                             nama:
                               type: string
                               example: fasilitas rumah sakit
-                            indikator_id:
+                            indikator:
                               type: object
                               properties:
                                 id:
@@ -3522,52 +3515,21 @@ paths:
                                 nama:
                                   type: string
                                   example: Agregat sebaran fasilitas kesehatan negeri
-                                sektor_id:
-                                  type: integer
-                                  example: 3
-                                antar_waktu_id:
-                                  type: integer
-                                  example: 3
-                                opd_provinsi_id:
-                                  type: integer
-                                  example: 2
                                 status:
                                   type: string
                                   example: public
-                                created_at:
-                                  type: string
-                                  format: date-time
-                                  example: "2024-10-08T01:21:16.000000Z"
-                                updated_at:
-                                  type: string
-                                  format: date-time
-                                  example: "2024-10-08T01:21:16.000000Z"
-                                sektor:
-                                  type: object
-                                  properties:
-                                    id:
-                                      type: integer
-                                      example: 3
-                                    nama:
-                                      type: string
-                                      example: kesehatan
-                                    created_at:
-                                      type: string
-                                      format: date-time
-                                      example: "2024-10-08T01:12:51.000000Z"
-                                    updated_at:
-                                      type: string
-                                      format: date-time
-                                      example: "2024-10-08T01:12:51.000000Z"
                             sektor:
                               type: string
                               example: kesehatan
+                            opd_provinsi:
+                              type: string
+                              example: Dinas Kesehatan Provinsi Gorontalo
                             tipe:
                               type: string
                               example: string
                             order:
                               type: integer
-                              example: 0
+                              example: 1
                             created_at:
                               type: string
                               format: date-time
@@ -3576,25 +3538,23 @@ paths:
                               type: string
                               format: date-time
                               example: "2024-10-12T03:32:28.000000Z"
+                  Pagination:
+                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Unauthorized
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
     post:
       tags:
-        - variabel
+        - Variabel
       summary: Menambahkan variabel baru
       security:
         - BearerAuth: []
@@ -3605,18 +3565,15 @@ paths:
             schema:
               type: object
               properties:
-                id:
-                  type: integer
-                  example: 1
+                nama:
+                  type: string
+                  example: "Jumlah fasilitas rumah sakit"
                 indikator_id:
                   type: integer
                   example: 4
-                nama:
-                  type: string
-                  example: "fasilitas rumah sakit"
                 tipe:
                   type: string
-                  example: "string"
+                  example: string
       responses:
         "201":
           description: variabel berhasil ditambahkan
@@ -3633,171 +3590,24 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: data berhasil dibuat
-                  id:
-                    type: integer
-                    example: 1
-                  indikator_id:
-                    type: integer
-                    example: 4
-                  nama:
-                    type: string
-                    example: "fasilitas rumah sakit"
-                  tipe:
-                    type: string
-                    example: "string"
+                    example: Data variabel berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
           description: Tidak diotorisasi
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /variabel/by-indikator/{id}:
-    get:
-      tags:
-        - variabel
-      summary: Mendapatkan data variabel berdasarkan id indikator
-      security:
-        - BearerAuth: []
-      responses:
-        "200":
-          description: Berhasil mendapatkan data variabel berdasarkan id indikator
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  status:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: success
-                  data:
-                    type: object
-                    properties:
-                      pagination:
-                        type: object
-                        properties:
-                          total:
-                            type: integer
-                            example: 1
-                          per_page:
-                            type: integer
-                            example: 10
-                          current_page:
-                            type: integer
-                            example: 1
-                          total_pages:
-                            type: integer
-                            example: 1
-                      data:
-                        type: array
-                        items:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 1
-                            nama:
-                              type: string
-                              example: fasilitas rumah sakit
-                            indikator_id:
-                              type: object
-                              properties:
-                                id:
-                                  type: integer
-                                  example: 4
-                                nama:
-                                  type: string
-                                  example: Agregat sebaran fasilitas kesehatan negeri
-                                sektor_id:
-                                  type: integer
-                                  example: 3
-                                antar_waktu_id:
-                                  type: integer
-                                  example: 3
-                                opd_provinsi_id:
-                                  type: integer
-                                  example: 2
-                                status:
-                                  type: string
-                                  example: public
-                                created_at:
-                                  type: string
-                                  format: date-time
-                                  example: "2024-10-08T01:21:16.000000Z"
-                                updated_at:
-                                  type: string
-                                  format: date-time
-                                  example: "2024-10-08T01:21:16.000000Z"
-                                sektor:
-                                  type: object
-                                  properties:
-                                    id:
-                                      type: integer
-                                      example: 3
-                                    nama:
-                                      type: string
-                                      example: kesehatan
-                                    created_at:
-                                      type: string
-                                      format: date-time
-                                      example: "2024-10-08T01:12:51.000000Z"
-                                    updated_at:
-                                      type: string
-                                      format: date-time
-                                      example: "2024-10-08T01:12:51.000000Z"
-                            sektor:
-                              type: string
-                              example: kesehatan
-                            tipe:
-                              type: string
-                              example: string
-                            order:
-                              type: integer
-                              example: 0
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-12T03:32:28.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-12T03:32:28.000000Z"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
   /variabel/{id}:
     get:
       tags:
-        - variabel
+        - Variabel
       summary: Mendapatkan detail variabel
       description: API untuk mendapatkan detail variabel berdasarkan ID
       security:
@@ -3832,21 +3642,36 @@ paths:
                       id:
                         type: integer
                         example: 1
-                      indikator_id:
-                        type: integer
-                        example: 4
                       nama:
                         type: string
                         example: fasilitas rumah sakit
+                      indikator:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          nama:
+                            type: string
+                            example: Agregat sebaran fasilitas kesehatan negeri
+                          status:
+                            type: string
+                            example: public
+                      sektor:
+                        type: string
+                        example: kesehatan
+                      opd_provinsi:
+                        type: string
+                        example: Dinas Kesehatan Provinsi Gorontalo
                       tipe:
                         type: string
                         example: string
                       order:
                         type: integer
-                        example: 0
+                        example: 1
                       created_at:
                         type: string
-                        ormat: date-time
+                        format: date-time
                         example: "2024-10-12T03:32:28.000000Z"
                       updated_at:
                         type: string
@@ -3857,21 +3682,17 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 401
-                  status:
-                    type: boolean
-                    example: false
-                  message:
-                    type: string
-                    example: Unauthorized
-  /variabel/edit{id}:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /variabel/edit/{id}:
     patch:
       tags:
-        - variabel
+        - Variabel
       summary: Memperbarui variabel yang ada
       security:
         - BearerAuth: []
@@ -3882,18 +3703,15 @@ paths:
             schema:
               type: object
               properties:
-                indikator_id:
-                  type: integer
-                  example: 2
                 nama:
                   type: string
                   example: "kualitas layanan"
+                indikator_id:
+                  type: integer
+                  example: 2
                 tipe:
                   type: string
                   example: "string"
-                order:
-                  type: integer
-                  example: 0
       responses:
         "201":
           description: opd kabupaten berhasil diperbarui
@@ -3908,24 +3726,31 @@ paths:
                   status:
                     type: boolean
                     example: true
-                  indikator_id:
-                    type: integer
-                    example: 1
-                  nama:
+                  message:
                     type: string
-                    example: "kualitas layanan"
-                  tipe:
-                    type: string
-                    example: "string"
-                  order:
-                    type: integer
-                    example: 0
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /variabel/tukar-posisi/{id}:
     patch:
       tags:
-        - variabel
+        - Variabel
       summary: Memperbarui variabel dengan menukar posisi
       security:
         - BearerAuth: []
@@ -3936,15 +3761,6 @@ paths:
             schema:
               type: object
               properties:
-                indikator_id:
-                  type: integer
-                  example: 2
-                nama:
-                  type: string
-                  example: "kualitas layanan"
-                tipe:
-                  type: string
-                  example: "string"
                 order:
                   type: integer
                   example: 0
@@ -3964,25 +3780,29 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data berhasil diperbarui
-                  indikator_id:
-                    type: integer
-                    example: 1
-                  nama:
-                    type: string
-                    example: "kualitas layanan"
-                  tipe:
-                    type: string
-                    example: "string"
-                  order:
-                    type: integer
-                    example: 0
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
         "401":
-          $ref: "#/components/responses/UnauthorizedResponse"
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /variabel/delete/{id}:
     delete:
       tags:
-        - variabel
+        - Variabel
       summary: Menghapus variabel berdasarkan id
       security:
         - BearerAuth: []
@@ -4015,18 +3835,61 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /variabel/multi-delete:
+    delete:
+      tags:
+        - Variabel
+      summary: Menghapus banyak variabel
+      description: API untuk menghapus banyak variabel berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: variabel berhasil dihapus
+          content:
+            application/json:
+              schema:
                 type: object
                 properties:
                   code:
                     type: number
-                    example: 404
+                    example: 200
                   status:
                     type: boolean
-                    example: false
+                    example: true
                   message:
                     type: string
-                    example: "Data tidak ditemukan"
-
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data variabel tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /subjek:
     get:
       tags:

@@ -70,7 +70,7 @@ class VariabelController extends Controller
             // Mengecek apabila terdapat data dengan id yang sama
             if ($data) {
                 return $this->successResponseWithData(
-                    $data,
+                    VariabelResource::make($data),
                     'Data variabel berhasil diambil',
                     Response::HTTP_OK
                 );

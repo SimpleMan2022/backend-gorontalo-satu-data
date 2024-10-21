@@ -26,6 +26,8 @@ Route::prefix("auth")->controller(AuthController::class)->group(function () {
     Route::post("login", "login")->name('login');
 });
 
+Route::get("opd-provinsi", [OpdProvinsiController::class, 'index']);
+
 Route::group(['middleware' => 'auth:sanctum'], function () {
     // Auth Route
     Route::controller(AuthController::class)->group(function () {
@@ -135,7 +137,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::prefix('opd-provinsi')->controller(OpdProvinsiController::class)->group(function () {
-        Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::post("/edit/{id}", "update");
