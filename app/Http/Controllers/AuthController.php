@@ -7,10 +7,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;
+use App\Mail\SendCodeResetPassword;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\ResetCodePassword;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -51,7 +53,16 @@ class AuthController extends Controller
   {
     // return $request->user();
     return $this->successResponseWithData(
-      $request->user(),
+      [
+        'id' => $request->user()->id,
+        'username' => $request->user()->username,
+        'email' => $request->user()->email,
+        'role' => [
+          'id' => $request->user()->roles->first()->id,
+          'name' => $request->user()->roles->first()->name,
+          'permissions' => $request->user()->roles->first()->permissions->pluck('name')
+        ],
+      ],
       'Data pengguna berhasil diambil',
       Response::HTTP_OK
     );
@@ -67,7 +78,8 @@ class AuthController extends Controller
     );
   }
 
-  public function forgotPassword(Request $request) {
+  public function forgotPassword(Request $request)
+  {
     $data = $request->validate([
       'email' => 'required|email|exists:users',
     ]);
