@@ -31,8 +31,6 @@ jobs:
             git pull origin main &&  # Pull the latest changes
             echo '📦 Installing dependencies...' &&
             composer install --optimize-autoloader --no-dev &&
-            echo '🛠️ Running migrations...' &&
-            php artisan migrate --force &&
             echo '🗂️ Caching configuration and routes...' &&
             php artisan config:cache &&
             php artisan route:cache

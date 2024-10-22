@@ -21,7 +21,7 @@ class HasilDataController extends Controller
         try {
             $perPage = $request->per_page ?? 10;
 
-            $hasilQuery = HasilData::orderBy('created_at', 'desc')->paginate($perPage);
+            $hasilQuery = HasilData::orderBy('created_at', 'desc');
 
             if ($rekapHasilId = $request->query('rekap_hasil_id')) {
                 $hasilQuery->where('rekap_hasil_id', $rekapHasilId);
@@ -94,14 +94,14 @@ class HasilDataController extends Controller
 
                     $randomString = rand(10000, 99999);
                     $enumerator_nama = strtolower(str_replace(' ', '_', $enumerator->nama));
-                  
+
                     $opd_nama = strtolower(str_replace(' ', '_', $opd->nama));
-                    
+
                     $file_name = $randomString . '_' . $enumerator_nama . '_' . $opd_nama . '.' . $file->getClientOriginalExtension();
                     $extension = $file->getClientOriginalExtension();
-                    
-                    if(in_array($extension, ['jpg', 'png', 'jpeg'])) {
-                        if($file->getSize() <= 2048000 ) {
+
+                    if (in_array($extension, ['jpg', 'png', 'jpeg'])) {
+                        if ($file->getSize() <= 2048000) {
                             Storage::putFileAs('hasil_gambar', $file, $file_name);
 
                             $hasil_data = HasilData::create([
@@ -109,48 +109,45 @@ class HasilDataController extends Controller
                                 'variabel_id' => $item['variabel_id'],
                                 'konten' => $file_name,
                             ]);
-                            
-                            
-                        }else {
+                        } else {
                             return $this->errorResponse('Ukuran file maksimal 2mb', Response::HTTP_BAD_REQUEST);
                         }
-                    }else {
+                    } else {
                         return $this->errorResponse('Ekstensi file harus berupa .jpg, .png atau .jpeg', Response::HTTP_BAD_REQUEST);
                     }
                 }
 
-                if($variabel->tipe == 'file'){
+                if ($variabel->tipe == 'file') {
 
                     $file = $item['konten'];
-                    
-                    $randomString = rand(10000,99999);
+
+                    $randomString = rand(10000, 99999);
                     $enumerator_nama = strtolower(str_replace(' ', '_', $enumerator->nama));
                     $opd_nama = strtolower(str_replace(' ', '_', $opd->nama));
-                    
+
                     $file_name = $randomString . '_' . $enumerator_nama . '_' . $opd_nama . '.' . $file->getClientOriginalExtension();
                     $extension = $file->getClientOriginalExtension();
 
                     $extension = $file->getClientOriginalExtension();
-                    
-                    
-                    if(in_array($extension, ['pdf'])) {
-                        if($file->getSize() <= 2048000 ) {
+
+
+                    if (in_array($extension, ['pdf'])) {
+                        if ($file->getSize() <= 2048000) {
                             Storage::putFileAs('hasil_file', $file, $file_name);
-    
+
                             $hasil_data = HasilData::create([
                                 'rekap_hasil_id' => $rekap_hasil->id,
                                 'variabel_id' => $item['variabel_id'],
                                 'konten' => $file_name,
-                            ]);    
-                        }else {
+                            ]);
+                        } else {
                             return $this->errorResponse('Ukuran file maksimal 2mb', Response::HTTP_BAD_REQUEST);
                         }
-                    }else {
+                    } else {
                         return $this->errorResponse('Ekstensi file harus berupa pdf', Response::HTTP_BAD_REQUEST);
                     }
-
                 }
-                if($variabel->tipe != 'file' && $variabel->tipe != 'gambar') {
+                if ($variabel->tipe != 'file' && $variabel->tipe != 'gambar') {
                     $hasil_data = HasilData::create([
                         'rekap_hasil_id' => $rekap_hasil->id,
                         'variabel_id' => $item['variabel_id'],
@@ -198,16 +195,16 @@ class HasilDataController extends Controller
                 ->first();
 
             $enumeratorId = collect($request->all())->pluck('enumerator_id')->first();
-            
+
             $enumerator = Enumerator::where('id', $enumeratorId)
                 ->with('enumerator_kabupaten')
                 ->with('enumerator_provinsi')
                 ->first();
-            
-            if($enumerator['enumerator_level'] == 'provinsi') {
+
+            if ($enumerator['enumerator_level'] == 'provinsi') {
                 $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['id'])->first();
-                $nama_rekap = $enumerator->nama . ' - ' . $opd->nama . ' (Provinsi) '. ' - ' . $periode->nama;
-            }else {
+                $nama_rekap = $enumerator->nama . ' - ' . $opd->nama . ' (Provinsi) ' . ' - ' . $periode->nama;
+            } else {
                 $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['id'])->first();
                 $nama_rekap = $enumerator->nama . ' - ' . $opd->nama .  ' - ' . $periode->nama;
             }
@@ -233,12 +230,12 @@ class HasilDataController extends Controller
                 // Buat data pada pivot jika belum ada
                 $variabel = Variabel::find($item['variabel_id']);
 
-                if($variabel->tipe == 'gambar'){
-                    
+                if ($variabel->tipe == 'gambar') {
+
                     $file = $item['konten'];
 
-                    
-                    $randomString = rand(10000,99999);
+
+                    $randomString = rand(10000, 99999);
                     $enumerator_nama = strtolower(str_replace(' ', '_', $enumerator->nama));
 
                     $file_name = $randomString . '_' . $enumerator_nama . '_' . $opd->nama . '_' . $randomString . '.' . $file->getClientOriginalExtension();
@@ -277,7 +274,7 @@ class HasilDataController extends Controller
                     if (in_array($extension, ['pdf'])) {
                         if ($file->getSize() <= 2048000) {
                             Storage::putFileAs('hasil_file', $file, $file_name);
-    
+
                             HasilData::find($item['id'])->update([
                                 'rekap_hasil_id' => $rekap_hasil->id,
                                 'variabel_id' => $item['variabel_id'],
@@ -290,8 +287,8 @@ class HasilDataController extends Controller
                         return $this->errorResponse('Ekstensi file harus berupa pdf', Response::HTTP_BAD_REQUEST);
                     }
                 }
-              
-                if($variabel->tipe != 'file' && $variabel->tipe != 'gambar') {
+
+                if ($variabel->tipe != 'file' && $variabel->tipe != 'gambar') {
                     HasilData::find($item['id'])->update([
                         'rekap_hasil_id' => $rekap_hasil->id,
                         'variabel_id' => $item['variabel_id'],
