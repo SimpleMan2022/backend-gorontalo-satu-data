@@ -6,10 +6,14 @@ use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;
 use App\Models\{SektorSpasial, Sektor};
 use App\Http\Resources\SektorSpasialResource;
+use Exception;
+use Illuminate\Http\Response;
 
 class SektorSpasialController extends Controller
 {
+    use ApiResponse;
     public function index(Request $request) {
+
         try {
             // Memanggil data dan request PerPage
             $per_page = $request->per_page ?? 10;

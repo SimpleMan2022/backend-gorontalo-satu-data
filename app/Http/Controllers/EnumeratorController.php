@@ -18,11 +18,18 @@ use Spatie\Permission\Models\Role;
 class EnumeratorController extends Controller
 {
     use ApiResponse;
-    public function index()
+    public function index(Request $request)
     {
         try{
             $perPage = $request->per_page ?? 10;
-            $data = Enumerator::orderBy('created_at', 'desc')->paginate($perPage);
+            $enumeratorQuery = Enumerator::orderBy('created_at', 'desc');
+
+            if ($userId = $request->query('user_id')) {
+                $enumeratorQuery->where('user_id', $userId);
+            }
+
+            $data = $enumeratorQuery->paginate($perPage);
+
             if ($data->isNotEmpty()){
                 return $this->successResponseWithDataIndex(
                     $data,

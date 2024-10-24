@@ -22,7 +22,18 @@ class UserOpdKabupatenController extends Controller
     {
         try {
             $perPage = $request->per_page ?? 10;
-            $data = UserOpdKabupaten::orderBy('created_at', 'desc')->paginate($perPage);
+            $UserOpdKabupatenQuery = UserOpdKabupaten::orderBy('created_at', 'desc');
+
+            if ($userId = $request->query('user_id')) {
+                $UserOpdKabupatenQuery->where('user_id', $userId);
+            }
+
+            if ($opdKabupatenId = $request->query('opd_kabupaten_id')) {
+                $UserOpdKabupatenQuery->where('opd_kabupaten_id', $opdKabupatenId);
+            }
+
+            $data = $UserOpdKabupatenQuery->paginate($perPage);
+
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
