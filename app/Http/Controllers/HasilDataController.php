@@ -50,32 +50,57 @@ class HasilDataController extends Controller
     public function store(Request $request)
     {
         try {
-            $now = date('Y-m-d');
-            $periode = Periode::where('tanggal_mulai', '<=', $now)
-                ->where('tanggal_selesai', '>=', $now)
-                ->first();
 
             $enumeratorId = collect($request->all())->pluck('enumerator_id')->first();
 
-            $enumerator = Enumerator::where('id', $enumeratorId)
-                ->with('enumerator_kabupaten')
-                ->with('enumerator_provinsi')
-                ->first();
+            if($enumeratorId) {
+                $enumerator = Enumerator::where('id', $enumeratorId)
+                    ->with('enumerator_kabupaten')
+                    ->with('enumerator_provinsi')
+                    ->first();
+                if(!$enumerator) {
+                    return $this->errorResponse('Enumerator tidak valid', Response::HTTP_NOT_FOUND);                    return $this->errorResponse('Enumerator masih kosong', Response::HTTP_NOT_FOUND);
+                }
+            }else {
+                return $this->errorResponse('Enumerator masih kosong', Response::HTTP_NOT_FOUND);
+            }
+        
 
             if ($enumerator['enumerator_level'] == 'provinsi') {
                 $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['id'])->first();
+                
+                $now = date('Y-m-d');
+                $periode = Periode::where('tanggal_mulai', '<=', $now)
+                    ->where('tanggal_selesai', '>=', $now)
+                    ->where('opd_provinsi_id', $opd->id)
+                    ->first();
+
                 $nama_rekap = $enumerator->nama . ' - ' . $opd->nama . ' (Provinsi) ' . ' - ' . $periode->nama;
             } else {
                 $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['id'])->first();
+
+                $opd_provinsi = OpdProvinsi::where('id', $opd->opd_provinsi_id)->first();
+
+                $now = date('Y-m-d');
+                $periode = Periode::where('tanggal_mulai', '<=', $now)
+                    ->where('tanggal_selesai', '>=', $now)
+                    ->where('opd_provinsi_id', $opd_provinsi->id)
+                    ->first();
+
                 $nama_rekap = $enumerator->nama . ' - ' . $opd->nama .  ' - ' . $periode->nama;
             }
+            
+            if($periode) {
+                $rekap_hasil = RekapHasil::create([
+                    'nama' => $nama_rekap,
+                    'enumerator_id' => $enumerator->id ?? $enumeratorId,
+                    'periode_id' => $periode->id,
+                    'status' => 'v2',
+                ]);
+            }else {
+                return $this->errorResponse('Periode masih kosong', Response::HTTP_NOT_FOUND);
+            }
 
-            $rekap_hasil = RekapHasil::create([
-                'nama' => $nama_rekap,
-                'enumerator_id' => $enumerator->id ?? $enumeratorId,
-                'periode_id' => $periode->id,
-                'status' => 'v2',
-            ]);
 
             $req = $request->validate([
                 '*.variabel_id' => 'required|integer|exists:variabel,id',  // Validasi setiap 'variabel_id' di dalam array sebagai integer dan harus ada di tabel 'variabel'

@@ -19,6 +19,14 @@ class RekapHasilResource extends JsonResource
             'nama' => $this->nama,
             'enumerator_id' => $this->enumerator,
             'periode_id' => $this->periode,
+            'hasil_data' => $this->hasil_data->map(function($hasil) {
+                return [
+                    'id' => $hasil->id,
+                    'variabel_id' => $hasil->variabel,
+                    'rekap_hasil_id' => $hasil->rekap_hasil_id,
+                    'konten' => $hasil->konten,
+                ];
+            }),
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

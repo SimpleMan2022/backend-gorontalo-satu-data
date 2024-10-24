@@ -18,8 +18,14 @@ class PeriodeController extends Controller
     public function index(Request $request)
     {
         try {
-            $per_page = $request->per_page ?? 10;
-            $data = Periode::orderBy('created_at', 'desc')->paginate($per_page);
+            $perPage = $request->per_page ?? 10;
+            $variabelQuery = Periode::orderBy('created_at', 'desc');
+
+            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
+                $variabelQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+
+            $data = $variabelQuery->paginate($perPage);
 
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
