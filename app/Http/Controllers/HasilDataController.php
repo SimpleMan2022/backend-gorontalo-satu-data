@@ -79,10 +79,12 @@ class HasilDataController extends Controller
             } else {
                 $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['id'])->first();
 
+                $opd_provinsi = OpdProvinsi::where('id', $opd->opd_provinsi_id)->first();
+
                 $now = date('Y-m-d');
                 $periode = Periode::where('tanggal_mulai', '<=', $now)
                     ->where('tanggal_selesai', '>=', $now)
-                    ->where('opd_provinsi_id', $opd->id)
+                    ->where('opd_provinsi_id', $opd_provinsi->id)
                     ->first();
 
                 $nama_rekap = $enumerator->nama . ' - ' . $opd->nama .  ' - ' . $periode->nama;
