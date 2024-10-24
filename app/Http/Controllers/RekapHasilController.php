@@ -11,6 +11,7 @@ use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
 use Str;
+use DB;
 
 class RekapHasilController extends Controller
 {
@@ -29,6 +30,13 @@ class RekapHasilController extends Controller
 
             if ($periodeId = $request->query('periode_id')) {
                 $hasilQuery->where('periode_id', $periodeId);
+            }
+            if ($indikatorId = $request->query('indikator_id')) {
+                $hasilQuery->join('hasil_data', 'hasil_data.rekap_hasil_id', '=', 'rekap_hasil.id')
+                ->join('variabel','variabel.id', '=', 'hasil_data.variabel_id')
+                ->select('rekap_hasil.*', DB::raw('MAX(variabel.indikator_id) as indikator_id'))
+                ->where('indikator_id', $indikatorId)
+                ->groupBy('rekap_hasil.id');
             }
 
             $data = $hasilQuery->paginate($perPage);
