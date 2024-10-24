@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Support\Facades\Hash;
@@ -9,15 +10,13 @@ use Illuminate\Validation\ValidationException;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
 use App\Mail\SendCodeResetPassword;
-use App\Traits\ApiResponse;
 use Carbon\Carbon;
-use Str;
 
 class ForgotPasswordController extends Controller
 {
 
     use ApiResponse;
-    
+
     public function sendResetLink(Request $request)
     {
         $request->validate([
@@ -48,7 +47,7 @@ class ForgotPasswordController extends Controller
                 ->first();
 
             // Jika token ditemukan, kirimkan email kustom
-            if($tokenData) {
+            if ($tokenData) {
                 Mail::to($request->email)->send(new SendCodeResetPassword($tokenData));
                 return response()->json(['message' => $tokenData], 200);
             }
@@ -59,31 +58,31 @@ class ForgotPasswordController extends Controller
         ]);
     }
 
-  // Mengatur ulang password
-  public function resetPassword(Request $request)
-  {
-    $request->validate([
-        'email' => 'required|email',
-        'token' => 'required',
-        'password' => 'required|min:8|confirmed',
-    ]);
+    // Mengatur ulang password
+    public function resetPassword(Request $request)
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'token' => 'required',
+            'password' => 'required|min:8|confirmed',
+        ]);
 
-    // Proses reset password
-    $status = Password::reset(
-        $request->only('email', 'password', 'password_confirmation', 'token'),
-        function ($user, $password) {
-            $user->forceFill([
-                'password' => Hash::make($password),
-            ])->save();
+        // Proses reset password
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function ($user, $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password),
+                ])->save();
+            }
+        );
+
+        if ($status === Password::PASSWORD_RESET) {
+            return response()->json(['message' => __($status)], 200);
         }
-    );
 
-    if ($status === Password::PASSWORD_RESET) {
-        return response()->json(['message' => __($status)], 200);
+        throw ValidationException::withMessages([
+            'email' => [trans($status)],
+        ]);
     }
-
-    throw ValidationException::withMessages([
-        'email' => [trans($status)],
-    ]);
-  }
 }

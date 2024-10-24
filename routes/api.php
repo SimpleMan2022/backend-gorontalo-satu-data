@@ -21,12 +21,14 @@ use App\Http\Controllers\PivotOpdSektorController;
 use App\Http\Controllers\HasilDataController;
 use App\Http\Controllers\PivotEnumeratorIndikatorController;
 use App\Http\Controllers\RekapHasilController;
+use App\Http\Controllers\SektorSpasialController;
 use App\Http\Controllers\ForgotPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
     Route::post("register", "create");
     Route::post("login", "login")->name('login');
+    Route::post("login-enumerator", "loginEnumerator")->name('login-enumerator');
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.reset');
     Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
 });
@@ -54,7 +56,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('antar-waktu')->controller(AntarWaktuController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
-        // Route::get("/{id}", "show");
+        Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
@@ -229,6 +231,15 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/{id}", "show");
         Route::put("/multiVerifikasi", "multiUpdate");
         Route::put("/verifikasi/{rekap_hasil_id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
+    });
+    
+    Route::prefix('sektor-spasial')->controller(SektorSpasialController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
