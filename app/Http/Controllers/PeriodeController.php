@@ -14,12 +14,17 @@ use Illuminate\Validation\ValidationException;
 class PeriodeController extends Controller
 {
     use ApiResponse;
-
+    
     public function index(Request $request)
     {
         try {
-            $per_page = $request->per_page ?? 10;
-            $data = Periode::orderBy('created_at', 'desc')->paginate($per_page);
+            $perPage = $request->per_page ?? 10;
+            $periodeQuery = Periode::orderBy('created_at', 'desc');
+
+            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
+                $periodeQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+            $data = $periodeQuery->paginate($perPage);
 
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(

@@ -23,13 +23,22 @@ class UserOpdProvinsiController extends Controller
     {
         try {
             $perPage = $request->per_page ?? 10;
-            $userOPDQuery = UserOpdProvinsi::orderBy('created_at', 'desc');
+            $UserOpdProvinsiQuery = UserOpdProvinsi::orderBy('created_at', 'desc');
 
             if ($request->has('opd_provinsi_id')) {
-                $userOPDQuery->where('opd_provinsi_id', $request->opd_provinsi_id);
+                $UserOpdProvinsiQuery->where('opd_provinsi_id', $request->opd_provinsi_id);
             }
 
-            $data = $userOPDQuery->paginate($perPage);
+            if ($userId = $request->query('user_id')) {
+                $UserOpdProvinsiQuery->where('user_id', $userId);
+            }
+
+            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
+                $UserOpdProvinsiQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+
+            $data = $UserOpdProvinsiQuery->paginate($perPage);
+
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,

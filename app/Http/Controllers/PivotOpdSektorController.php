@@ -16,10 +16,24 @@ class PivotOpdSektorController extends Controller
 {
     use ApiResponse;
 
-    public function index() {
+    public function index(Request $request) {
         try {
             $perPage = $request->per_page ?? 20;
-            $data = PivotOpdSektor::orderBy('created_at', 'desc')->paginate($perPage);
+            $PivotOpdSektorQuery = PivotOpdSektor::orderBy('created_at', 'desc');
+
+            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
+                $PivotOpdSektorQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+
+            if ($opdKabupatenId = $request->query('opd_kabupaten_id')) {
+                $PivotOpdSektorQuery->where('opd_kabupaten_id', $opdKabupatenId);
+            }
+
+            if ($sektorId = $request->query('sektor_id')) {
+                $PivotOpdSektorQuery->where('sektor_id', $sektorId);
+            }
+            $data = $PivotOpdSektorQuery->paginate($perPage);
+            
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data, 

@@ -18,8 +18,18 @@ class BeritaAcaraController extends Controller
     public function index(Request $request)
     {
         try {
-            $per_page = $request->per_page ?? 10;
-            $data = BeritaAcara::orderBy('created_at', 'desc')->paginate($per_page);
+            $perPage = $request->per_page ?? 10;
+            $BeritaAcaraQuery = BeritaAcara::orderBy('created_at', 'desc');
+
+            if ($opdKabupatenId = $request->query('opd_kabupaten_id')) {
+                $BeritaAcaraQuery->wehere('opd_kabupaten_id', $opdKabupatenId);
+            }
+
+            if ($indikatorId = $request->query('indikator')) {
+                $BeritaAcaraQuery->where('indikator', $indikatorId);
+            }
+
+            $data = $BeritaAcaraQuery->paginate(($perPage));
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
