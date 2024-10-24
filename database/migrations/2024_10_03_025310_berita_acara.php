@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('opd_kabupaten_id')->references('id')->on('opd_kabupaten')->onDelete('cascade');
             $table->string('file');
             $table->foreignId('indikator_id')->references('id')->on('indikator')->onDelete('cascade');
-            $table->enum('status', ['pending', 'approved']);
+            $table->enum('status', ['public', 'private']);
             $table->timestamps();
         });
     }

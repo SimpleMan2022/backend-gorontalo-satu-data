@@ -195,7 +195,9 @@ class DashboardController extends Controller
             // Count the total number of indikator filtered by opd_provinsi_id
             $total_rekap_hasil = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
                 $query->where('opd_provinsi_id', $opd_provinsi_id);
-            })->count();
+            })
+            ->whereIn('status', ['terima', 'revisi', 'tolak', 'v3'])
+            ->count();
 
             // Count the total number of each status in the RekapHasil model, filtered by opd_provinsi_id
             $terima_count = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
@@ -210,13 +212,21 @@ class DashboardController extends Controller
                 $query->where('opd_provinsi_id', $opd_provinsi_id);
             })->where('status', 'tolak')->count();
 
+            $v3_count = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            })->where('status', 'v3')->count();
+
             // Calculate percentages with two decimal points
             $terima_percentage = $total_rekap_hasil > 0 ? ($terima_count / $total_rekap_hasil) * 100 : 0;
             $revisi_percentage = $total_rekap_hasil > 0 ? ($revisi_count / $total_rekap_hasil) * 100 : 0;
             $tolak_percentage = $total_rekap_hasil > 0 ? ($tolak_count / $total_rekap_hasil) * 100 : 0;
+            $v3_percentage = $total_rekap_hasil > 0 ? ($v3_count / $total_rekap_hasil) * 100 : 0;
 
             // Create the response structure with percentages
             $status_counts = [
+                [
+                    'total_rekap_hasil' => $total_rekap_hasil
+                ],
                 [
                     'status_rekap_hasil' => 'terima',
                     'jumlah' => $terima_count,
@@ -231,6 +241,11 @@ class DashboardController extends Controller
                     'status_rekap_hasil' => 'tolak',
                     'jumlah' => $tolak_count,
                     'persentase' => number_format($tolak_percentage, 2)
+                ],
+                [
+                    'status_rekap_hasil' => 'proses',
+                    'jumlah' => $v3_count,
+                    'persentase' => number_format($v3_percentage, 2)
                 ]
             ];
 
@@ -347,6 +362,157 @@ class DashboardController extends Controller
         } catch (Exception $e) {
             return response()->json([
                 'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function ChartDonutOpdKabupaten(Request $request)
+    {
+        try {
+            // Check if opd_kabupaten_id is provided
+            $opd_kabupaten_id = $request->input('opd_kabupaten_id');
+            if (!$opd_kabupaten_id) {
+                return response()->json([
+                    'error' => 'opd_kabupaten_id is required'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Retrieve the opd_provinsi_id from the OpdKabupaten model
+            $opdKabupaten = OpdKabupaten::find($opd_kabupaten_id);
+            if (!$opdKabupaten) {
+                return response()->json([
+                    'error' => 'OpdKabupaten not found'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // Extract the opd_provinsi_id
+            $opd_provinsi_id = $opdKabupaten->opd_provinsi_id;
+
+            // Count the total number of indikator filtered by opd_provinsi_id
+            $total_rekap_hasil = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            })
+            ->whereIn('status', ['v3', 'revisi', 'tolak', 'v2'])
+            ->count();
+
+            // Count the total number of each status in the RekapHasil model, filtered by opd_provinsi_id
+            $terima_count = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            })->where('status', 'v3')->count();
+
+            $revisi_count = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            })->where('status', 'revisi')->count();
+
+            $tolak_count = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            })->where('status', 'tolak')->count();
+
+            $proses_count = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            })->where('status', 'v2')->count();
+
+            // Calculate percentages with two decimal points
+            $terima_percentage = $total_rekap_hasil > 0 ? ($terima_count / $total_rekap_hasil) * 100 : 0;
+            $revisi_percentage = $total_rekap_hasil > 0 ? ($revisi_count / $total_rekap_hasil) * 100 : 0;
+            $tolak_percentage = $total_rekap_hasil > 0 ? ($tolak_count / $total_rekap_hasil) * 100 : 0;
+            $proses_percentage = $total_rekap_hasil > 0 ? ($proses_count / $total_rekap_hasil) * 100 : 0;
+
+            // Create the response structure with percentages
+            $status_counts = [
+                [
+                    'total_rekap_hasil' => $total_rekap_hasil
+                ],
+                [
+                    'status_rekap_hasil' => 'terima',
+                    'jumlah' => $terima_count,
+                    'persentase' => number_format($terima_percentage, 2)
+                ],
+                [
+                    'status_rekap_hasil' => 'revisi',
+                    'jumlah' => $revisi_count,
+                    'persentase' => number_format($revisi_percentage, 2)
+                ],
+                [
+                    'status_rekap_hasil' => 'tolak',
+                    'jumlah' => $tolak_count,
+                    'persentase' => number_format($tolak_percentage, 2)
+                ],
+                [
+                    'status_rekap_hasil' => 'proses',
+                    'jumlah' => $proses_count,
+                    'persentase' => number_format($proses_percentage, 2)
+                ]
+            ];
+
+            return $this->successResponseWithData(
+                $status_counts,
+                'success',
+                Response::HTTP_OK
+            );
+
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                $e->getMessage(),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    public function ChartBarOpdKabupaten(Request $request)
+    {
+        try {
+            // Check if opd_kabupaten_id is provided
+            $opd_kabupaten_id = $request->input('opd_kabupaten_id');
+            if (!$opd_kabupaten_id) {
+                return response()->json([
+                    'error' => 'opd_kabupaten_id is required'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+
+            // Retrieve the opd_provinsi_id from the OpdKabupaten model
+            $opdKabupaten = OpdKabupaten::find($opd_kabupaten_id);
+            if (!$opdKabupaten) {
+                return response()->json([
+                    'error' => 'OpdKabupaten not found'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // Extract the opd_provinsi_id
+            $opd_provinsi_id = $opdKabupaten->opd_provinsi_id;
+
+            // Query AntarWaktu with related Indikator and BeritaAcara
+            $data = AntarWaktu::with(['indikator' => function ($query) use ($opd_provinsi_id) {
+                    // Filter indikator by opd_provinsi_id
+                    $query->where('opd_provinsi_id', $opd_provinsi_id);
+                }, 'indikator.beritaAcara'])  // Add BeritaAcara relation
+                ->get()
+                ->map(function($antarWaktu) {
+                    // Calculate the total number of BeritaAcara across all indicators for each AntarWaktu
+                    $jumlahBeritaAcara = $antarWaktu->indikator->sum(function($indikator) {
+                        return $indikator->beritaAcara->count();
+                    });
+
+                    return [
+                        'tahun' => $antarWaktu->tahun,
+                        'nama' => $antarWaktu->nama,
+                        'jumlah_berita_acara' => $jumlahBeritaAcara  // Count of BeritaAcara
+                    ];
+                });
+
+            // Build the response
+            return response()->json([
+                'code' => Response::HTTP_OK,
+                'status' => true,
+                'message' => 'success',
+                'data' => $data
+            ], Response::HTTP_OK);
+
+        } catch (Exception $e) {
+            return response()->json([
+                'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
+                'status' => false,
+                'message' => $e->getMessage()
             ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
