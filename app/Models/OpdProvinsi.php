@@ -21,10 +21,11 @@ class OpdProvinsi extends Model
         return $this->hasMany(Indikator::class);
     }
 
-    public function opd_kabupaten() {
+    public function opd_kabupaten()
+    {
         return $this->hasMany(OpdKabupaten::class);
     }
-    
+
     public function periode()
     {
         return $this->hasMany(Periode::class);
@@ -35,7 +36,8 @@ class OpdProvinsi extends Model
         return $this->hasMany(ArtikelKawasan::class);
     }
 
-    public function pivot_opd_sektor() {
+    public function pivot_opd_sektor()
+    {
         return $this->hasMany(PivotOpdSektor::class);
     }
 }
