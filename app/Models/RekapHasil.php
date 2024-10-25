@@ -12,7 +12,7 @@ class RekapHasil extends Model
     protected $table = 'rekap_hasil';
 
     public function hasil_data() {
-        return $this->hasMany(HasilData::class);
+        return $this->hasMany(HasilData::class, 'rekap_hasil_id', 'id');
     }
 
     public function enumerator() {

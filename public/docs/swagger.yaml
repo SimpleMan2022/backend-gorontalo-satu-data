@@ -148,8 +148,6 @@ paths:
         - Sektor
       summary: Mendapatkan semua data sektor
       description: API untuk mendapatkan semua data sektor
-      security:
-        - BearerAuth: []
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
@@ -4207,6 +4205,389 @@ paths:
                 $ref: "#/components/schemas/UnauthorizedResponse"
         "404":
           description: Data subjek tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
+  /enumerator:
+    get:
+      tags:
+        - Enumerator
+      summary: Mendapatkan semua data enumerator
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data enumerator
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data enumerator berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        email:
+                          type: string
+                          example: "user@example.com"
+                        username:
+                          type: string
+                          example: "user"
+                        nama:
+                          type: string
+                          example: "enumerator 1"
+                        jabatan:
+                          type: string
+                          example: "enumerator"
+                        enumerator_level:
+                          type: string
+                          example: "kabupaten"
+                        opd_kabupaten:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Dinas Komunikasi dan Informatika"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+    post:
+      tags:
+        - Enumerator
+      summary: Menambahkan enumerator baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+                nama:
+                  type: string
+                  example: "enumerator 1"
+                jabatan:
+                  type: string
+                  example: "enumerator"
+                opd_kabupaten_id:
+                  type: integer
+                  example: 1
+                  nullable: true
+                opd_provinsi_id:
+                  type: integer
+                  example: 1
+                  nullable: true
+      responses:
+        "201":
+          description: enumerator berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data enumerator berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+  /enumerator/{id}:
+    get:
+      tags:
+        - Enumerator
+      summary: Mendapatkan detail enumerator
+      description: API untuk mendapatkan detail enumerator berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Detail enumerator berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data enumerator berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      email:
+                        type: string
+                        example: "user@example.com"
+                      username:
+                        type: string
+                        example: "user"
+                      nama:
+                        type: string
+                        example: "enumerator 1"
+                      jabatan:
+                        type: string
+                        example: "enumerator"
+                      enumerator_level:
+                        type: string
+                        example: "kabupaten"
+                      opd_kabupaten:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nama:
+                            type: string
+                            example: "Dinas Komunikasi dan Informatika"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /enumerator/edit/{id}:
+    patch:
+      tags:
+        - Enumerator
+      summary: Memperbarui enumerator yang ada
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+                nama:
+                  type: string
+                  example: "enumerator 1"
+                jabatan:
+                  type: string
+                  example: "enumerator"
+                opd_kabupaten_id:
+                  type: integer
+                  example: 1
+                  nullable: true
+                opd_provinsi_id:
+                  type: integer
+                  example: 1
+                  nullable: true
+      responses:
+        "201":
+          description: enumerator berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /enumerator/delete/{id}:
+    delete:
+      tags:
+        - Enumerator
+      summary: Menghapus enumerator berdasarkan id
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari enumerator yang akan dihapus
+      responses:
+        "200":
+          description: enumerator berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 404
+                  status:
+                    type: boolean
+                    example: false
+                  message:
+                    type: string
+                    example: "Data tidak ditemukan"
+  /enumerator/multi-delete:
+    delete:
+      tags:
+        - Enumerator
+      summary: Menghapus banyak enumerator
+      description: API untuk menghapus banyak enumerator berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: enumerator berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data enumerator berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data enumerator tidak ditemukan
           content:
             application/json:
               schema:

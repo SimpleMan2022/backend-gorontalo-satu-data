@@ -25,6 +25,7 @@ class UserOpdKabupatenResource extends JsonResource
                 'opd_provinsi' => $this->opd_kabupaten->opd_provinsi ? $this->opd_kabupaten->opd_provinsi->only('id', 'nama') : null,
             ],
             'jabatan' => $this->jabatan,
+            'user' => $this->user,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

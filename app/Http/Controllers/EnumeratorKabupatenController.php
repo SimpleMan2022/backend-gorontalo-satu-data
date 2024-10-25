@@ -15,11 +15,22 @@ use Illuminate\Http\Request;
 class EnumeratorKabupatenController extends Controller
 {
     use ApiResponse;
-    public function index()
+    public function index(Request $request)
     {
         try{
             $perPage = $request->per_page ?? 10;
-            $data = EnumeratorKabupaten::orderBy('created_at', 'desc')->paginate($perPage);
+            $EnumeratorKabupatenQuery = EnumeratorKabupaten::orderBy('created_at', 'desc');
+
+            if ($opdKabupatenId = $request->query('opd_kabupaten_id')) {
+                $EnumeratorKabupatenQuery->where('opd_kabupaten_id', $opdKabupatenId);
+            }
+
+            if ($enumeratorId = $request->query('enumerator_id')) {
+                $EnumeratorKabupatenQuery->where('enmuerator_id', $enumeratorId);
+            }
+
+            $data = $EnumeratorKabupatenQuery->paginate($perPage);
+
             if ($data->isNotEmpty()){
                 return $this->successResponseWithDataIndex(
                     $data,

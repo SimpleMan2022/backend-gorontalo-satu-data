@@ -29,12 +29,49 @@ class AuthController extends Controller
       if (!Auth::attempt($request->only('username', 'password'))) {
         return $this->errorResponse('Terdapat kesalahan kredensial.', Response::HTTP_UNAUTHORIZED);
       }
+
       $user = User::where('username', $request->username)->firstOrFail();
+
+      if($user->hasRole('enumerator')) {
+        return $this->errorResponse('Enumerator login menggunakan aplikasi mobile.', Response::HTTP_UNAUTHORIZED);
+      }
       $token = $user->createToken('auth_token')->plainTextToken;
       $data = [
         'token_type' => 'Bearer',
         'token' => $token,
-        // 'id' => $user
+      ];
+
+      return $this->successResponseWithData(
+        $data,
+        'Login berhasil',
+        Response::HTTP_OK
+      );
+    } catch (ValidationException $e) {
+      return $this->errorResponseWithData($e->errors(), 'Login gagal', Response::HTTP_BAD_REQUEST);
+      return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+  }
+  public function loginEnumerator(Request $request)
+  {
+    try {
+      $validate = $request->validate([
+        'username' => 'required',
+        'password' => 'required|min:8'
+      ]);
+
+      if (!Auth::attempt($request->only('username', 'password'))) {
+        return $this->errorResponse('Terdapat kesalahan kredensial.', Response::HTTP_UNAUTHORIZED);
+      }
+
+      $user = User::where('username', $request->username)->firstOrFail();
+
+      if(!$user->hasRole('enumerator')) {
+        return $this->errorResponse('Operator login menggunakan aplikasi website.', Response::HTTP_UNAUTHORIZED);
+      }
+      $token = $user->createToken('auth_token')->plainTextToken;
+      $data = [
+        'token_type' => 'Bearer',
+        'token' => $token,
       ];
 
       return $this->successResponseWithData(
@@ -98,51 +135,4 @@ class AuthController extends Controller
 
     return response(['message' => trans('passwords.sent')], 200);
   }
-
-  // public function codeCheck(Request $request) {
-  //   $request->validate([
-  //     'token' => 'required|string|exists:password_reset_tokens',
-  //   ]);
-
-  //   // find the code
-  //   $passwordReset = ResetCodePassword::firstWhere('token', $request->token);
-
-  //   // check if it does not expired: the time is one hour
-  //   if ($passwordReset->created_at > now()->addHour()) {
-  //       $passwordReset->delete();
-  //       return response(['message' => trans('passwords.code_is_expire')], 422);
-  //   }
-
-  //   return response([
-  //       'code' => $passwordReset->token,
-  //       'message' => trans('passwords.code_is_valid')
-  //   ], 200);
-  // }
-
-  // public function resetPassword(Request $request) {
-  //   $request->validate([
-  //     'token' => 'required|string|exists:password_reset_tokens',
-  //     'password' => 'required|string|min:6|confirmed',
-  //   ]);
-
-  //   // find the code
-  //   $passwordReset = ResetCodePassword::firstWhere('token', $request->token);
-
-  //   // check if it does not expired: the time is one hour
-  //   if ($passwordReset->created_at > now()->addHour()) {
-  //       $passwordReset->delete();
-  //       return response(['message' => trans('passwords.code_is_expire')], 422);
-  //   }
-
-  //   // find user's email 
-  //   $user = User::firstWhere('email', $passwordReset->email);
-
-  //   // update user password
-  //   $user->update($request->only('password'));
-
-  //   // delete current code 
-  //   $passwordReset->delete();
-
-  //   return response(['message' =>'password has been successfully reset'], 200);
-  // }
 }

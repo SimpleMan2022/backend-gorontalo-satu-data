@@ -16,7 +16,6 @@ class EnumeratorResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'user_id' => $this->user_id,
             'email' => $this->user->email,
             'username' => $this->user->username,
             'nama' => $this->nama,
@@ -40,9 +39,8 @@ class EnumeratorResource extends JsonResource
                 $this->enumerator_kabupaten->isNotEmpty(),
                 $this->enumerator_kabupaten->map(function ($kabupaten) {
                     return [
-                        'id' => $kabupaten->id,
-                        'opd_kabupaten_id' => $kabupaten->opd_kabupaten->nama,
-                        'kabupaten' => $kabupaten->opd_kabupaten->kabupaten->name,
+                        'id' => $kabupaten->opd_kabupaten->id,
+                        'nama' => $kabupaten->opd_kabupaten->nama,
                     ];
                 })
             ),
@@ -50,8 +48,8 @@ class EnumeratorResource extends JsonResource
                 $this->enumerator_provinsi->isNotEmpty(),
                 $this->enumerator_provinsi->map(function ($provinsi) {
                     return [
-                        'id' => $provinsi->id,
-                        'opd_provinsi_id' => $provinsi->opd_provinsi->nama,
+                        'id' => $provinsi->opd_provinsi->id,
+                        'nama' => $provinsi->opd_provinsi->nama,
                     ];
                 })
             ),

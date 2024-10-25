@@ -7,38 +7,58 @@ use Illuminate\Database\Eloquent\Model;
 
 class Enumerator extends Model
 {
+
+    public static function boot()
+    {
+        parent::boot();
+
+        static::deleting(function ($enumerator) {
+            $enumerator->enumerator_kabupaten()->delete();
+            $enumerator->enumerator_provinsi()->delete();
+            $enumerator->pivot_enumerator_indikator()->delete();
+            $enumerator->user()->delete();
+        });
+    }
+
     use HasFactory;
     protected $guarded = [];
     protected $table = 'enumerator';
 
-    public function user() {
+    public function user()
+    {
         return $this->belongsTo(User::class);
     }
 
-    public function enumerator_kabupaten() {
+    public function enumerator_kabupaten()
+    {
         return $this->hasMany(EnumeratorKabupaten::class);
     }
 
-    public function enumerator_provinsi() {
+    public function enumerator_provinsi()
+    {
         return $this->hasMany(EnumeratorProvinsi::class);
     }
 
-    public function opd_kabupaten() {
+    public function opd_kabupaten()
+    {
         return $this->belongsTo(OpdKabupaten::class);
     }
 
-    public function opd_provinsi() {
+    public function opd_provinsi()
+    {
         return $this->belongsTo(OpdProvinsi::class);
     }
 
-    public function pivot_enumerator_indikator() {
+    public function pivot_enumerator_indikator()
+    {
         return $this->hasMany(PivotEnumeratorIndikator::class);
     }
 
-    
+
     protected $appends = ['enumerator_level'];
 
-    public function getEnumeratorLevelAttribute() {
+    public function getEnumeratorLevelAttribute()
+    {
         if ($this->enumerator_provinsi->isNotEmpty()) {
             return 'provinsi';
         }
