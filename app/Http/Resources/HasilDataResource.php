@@ -16,8 +16,8 @@ class HasilDataResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'variabel_id' => $this->variabel,
-            'rekap_hasil_id' => $this->rekap_hasil,
+            'variabel' => $this->variabel->only('id', 'nama', 'order', 'tipe'),
+            'rekap_hasil' => $this->rekap_hasil,
             'konten' => $this->konten,
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,

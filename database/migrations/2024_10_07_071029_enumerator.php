@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('enumerator', function (Blueprint $table) {
             $table->id();
-            $table->integer('user_id');
+            $table->foreignId('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->string('nama');
             $table->string('jabatan');
             $table->timestamps();
