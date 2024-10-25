@@ -44,7 +44,26 @@ class AntarWaktuController extends Controller
         }
     }
 
-    //show??
+    public function show($id)
+    {
+        try {
+            // Mencari data sektor dengan id
+            $data = AntarWaktu::find($id);
+
+            // Mengecek apabila terdapat data dengan id yang sama
+            if ($data) {
+                return $this->successResponseWithData(
+                    AntarWaktuResource::make($data),
+                    'Data Sektor Spasial berhasil diambil',
+                    Response::HTTP_OK
+                );
+            } else {
+                return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     public function update(Request $request, $id)
     {
