@@ -4592,6 +4592,424 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiDataNotFoundResponse"
+  /pivot-enumerator-indikator:
+    get:
+      tags:
+        - Pivot Enumerator Indikator
+      summary: Mendapatkan semua data pivot enumerator indikator
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data pivot enumerator indikator
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data pivot enumerator indikator berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        enumerator:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            nama:
+                              type: string
+                              example: "Enumerator Evan"
+                            jabatan:
+                              type: string
+                              example: "Operator"
+                            enumerator_level:
+                              type: string
+                              example: "provinsi"
+                        indikator:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 4
+                            nama:
+                              type: string
+                              example: "Agregat sebaran fasilitas kesehatan negeri"
+                            status:
+                              type: string
+                              example: "pending"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+    post:
+      tags:
+        - Pivot Enumerator Indikator
+      summary: Menambahkan pivot enumerator indikator baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enumerator_id:
+                  type: integer
+                  example: 1
+                indikator_id:
+                  type: integer
+                  example: 1
+      responses:
+        "201":
+          description: pivot enumerator indikator berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data pivot enumerator indikator berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+  /pivot-enumerator-indikator/multi-store:
+    post:
+      tags:
+        - Pivot Enumerator Indikator
+      summary: Menambahkan lebih dari 1 pivot enumerator indikator sekaligus
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  enumerator_id:
+                    type: integer
+                    example: 1
+                  indikator_id:
+                    type: integer
+                    example: 1
+                required:
+                  - enumerator_id
+                  - indikator_id
+
+      responses:
+        "201":
+          description: pivot enumerator indikator berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: data pivot enumerator indikator berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+  /pivot-enumerator-indikator/{id}:
+    get:
+      tags:
+        - Pivot Enumerator Indikator
+      summary: Mendapatkan detail pivot enumerator indikator
+      description: API untuk mendapatkan detail pivot enumerator indikator berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Detail pivot enumerator indikator berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data pivot enumerator indikator berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      enumerator:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Enumerator Evan"
+                          jabatan:
+                            type: string
+                            example: "Operator"
+                          enumerator_level:
+                            type: string
+                            example: "provinsi"
+                      indikator:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 4
+                          nama:
+                            type: string
+                            example: "Agregat sebaran fasilitas kesehatan negeri"
+                          status:
+                            type: string
+                            example: "pending"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /pivot-enumerator-indikator/edit/{id}:
+    patch:
+      tags:
+        - Pivot Enumerator Indikator
+      summary: Memperbarui pivot enumerator indikator yang ada
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enumerator_id:
+                  type: integer
+                  example: 1
+                indikator_id:
+                  type: integer
+                  example: 1
+      responses:
+        "201":
+          description: pivot enumerator indikator berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /pivot-enumerator-indikator/delete/{id}:
+    delete:
+      tags:
+        - Pivot Enumerator Indikator
+      summary: Menghapus pivot enumerator indikator berdasarkan id
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari pivot enumerator indikator yang akan dihapus
+      responses:
+        "200":
+          description: pivot enumerator indikator berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /pivot-enumerator-indikator/multi-delete:
+    delete:
+      tags:
+        - Pivot Enumerator Indikator
+      summary: Menghapus banyak pivot enumerator indikator
+      description: API untuk menghapus banyak pivot enumerator indikator berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: pivot enumerator indikator berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
 components:
   schemas:
     Pagination:
