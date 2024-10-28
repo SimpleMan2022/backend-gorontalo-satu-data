@@ -78,7 +78,7 @@ class UserOpdProvinsiController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-            if (User::where('username', $validated['nama'])->get()) {
+            if (User::where('username', $validated['username'])->exists()) {
                 return $this->errorResponse('Username sudah tersedia', Response::HTTP_BAD_REQUEST);
             }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
