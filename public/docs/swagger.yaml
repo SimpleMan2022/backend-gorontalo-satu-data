@@ -182,6 +182,23 @@ paths:
                         logo:
                           type: string
                           example: "http://gsd/foto.webp"
+                        opd_provinsi:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              nama:
+                                type: string
+                                example: "Dinas Pendidikan"
+                              lokasi:
+                                type: string
+                                example: "Jl. Pendidikan No. 1"
+                              logo:
+                                type: string
+                                example: "http://gsd/foto.webp"
                         created_at:
                           type: string
                           example: "2024-10-16T01:32:59.000000Z"
@@ -2055,6 +2072,9 @@ paths:
                 lokasi:
                   type: string
                   example: "Jl. Pendidikan No. 1"
+                sektor_id:
+                  type: string
+                  example: "1,2,3"
       responses:
         "201":
           description: opd provinsi berhasil ditambahkan
