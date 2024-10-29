@@ -16,11 +16,11 @@ class OlahanSpasialResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'opd_provinsi_id' => $this->opd_provinsi,
-            'sektor_spasial_id' => $this->sektor_spasial,
             'judul' => $this->judul,
             'konten' => $this->konten,
             'status' => $this->status,
+            'sektor_spasial' => $this->sektor_spasial->only('id', 'nama'),
+            'opd_provinsi' => $this->opd_provinsi->only('id', 'nama', 'logo', 'lokasi'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

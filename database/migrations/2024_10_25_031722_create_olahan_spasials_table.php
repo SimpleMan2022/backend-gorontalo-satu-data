@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('sektor_spasial_id')->references('id')->on('sektor_spasial')->onDelete('cascade');
             $table->string('judul');
             $table->text('konten');
-            $table->enum('status',[0,1]);
+            $table->enum('status', ['public', 'private'])->default('private');
             $table->timestamps();
         });
     }
