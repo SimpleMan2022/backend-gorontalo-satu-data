@@ -133,15 +133,15 @@ class SektorSpasialController extends Controller
             $id = request('id');
             $ids = explode(",", $id);
 
-            $variabel = SektorSpasial::whereIn('id', $ids)->pluck('id')->toArray();
+            $sektor_spasial = SektorSpasial::whereIn('id', $ids)->pluck('id')->toArray();
 
-            $notFoundIds = array_diff($ids, $variabel);
+            $notFoundIds = array_diff($ids, $sektor_spasial);
 
             if (!empty($notFoundIds)) {
                 return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
             }
 
-            SektorSpasial::whereIn('id', $variabel)->delete();
+            SektorSpasial::whereIn('id', $sektor_spasial)->delete();
 
             return $this->successResponse('Data sektor spasial berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
