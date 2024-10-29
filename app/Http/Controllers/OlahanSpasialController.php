@@ -42,24 +42,26 @@ class OlahanSpasialController extends Controller
             } else {
                 return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-    public function store(Request $request){
-        try{
+    public function store(Request $request)
+    {
+        try {
             $req = $request->validate([
-                'opd_provinsi_id' => 'required',
-                'sektor_spasial_id' => 'required',
-                'judul' => 'required',
-                'konten' => 'required',
+                'opd_provinsi_id' => 'required|exists:opd_provinsi,id',
+                'sektor_spasial_id' => 'required|exists:sektor_spasial,id',
+                'judul' => 'required|string',
+                'konten' => 'required|string',
+                'status' => 'required|in:public,private',
             ]);
 
-            $data = OlahanSpasial::create($req);
+            OlahanSpasial::create($req);
 
             return $this->successResponse('Data Olahan Spasial berhasil dibuat', Response::HTTP_CREATED);
-        }catch(Expcetion $e){
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -88,13 +90,15 @@ class OlahanSpasialController extends Controller
         }
     }
 
-    public function update(Request $request, $id){
-        try{
+    public function update(Request $request, $id)
+    {
+        try {
             $req = $request->validate([
-                'opd_provinsi_id' => 'required',
-                'sektor_spasial_id' => 'required',
-                'judul' => 'required',
-                'konten' => 'required',
+                'opd_provinsi_id' => 'required|exists:opd_provinsi,id',
+                'sektor_spasial_id' => 'required|exists:sektor_spasial,id',
+                'judul' => 'required|string',
+                'konten' => 'required|string',
+                'status' => 'required|in:public,private',
             ]);
 
             $data = OlahanSpasial::find($id);
@@ -106,7 +110,7 @@ class OlahanSpasialController extends Controller
             } else {
                 return $this->errorResponse(
                     'Data tidak ditemukan',
-                    Response::HTTP_INTERNAL_SERVER_ERROR
+                    Response::HTTP_NOT_FOUND
                 );
             }
         } catch (ValidationException $e) {
