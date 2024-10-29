@@ -5363,6 +5363,399 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiDataNotFoundResponse"
+  /olahan-spasial:
+    get:
+      tags:
+        - Olahan Spasial
+      summary: Mendapatkan semua data olahan spasial
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data olahan spasial
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data olahan spasial berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        judul:
+                          type: string
+                          example: "Sebaran Jumlah Fasilitas"
+                        konten:
+                          type: string
+                          example: "deskripsi singkat"
+                        status:
+                          type: string
+                          example: "public"
+                        sektor_spasial:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            nama:
+                              type: string
+                              example: "Kemiskinan"
+                        opd_provinsi:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            nama:
+                              type: string
+                              example: "Dinas Pertanian"
+                            logo:
+                              type: string
+                              example: logo/example.webp
+                            lokasi:
+                              type: string
+                              lokasi: Gorontalo Barat
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+    post:
+      tags:
+        - Olahan Spasial
+      summary: Menambahkan olahan spasial baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sektor_id:
+                  type: integer
+                  example: 4
+                sektor_spasial_id:
+                  type: integer
+                  example: 2
+                opd_provinsi_id:
+                  type: integer
+                  example: 1
+                judul:
+                  type: string
+                  example: Sebaraan Jumlah Fasilitas
+                konten:
+                  type: string
+                  example: deskripsi singkat
+                status:
+                  type: string
+                  example: public
+      responses:
+        "200":
+          description: olahan spasial berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil dibuat
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+  /olahan-spasial/{id}:
+    get:
+      tags:
+        - Olahan Spasial
+      summary: Mendapatkan detail olahan spasial
+      description: API untuk mendapatkan detail olahan spasial berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Detail olahan spasial berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data olahan spasial berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      judul:
+                        type: string
+                        example: "Sebaran Jumlah Fasilitas"
+                      konten:
+                        type: string
+                        example: "deskripsi singkat"
+                      status:
+                        type: string
+                        example: "public"
+                      sektor_spasial:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Kemiskinan"
+                      opd_provinsi:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Dinas Pertanian"
+                          logo:
+                            type: string
+                            example: logo/example.webp
+                          lokasi:
+                            type: string
+                            lokasi: Gorontalo Barat
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /olahan-spasial/edit/{id}:
+    patch:
+      tags:
+        - Olahan Spasial
+      summary: Memperbarui olahan spasial yang ada
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                sektor_id:
+                  type: integer
+                  example: 4
+                sektor_spasial_id:
+                  type: integer
+                  example: 2
+                opd_provinsi_id:
+                  type: integer
+                  example: 1
+                judul:
+                  type: string
+                  example: Sebaraan Jumlah Fasilitas
+                konten:
+                  type: string
+                  example: deskripsi singkat
+                status:
+                  type: string
+                  example: public
+      responses:
+        "201":
+          description: olahan spasial berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /olahan-spasial/delete/{id}:
+    delete:
+      tags:
+        - Olahan Spasial
+      summary: Menghapus olahan spasial berdasarkan id
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari olahan spasial yang akan dihapus
+      responses:
+        "200":
+          description: olahan spasial berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /olahan-spasial/multi-delete:
+    delete:
+      tags:
+        - Olahan Spasial
+      summary: Menghapus banyak olahan spasial
+      description: API untuk menghapus banyak olahan spasial berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: olahan spasial berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data olahan spasial berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data olahan spasial tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
 components:
   schemas:
     Pagination:
