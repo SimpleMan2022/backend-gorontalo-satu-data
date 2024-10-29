@@ -17,7 +17,7 @@ class PivotEnumeratorIndikatorResource extends JsonResource
         return [
             'id' => $this->id,
             'enumerator_id' => $this->enumerator,
-            'indikator_id' => $this->indikator,
+            'indikator_id' => IndikatorResource::make($this->indikator),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

@@ -16,4 +16,8 @@ class SektorSpasial extends Model
     public function sektor() {
         return $this->belongsTo(Sektor::class);
     }
+
+    public function olahan_spasial() {
+        return $this->hasMany(OlahanSpasial::class);
+    }
 }
