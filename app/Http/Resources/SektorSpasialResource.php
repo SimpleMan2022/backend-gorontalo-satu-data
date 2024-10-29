@@ -16,8 +16,8 @@ class SektorSpasialResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'sektor_id' => $this->sektor,
             'nama' => $this->nama,
+            'sektor' => $this->sektor->only('id', 'nama'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
