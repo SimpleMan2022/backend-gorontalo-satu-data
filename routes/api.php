@@ -22,6 +22,8 @@ use App\Http\Controllers\HasilDataController;
 use App\Http\Controllers\PivotEnumeratorIndikatorController;
 use App\Http\Controllers\RekapHasilController;
 use App\Http\Controllers\SektorSpasialController;
+use App\Http\Controllers\OlahanSpasialController;
+use App\Http\Controllers\SpasialKabupatenController;
 use App\Http\Controllers\ForgotPasswordController;
 use Illuminate\Support\Facades\Route;
 
@@ -236,6 +238,26 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
     
     Route::prefix('sektor-spasial')->controller(SektorSpasialController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
+    });
+
+    
+    Route::prefix('olahan-spasial')->controller(OlahanSpasialController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
+    });
+
+
+    Route::prefix('spasial-kabupaten')->controller(SpasialKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
