@@ -7,6 +7,7 @@ use App\Models\Sektor;
 use App\Models\Subjek;
 use App\Http\Traits\ApiResponse;
 use App\Models\AntarWaktu;
+use App\Models\Enumerator;
 use App\Models\EnumeratorKabupaten;
 use App\Models\EnumeratorProvinsi;
 use App\Models\Indikator;
@@ -517,5 +518,133 @@ class DashboardController extends Controller
         }
     }
 
+    public function EnumeratorView(Request $request)
+    {
+        try {
+            // Check if enumerator_id is provided
+            $enumerator_id = $request->input('enumerator_id');
+            if (!$enumerator_id) {
+                return response()->json([
+                    'error' => 'enumerator_id is required'
+                ], Response::HTTP_BAD_REQUEST);
+            }
 
+            // Check if the enumerator exists
+            $enumerator = Enumerator::find($enumerator_id);
+            if (!$enumerator) {
+                return response()->json([
+                    'error' => 'Enumerator not found'
+                ], Response::HTTP_NOT_FOUND);
+            }
+
+            // Check if enumerator_id exists in EnumeratorKabupaten or EnumeratorProvinsi
+            $isInKabupaten = EnumeratorKabupaten::where('enumerator_id', $enumerator_id)->exists();
+            $isInProvinsi = EnumeratorProvinsi::where('enumerator_id', $enumerator_id)->exists();
+
+            $enumerator_kabupaten = EnumeratorKabupaten::find($enumerator_id);
+            $enumerator_provinsi = EnumeratorProvinsi::find($enumerator_id);
+
+            // If enumerator is not associated with either Kabupaten or Provinsi, return "no data"
+            if (!$isInKabupaten && !$isInProvinsi) {
+                return response()->json([
+                    'message' => 'No data available for this enumerator'
+                ], Response::HTTP_OK);
+            }
+
+            // Initialize total_indikator count
+            $total_indikator = RekapHasil::where('enumerator_id', $enumerator_id)->count();
+
+            // Set totals based on where the enumerator is located
+            if ($isInKabupaten) {
+                $opd = $enumerator_kabupaten->opd_kabupaten->nama;
+                $total_indikator_diverifikasi = RekapHasil::where('enumerator_id', $enumerator_id)
+                    ->where('status', 'v3')
+                    ->count();
+
+                $total_indikator_ditolak = RekapHasil::where('enumerator_id', $enumerator_id)
+                    ->where('status', 'tolak')
+                    ->count();
+
+                $total_indikator_diproses = RekapHasil::where('enumerator_id', $enumerator_id)
+                    ->where('status', 'v2')
+                    ->count();
+            } else { // If in EnumeratorProvinsi
+                $opd = $enumerator_provinsi->opd_provinsi->nama;
+                $total_indikator_diverifikasi = RekapHasil::where('enumerator_id', $enumerator_id)
+                    ->where('status', 'terima')
+                    ->count();
+
+                $total_indikator_ditolak = RekapHasil::where('enumerator_id', $enumerator_id)
+                    ->where('status', 'tolak')
+                    ->count();
+
+                $total_indikator_diproses = RekapHasil::where('enumerator_id', $enumerator_id)
+                    ->where('status', 'v3')
+                    ->count();
+            }
+
+            // Prepare data response
+            $data = [
+                'opd' => $opd,
+                'terinput' => $total_indikator,
+                'diverifikasi' => $total_indikator_diverifikasi,
+                'ditolak' => $total_indikator_ditolak,
+                'menunggu' => $total_indikator_diproses,
+            ];
+
+            return $this->successResponseWithData(
+                $data,
+                'success',
+                Response::HTTP_OK
+            );
+        } catch (Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage()
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+
+    public function EnumeratorIndikator(Request $request)
+    {
+        try {
+            // Validate that enumerator_id is provided
+            $enumerator_id = $request->input('enumerator_id');
+            if (!$enumerator_id) {
+                return response()->json([
+                    'error' => 'enumerator_id is required'
+                ], Response::HTTP_BAD_REQUEST);
+            }
+    
+            // Retrieve data from Enumerator with Indikator details through the pivot table
+            $data = Enumerator::with(['pivot_enumerator_indikator.indikator' => function ($query) {
+                    $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
+                }])
+                ->where('id', $enumerator_id)
+                ->get()
+                ->map(function ($enumerator) {
+                    return $enumerator->pivot_enumerator_indikator->map(function ($pivot) {
+                        return [
+                            'id' => $pivot->indikator->id,
+                            'nama_indikator' => $pivot->indikator->nama,
+                            'sektor' => $pivot->indikator->sektor->nama,
+                            'opd' => $pivot->indikator->opd_provinsi->nama,
+                        ];
+                    });
+                });
+    
+            return $this->successResponseWithData(
+                $data,
+                'success',
+                Response::HTTP_OK
+            );
+    
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                $e->getMessage(),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }    
 }
