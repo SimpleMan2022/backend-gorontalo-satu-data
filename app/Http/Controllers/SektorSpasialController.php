@@ -4,22 +4,25 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;
-use App\Models\{SektorSpasial, Sektor};
+use App\Models\{SektorSpasial, Sektor, Variabel};
 use App\Http\Resources\SektorSpasialResource;
 use Exception;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Response;
+use Illuminate\Validation\ValidationException;
 
 class SektorSpasialController extends Controller
 {
     use ApiResponse;
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
 
         try {
             // Memanggil data dan request PerPage
             $per_page = $request->per_page ?? 10;
             $variabelQuery = SektorSpasial::orderBy('created_at', 'desc');
 
-            if($sektorId = $request->query('sektor_id')){
+            if ($sektorId = $request->query('sektor_id')) {
                 $variabelQuery->where('sektor_id', $sektorId);
             }
 
@@ -44,7 +47,8 @@ class SektorSpasialController extends Controller
         }
     }
 
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
             $req = $request->validate([
                 'sektor_id' => 'required|exists:sektor,id',
@@ -82,7 +86,8 @@ class SektorSpasialController extends Controller
         }
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         try {
             $req = $request->validate([
                 'sektor_id' => 'required|exists:sektor,id',
@@ -101,7 +106,7 @@ class SektorSpasialController extends Controller
                     Response::HTTP_INTERNAL_SERVER_ERROR
                 );
             }
-            
+
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
@@ -113,7 +118,7 @@ class SektorSpasialController extends Controller
     public function destroy($id)
     {
         try {
-            SektorSpasial::findOrFail($id)->delete;
+            SektorSpasial::findOrFail($id)->delete();
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
@@ -136,9 +141,9 @@ class SektorSpasialController extends Controller
                 return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
             }
 
-            Variabel::whereIn('id', $variabel)->delete();
+            SektorSpasial::whereIn('id', $variabel)->delete();
 
-            return $this->successResponse('Data variabel berhasil dihapus', Response::HTTP_OK);
+            return $this->successResponse('Data sektor spasial berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
