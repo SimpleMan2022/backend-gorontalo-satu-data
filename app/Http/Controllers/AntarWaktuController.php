@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\AntarWaktuResource;
 use App\Models\AntarWaktu;
 use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;

@@ -5,6 +5,7 @@ use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataController;
 use App\Http\Controllers\EnumeratorController;
 use App\Http\Controllers\EnumeratorKabupatenController;
 use App\Http\Controllers\EnumeratorProvinsiController;
@@ -33,6 +34,12 @@ Route::prefix("auth")->controller(AuthController::class)->group(function () {
     Route::post("login-enumerator", "loginEnumerator")->name('login-enumerator');
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.reset');
     Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
+});
+
+Route::prefix("data")->controller(DataController::class)->group(function () {
+    Route::get("kabupaten", "getAllKabupaten");
+    Route::get("kecamatan", "getAllKecamatan");
+    Route::get("desa", "getAllDesa");
 });
 
 Route::get("opd-provinsi", [OpdProvinsiController::class, 'index']);
@@ -236,7 +243,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
-    
+
     Route::prefix('sektor-spasial')->controller(SektorSpasialController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
@@ -246,7 +253,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/multi-delete", "multiDestroy");
     });
 
-    
+
     Route::prefix('olahan-spasial')->controller(OlahanSpasialController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
@@ -273,7 +280,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
         Route::get("/opd", "OpdView");
     });
-
 });
 
 Route::get('/docs', function () {

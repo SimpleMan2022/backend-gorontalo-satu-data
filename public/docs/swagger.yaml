@@ -5030,6 +5030,917 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiDataNotFoundResponse"
+
+  /hasil-data:
+    get:
+      tags:
+        - Hasil Data
+      summary: Mendapatkan semua hasil data
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Data Hasil berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data Hasil berhasil diambil"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        variabel:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            nama:
+                              type: string
+                              example: "Nama Pelabuhan"
+                            order:
+                              type: integer
+                              example: 0
+                            tipe:
+                              type: string
+                              example: "string"
+                        rekap_hasil:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "mantohar sidomuncul - Dinas Pendidikan Kabupaten Bone Bolango - periode 1"
+                            enumerator_id:
+                              type: integer
+                              example: 7
+                            periode_id:
+                              type: integer
+                              example: 1
+                            status:
+                              type: string
+                              example: "v2"
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-29T03:08:39.000000Z"
+                            updated_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-29T03:08:39.000000Z"
+                        konten:
+                          type: string
+                          example: "pelabuhan itim"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-29T03:08:39.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-29T03:08:39.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+    post:
+      tags:
+        - Hasil Data
+      summary: Menambahkan hasil data baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enumerator_id:
+                  type: integer
+                  example: 7
+                variabel_id:
+                  type: integer
+                  example: 2
+                konten:
+                  type: string
+                  example: "pelabuhan itim"
+      responses:
+        "201":
+          description: data berhasil dibuat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Hasil data berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+  /hasil-data/edit/{id}:
+    patch:
+      tags:
+        - Hasil Data
+      summary: Memperbarui hasil data yang ada
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: integer
+                  example: 1
+                enumerator_id:
+                  type: integer
+                  example: 5
+                indikator_id:
+                  type: integer
+                  example: 6
+                konten:
+                  type: string
+                  example: pelabuhan bitung
+      responses:
+        "201":
+          description: hasil data berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /hasil-data/{id}:
+    get:
+      tags:
+        - Hasil Data
+      summary: Mendapatkan detail hasil data
+      description: API untuk mendapatkan hasil data berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Detail pivot enumerator indikator berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Hasil data berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      variabel:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Nama Pelabuhan"
+                          order:
+                            type: integer
+                            example: 0
+                          tipe:
+                            type: string
+                            example: "string"
+                      rekap_hasil:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nama:
+                            type: string
+                            example: "mantohar sidomuncul - Dinas Pendidikan Kabupaten Bone Bolango - periode 1"
+                          enumerator_id:
+                            type: integer
+                            example: 7
+                          periode_id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: "v2"
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: "2024-10-29T03:08:39.000000Z"
+                          updated_at:
+                            type: string
+                            format: date-time
+                            example: "2024-10-29T03:08:39.000000Z"
+                      konten:
+                        type: string
+                        example: "pelabuhan itim"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-29T03:08:39.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-29T03:08:39.000000Z"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /hasil-data/delete/{id}:
+    delete:
+      tags:
+        - Hasil Data
+      summary: Menghapus hasil data berdasarkan id
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari hasil data yang akan dihapus
+      responses:
+        "200":
+          description: hasil data berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /hasil-data/multi-delete:
+    delete:
+      tags:
+        - Hasil Data
+      summary: Menghapus banyak hasil data
+      description: API untuk menghapus banyak hasil data sekaligus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: hasil data berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
+  /rekap-hasil:
+    get:
+      tags:
+        - Rekap Hasil
+      summary: Mendapatkan semua data rekap hasil
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data rekap hasil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Rekap hasil berhasil diambil"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nama:
+                          type: string
+                          example: "mantohar sidomuncul - Dinas Pendidikan Kabupaten Bone Bolango - periode 1"
+                        enumerator_id:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 7
+                            user_id:
+                              type: integer
+                              example: 16
+                            nama:
+                              type: string
+                              example: "mantohar sidomuncul"
+                            jabatan:
+                              type: string
+                              example: "Kabid Informatika"
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-29T03:01:13.000000Z"
+                            updated_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-29T03:01:13.000000Z"
+                            enumerator_level:
+                              type: string
+                              example: "kabupaten"
+                            enumerator_provinsi:
+                              type: array
+                              items:
+                                type: object
+                            enumerator_kabupaten:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 4
+                                  opd_kabupaten_id:
+                                    type: integer
+                                    example: 9
+                                  enumerator_id:
+                                    type: integer
+                                    example: 7
+                                  created_at:
+                                    type: string
+                                    format: date-time
+                                    example: "2024-10-29T03:01:13.000000Z"
+                                  updated_at:
+                                    type: string
+                                    format: date-time
+                                    example: "2024-10-29T03:01:13.000000Z"
+                        periode_id:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "periode 1"
+                            tanggal_mulai:
+                              type: string
+                              format: date
+                              example: "2024-01-12"
+                            tanggal_selesai:
+                              type: string
+                              format: date
+                              example: "2024-12-15"
+                            opd_provinsi_id:
+                              type: integer
+                              example: 1
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-11T06:09:00.000000Z"
+                            updated_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-11T06:09:00.000000Z"
+                        hasil_data:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              variabel_id:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 2
+                                  indikator_id:
+                                    type: integer
+                                    example: 6
+                                  nama:
+                                    type: string
+                                    example: "Nama Pelabuhan"
+                                  order:
+                                    type: integer
+                                    example: 0
+                                  tipe:
+                                    type: string
+                                    example: "string"
+                                  created_at:
+                                    type: string
+                                    format: date-time
+                                    example: "2024-10-29T03:03:45.000000Z"
+                                  updated_at:
+                                    type: string
+                                    format: date-time
+                                    example: "2024-10-29T03:03:45.000000Z"
+                              rekap_hasil_id:
+                                type: integer
+                                example: 1
+                              konten:
+                                type: string
+                                example: "pelabuhan itim"
+                        status:
+                          type: string
+                          example: "v2"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-29T03:08:39.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-29T03:08:39.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /rekap-hasil/verifikasi/{id}:
+    patch:
+      tags:
+        - Rekap Hasil
+      summary: Memperbarui rekap hasil yang ada
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "terima"
+      responses:
+        "201":
+          description: rekap hasil berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /rekap-hasil/multiVerifikasi:
+    patch:
+      tags:
+        - Rekap Hasil
+      summary: Memperbarui rekap hasil yang ada secara bersamaan
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "tolak"
+      responses:
+        "201":
+          description: rekap hasil berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /rekap-hasil/{id}:
+    get:
+      tags:
+        - Rekap Hasil
+      summary: Mendapatkan detail rekap hasil
+      description: API untuk mendapatkan detail rekap hasil berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Berhasil mendapatkan data rekap hasil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Rekap hasil berhasil diambil"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nama:
+                          type: string
+                          example: "mantohar sidomuncul - Dinas Pendidikan Kabupaten Bone Bolango - periode 1"
+                        enumerator_id:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 7
+                            user_id:
+                              type: integer
+                              example: 16
+                            nama:
+                              type: string
+                              example: "mantohar sidomuncul"
+                            jabatan:
+                              type: string
+                              example: "Kabid Informatika"
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-29T03:01:13.000000Z"
+                            updated_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-29T03:01:13.000000Z"
+                            enumerator_level:
+                              type: string
+                              example: "kabupaten"
+                            enumerator_provinsi:
+                              type: array
+                              items:
+                                type: object
+                            enumerator_kabupaten:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 4
+                                  opd_kabupaten_id:
+                                    type: integer
+                                    example: 9
+                                  enumerator_id:
+                                    type: integer
+                                    example: 7
+                                  created_at:
+                                    type: string
+                                    format: date-time
+                                    example: "2024-10-29T03:01:13.000000Z"
+                                  updated_at:
+                                    type: string
+                                    format: date-time
+                                    example: "2024-10-29T03:01:13.000000Z"
+                        periode_id:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "periode 1"
+                            tanggal_mulai:
+                              type: string
+                              format: date
+                              example: "2024-01-12"
+                            tanggal_selesai:
+                              type: string
+                              format: date
+                              example: "2024-12-15"
+                            opd_provinsi_id:
+                              type: integer
+                              example: 1
+                            created_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-11T06:09:00.000000Z"
+                            updated_at:
+                              type: string
+                              format: date-time
+                              example: "2024-10-11T06:09:00.000000Z"
+                        hasil_data:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              variabel_id:
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 2
+                                  indikator_id:
+                                    type: integer
+                                    example: 6
+                                  nama:
+                                    type: string
+                                    example: "Nama Pelabuhan"
+                                  order:
+                                    type: integer
+                                    example: 0
+                                  tipe:
+                                    type: string
+                                    example: "string"
+                                  created_at:
+                                    type: string
+                                    format: date-time
+                                    example: "2024-10-29T03:03:45.000000Z"
+                                  updated_at:
+                                    type: string
+                                    format: date-time
+                                    example: "2024-10-29T03:03:45.000000Z"
+                              rekap_hasil_id:
+                                type: integer
+                                example: 1
+                              konten:
+                                type: string
+                                example: "pelabuhan itim"
+                        status:
+                          type: string
+                          example: "v2"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-29T03:08:39.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-29T03:08:39.000000Z"
+  /rekap-hasil/delete/{id}:
+    delete:
+      tags:
+        - Rekap Hasil
+      summary: Menghapus rekap hasil berdasarkan id
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari rekap hasil yang akan dihapus
+      responses:
+        "200":
+          description: rekap hasil berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /sektor-spasial:
     get:
       tags:
@@ -5756,6 +6667,172 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiDataNotFoundResponse"
+  /data/kabupaten:
+    get:
+      tags:
+        - Data
+      summary: Mendapatkan semua data kabupaten
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data kabupaten
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data kabupaten berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nama:
+                          type: string
+                          example: "Kabupaten Gorontalo"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /data/kecamatan:
+    get:
+      tags:
+        - Data
+      summary: Mendapatkan semua data kecamatan
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: kabupaten_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Berhasil mendapatkan data kecamatan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data kecamatan berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        regency_id:
+                          type: string
+                          example: 7502
+                        name:
+                          type: string
+                          example: "Batudaa Pantai"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /data/desa:
+    get:
+      tags:
+        - Data
+      summary: Mendapatkan semua data desa
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: kecamatan_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 750201
+      responses:
+        "200":
+          description: Berhasil mendapatkan data desa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data desa berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        district_id:
+                          type: string
+                          example: 750201
+                        name:
+                          type: string
+                          example: "Tabullo"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
 components:
   schemas:
     Pagination:
