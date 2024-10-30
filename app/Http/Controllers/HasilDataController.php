@@ -70,12 +70,17 @@ class HasilDataController extends Controller
                 $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['id'])->first();
                 
                 $now = date('Y-m-d');
+                
                 $periode = Periode::where('tanggal_mulai', '<=', $now)
-                    ->where('tanggal_selesai', '>=', $now)
-                    ->where('opd_provinsi_id', $opd->id)
-                    ->first();
+                ->where('tanggal_selesai', '>=', $now)
+                ->where('opd_provinsi_id', $opd->id)
+                ->first();
 
-                $nama_rekap = $enumerator->nama . ' - ' . $opd->nama . ' (Provinsi) ' . ' - ' . $periode->nama;
+                if($periode) {
+                    $nama_rekap = $enumerator->nama . ' - ' . $opd->nama . ' (Provinsi) ' . ' - ' . $periode->nama;
+                }else {
+                    return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
+                }
             } else {
                 $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['id'])->first();
 
@@ -86,8 +91,12 @@ class HasilDataController extends Controller
                     ->where('tanggal_selesai', '>=', $now)
                     ->where('opd_provinsi_id', $opd_provinsi->id)
                     ->first();
-
-                $nama_rekap = $enumerator->nama . ' - ' . $opd->nama .  ' - ' . $periode->nama;
+                    
+                if($periode) {
+                    $nama_rekap = $enumerator->nama . ' - ' . $opd->nama .  ' - ' . $periode->nama;
+                }else {
+                    return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
+                }
             }
             
             if($periode) {
