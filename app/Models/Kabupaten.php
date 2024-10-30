@@ -11,7 +11,13 @@ class Kabupaten extends Model
     protected $guarded = [];
     protected $table = 'regencies';
 
-    public function opd_kabupaten() {
+    public function opd_kabupaten()
+    {
         return $this->hasMany(OpdKabupaten::class);
+    }
+
+    public function kecamatan()
+    {
+        return $this->hasMany(Kecamatan::class, 'regency_id');
     }
 }
