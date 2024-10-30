@@ -5042,7 +5042,7 @@ paths:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
       responses:
-        '200':
+        "200":
           description: Data Hasil berhasil diambil
           content:
             application/json:
@@ -5248,7 +5248,7 @@ paths:
     get:
       tags:
         - Hasil Data
-      summary: Mendapatkan detail hasil data 
+      summary: Mendapatkan detail hasil data
       description: API untuk mendapatkan hasil data berdasarkan ID
       security:
         - BearerAuth: []
@@ -5279,61 +5279,61 @@ paths:
                   data:
                     type: object
                     properties:
-                        id:
-                          type: integer
-                          example: 1
-                        variabel:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 2
-                            nama:
-                              type: string
-                              example: "Nama Pelabuhan"
-                            order:
-                              type: integer
-                              example: 0
-                            tipe:
-                              type: string
-                              example: "string"
-                        rekap_hasil:
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 1
-                            nama:
-                              type: string
-                              example: "mantohar sidomuncul - Dinas Pendidikan Kabupaten Bone Bolango - periode 1"
-                            enumerator_id:
-                              type: integer
-                              example: 7
-                            periode_id:
-                              type: integer
-                              example: 1
-                            status:
-                              type: string
-                              example: "v2"
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-29T03:08:39.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-29T03:08:39.000000Z"
-                        konten:
-                          type: string
-                          example: "pelabuhan itim"
-                        created_at:
-                          type: string
-                          format: date-time
-                          example: "2024-10-29T03:08:39.000000Z"
-                        updated_at:
-                          type: string
-                          format: date-time
-                          example: "2024-10-29T03:08:39.000000Z"
+                      id:
+                        type: integer
+                        example: 1
+                      variabel:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Nama Pelabuhan"
+                          order:
+                            type: integer
+                            example: 0
+                          tipe:
+                            type: string
+                            example: "string"
+                      rekap_hasil:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nama:
+                            type: string
+                            example: "mantohar sidomuncul - Dinas Pendidikan Kabupaten Bone Bolango - periode 1"
+                          enumerator_id:
+                            type: integer
+                            example: 7
+                          periode_id:
+                            type: integer
+                            example: 1
+                          status:
+                            type: string
+                            example: "v2"
+                          created_at:
+                            type: string
+                            format: date-time
+                            example: "2024-10-29T03:08:39.000000Z"
+                          updated_at:
+                            type: string
+                            format: date-time
+                            example: "2024-10-29T03:08:39.000000Z"
+                      konten:
+                        type: string
+                        example: "pelabuhan itim"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-29T03:08:39.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-29T03:08:39.000000Z"
         "401":
           description: Tidak diotorisasi
           content:
@@ -5448,7 +5448,7 @@ paths:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
       responses:
-        '200':
+        "200":
           description: Berhasil mendapatkan data rekap hasil
           content:
             application/json:
@@ -5740,7 +5740,7 @@ paths:
             type: integer
             example: 1
       responses:
-        '200':
+        "200":
           description: Berhasil mendapatkan data rekap hasil
           content:
             application/json:
@@ -5940,7 +5940,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/DataNotFoundResponse"                        
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /sektor-spasial:
     get:
       tags:
@@ -6667,6 +6667,172 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiDataNotFoundResponse"
+  /data/kabupaten:
+    get:
+      tags:
+        - Data
+      summary: Mendapatkan semua data kabupaten
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data kabupaten
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data kabupaten berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nama:
+                          type: string
+                          example: "Kabupaten Gorontalo"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /data/kecamatan:
+    get:
+      tags:
+        - Data
+      summary: Mendapatkan semua data kecamatan
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: kabupaten_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Berhasil mendapatkan data kecamatan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data kecamatan berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        regency_id:
+                          type: string
+                          example: 7502
+                        name:
+                          type: string
+                          example: "Batudaa Pantai"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /data/desa:
+    get:
+      tags:
+        - Data
+      summary: Mendapatkan semua data desa
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: kecamatan_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 750201
+      responses:
+        "200":
+          description: Berhasil mendapatkan data desa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data desa berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        district_id:
+                          type: string
+                          example: 750201
+                        name:
+                          type: string
+                          example: "Tabullo"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
 components:
   schemas:
     Pagination:

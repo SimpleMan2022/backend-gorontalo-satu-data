@@ -16,7 +16,7 @@ class DataController extends Controller
     {
         try {
             $kabupaten = Kabupaten::select('id', 'name')->get();
-            return $this->successResponseWithData($kabupaten, 'berhasil mendapatkan data kabupaten');
+            return $this->successResponseWithData($kabupaten, 'Data kabupaten berhasil diambil');
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
@@ -32,7 +32,11 @@ class DataController extends Controller
                 $kecamatanQuery->where('regency_id', $kabQuery);
             }
             $data = $kecamatanQuery->paginate($per_page);
-            return $this->successResponseWithDataIndex($data, $data->items(), 'berhasil mendapatkan data kecamatan');
+            if ($data->isNotEmpty()) {
+                return $this->successResponseWithDataIndex($data, $data->items(), 'Data kecamatan berhasil diambil');
+            } else {
+                return $this->errorResponse('Data tidak ditemukan', 404);
+            }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
@@ -48,7 +52,11 @@ class DataController extends Controller
                 $desaQuery->where('district_id', $kecQuery);
             }
             $data = $desaQuery->paginate($per_page);
-            return $this->successResponseWithDataIndex($data, $data->items(), 'berhasil mendapatkan data desa');
+            if ($data->isNotEmpty()) {
+                return $this->successResponseWithDataIndex($data, $data->items(), 'Data desa berhasil diambil');
+            } else {
+                return $this->errorResponse('Data tidak ditemukan', 404);
+            }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage());
         }
