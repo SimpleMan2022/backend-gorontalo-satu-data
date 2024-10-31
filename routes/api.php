@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AntarWaktuController;
-use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
 use App\Http\Controllers\DashboardController;
@@ -26,6 +25,7 @@ use App\Http\Controllers\SektorSpasialController;
 use App\Http\Controllers\OlahanSpasialController;
 use App\Http\Controllers\SpasialKabupatenController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\HasilSpasialController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
@@ -161,7 +161,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/multi-delete", "multiDestroy");
     });
 
-    Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
+    Route::prefix('hasil-spasial')->controller(HasilSpasialController::class)->group(function () {
+        Route::get("", "index");
         Route::post("", "store");
         Route::post("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
