@@ -5447,6 +5447,12 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - name: indikator_id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: ID dari indikator yang akan diambil
       responses:
         "200":
           description: Berhasil mendapatkan data rekap hasil
@@ -5475,59 +5481,25 @@ paths:
                         nama:
                           type: string
                           example: "mantohar sidomuncul - Dinas Pendidikan Kabupaten Bone Bolango - periode 1"
-                        enumerator_id:
+                        nama_opd:
+                          type: string
+                          example: "Dinas Pendidikan Kabupaten Bone Bolango"
+                        enumerator:
                           type: object
                           properties:
                             id:
                               type: integer
                               example: 7
-                            user_id:
-                              type: integer
-                              example: 16
                             nama:
                               type: string
                               example: "mantohar sidomuncul"
                             jabatan:
                               type: string
                               example: "Kabid Informatika"
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-29T03:01:13.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-29T03:01:13.000000Z"
                             enumerator_level:
                               type: string
                               example: "kabupaten"
-                            enumerator_provinsi:
-                              type: array
-                              items:
-                                type: object
-                            enumerator_kabupaten:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  id:
-                                    type: integer
-                                    example: 4
-                                  opd_kabupaten_id:
-                                    type: integer
-                                    example: 9
-                                  enumerator_id:
-                                    type: integer
-                                    example: 7
-                                  created_at:
-                                    type: string
-                                    format: date-time
-                                    example: "2024-10-29T03:01:13.000000Z"
-                                  updated_at:
-                                    type: string
-                                    format: date-time
-                                    example: "2024-10-29T03:01:13.000000Z"
-                        periode_id:
+                        periode:
                           type: object
                           properties:
                             id:
@@ -5544,17 +5516,6 @@ paths:
                               type: string
                               format: date
                               example: "2024-12-15"
-                            opd_provinsi_id:
-                              type: integer
-                              example: 1
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-11T06:09:00.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-11T06:09:00.000000Z"
                         hasil_data:
                           type: array
                           items:
@@ -5581,14 +5542,6 @@ paths:
                                   tipe:
                                     type: string
                                     example: "string"
-                                  created_at:
-                                    type: string
-                                    format: date-time
-                                    example: "2024-10-29T03:03:45.000000Z"
-                                  updated_at:
-                                    type: string
-                                    format: date-time
-                                    example: "2024-10-29T03:03:45.000000Z"
                               rekap_hasil_id:
                                 type: integer
                                 example: 1
@@ -6890,7 +6843,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmptyDataResponse"                
+                $ref: "#/components/schemas/EmptyDataResponse"
   /dashboard/admin/chart-donut:
     get:
       tags:
@@ -6945,7 +6898,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmptyDataResponse"              
+                $ref: "#/components/schemas/EmptyDataResponse"
   /dashboard/admin/chart-bar:
     get:
       tags:
@@ -7325,12 +7278,12 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmptyDataResponse"              
+                $ref: "#/components/schemas/EmptyDataResponse"
   /dashboard/mobile/enumerator/indikator:
     get:
       tags:
         - Dashboard
-      summary: Mendapatkan semua data enumerator indikator 
+      summary: Mendapatkan semua data enumerator indikator
       security:
         - BearerAuth: []
       parameters:
@@ -7370,6 +7323,419 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"
+  /hasil-spasial:
+    get:
+      tags:
+        - Hasil Spasial
+      summary: Mendapatkan semua data hasil spasial
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: sektor_spasial_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: opd_provinsi_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Berhasil mendapatkan data hasil spasial
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data hasil spasial berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        judul:
+                          type: string
+                          example: "Sebaran Jumlah Fasilitas"
+                        file:
+                          type: string
+                          example: "geojson/example.geojson"
+                        konten:
+                          type: string
+                          example: "deskripsi singkat"
+                        status:
+                          type: string
+                          example: "public"
+                        sektor_spasial:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            nama:
+                              type: string
+                              example: "Kemiskinan"
+                        opd_provinsi:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 2
+                            nama:
+                              type: string
+                              example: "Dinas Pertanian"
+                            lokasi:
+                              type: string
+                              lokasi: Gorontalo Barat
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+    post:
+      tags:
+        - Hasil Spasial
+      summary: Menambahkan hasil spasial baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                sektor_spasial_id:
+                  type: integer
+                  example: 2
+                opd_provinsi_id:
+                  type: integer
+                  example: 1
+                judul:
+                  type: string
+                  example: Sebaraan Jumlah Fasilitas
+                konten:
+                  type: string
+                  example: deskripsi singkat
+                status:
+                  type: string
+                  example: public
+                file:
+                  type: string
+                  format: binary
+                  description: File zip yang berisi file format shp, dbf, prj, shx
+      responses:
+        "200":
+          description: hasil spasial berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+  /hasil-spasial/{id}:
+    get:
+      tags:
+        - Hasil Spasial
+      summary: Mendapatkan detail hasil spasial
+      description: API untuk mendapatkan detail hasil spasial berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Detail hasil spasial berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data hasil spasial berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      judul:
+                        type: string
+                        example: "Sebaran Jumlah Fasilitas"
+                      file:
+                        type: string
+                        example: "geojson/example.geojson"
+                      konten:
+                        type: string
+                        example: "deskripsi singkat"
+                      status:
+                        type: string
+                        example: "public"
+                      sektor_spasial:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Kemiskinan"
+                      opd_provinsi:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Dinas Pertanian"
+                          lokasi:
+                            type: string
+                            lokasi: Gorontalo Barat
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /hasil-spasial/edit/{id}:
+    post:
+      tags:
+        - Hasil Spasial
+      summary: Memperbarui hasil spasial yang ada
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                sektor_spasial_id:
+                  type: integer
+                  example: 2
+                opd_provinsi_id:
+                  type: integer
+                  example: 1
+                judul:
+                  type: string
+                  example: Sebaraan Jumlah Fasilitas
+                konten:
+                  type: string
+                  example: deskripsi singkat
+                status:
+                  type: string
+                  example: public
+                file:
+                  type: string
+                  format: binary
+                  description: File zip yang berisi file format shp, dbf, prj, shx
+      responses:
+        "201":
+          description: hasil spasial berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /hasil-spasial/delete/{id}:
+    delete:
+      tags:
+        - Hasil Spasial
+      summary: Menghapus hasil spasial berdasarkan id
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari hasil spasial yang akan dihapus
+      responses:
+        "200":
+          description: hasil spasial berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /hasil-spasial/multi-delete:
+    delete:
+      tags:
+        - Hasil Spasial
+      summary: Menghapus banyak hasil spasial
+      description: API untuk menghapus banyak hasil spasial berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: hasil spasial berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data hasil spasial berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data hasil spasial tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
 components:
   schemas:
     Pagination:

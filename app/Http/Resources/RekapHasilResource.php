@@ -17,12 +17,13 @@ class RekapHasilResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
-            'enumerator_id' => $this->enumerator,
-            'periode_id' => $this->periode,
-            'hasil_data' => $this->hasil_data->map(function($hasil) {
+            'nama_opd' => $this->periode->opd_provinsi->nama,
+            'enumerator' => $this->enumerator->only('id', 'nama', 'jabatan', 'enumerator_level'),
+            'periode' => $this->periode->only('id', 'nama', 'tanggal_mulai', 'tanggal_selesai'),
+            'hasil_data' => $this->hasil_data->map(function ($hasil) {
                 return [
                     'id' => $hasil->id,
-                    'variabel_id' => $hasil->variabel,
+                    'variabel' => $hasil->variabel->only('id', 'indikator_id', 'nama', 'order', 'tipe'),
                     'rekap_hasil_id' => $hasil->rekap_hasil_id,
                     'konten' => $hasil->konten,
                 ];

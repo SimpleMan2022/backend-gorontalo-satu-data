@@ -2,11 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\HasilDataResource;
+use App\Http\Resources\HasilSpasialResource;
 use Illuminate\Http\Request;
 use Shapefile\ShapefileException;
 use Shapefile\ShapefileReader;
 use App\Http\Traits\ApiResponse;
-use App\Models\ArtikelKawasan;
+use App\Models\HasilSpasial;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Log;
@@ -17,10 +19,55 @@ use Exception;
 use Symfony\Component\HttpFoundation\Response;
 use ZipArchive;
 
-class ArtikelKawasanController extends Controller
+class HasilSpasialController extends Controller
 {
     use ApiResponse;
-    // public function index() {}
+    public function index(Request $request)
+    {
+        try {
+            $perPage = $request->per_page ?? 10;
+            $hasilSpasialQuery = HasilSpasial::orderBy('created_at', 'desc');
+
+            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
+                $hasilSpasialQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+
+            if ($sektorSpasialId = $request->query('sektor_spasial_id')) {
+                $hasilSpasialQuery->where('sektor_spasial_id', $sektorSpasialId);
+            }
+
+            $data = $hasilSpasialQuery->paginate($perPage);
+
+            if ($data->isNotEmpty()) {
+                return $this->successResponseWithDataIndex(
+                    $data,
+                    HasilSpasialResource::collection($data),
+                    'Data Hasil Spasial berhasil diambil',
+                    Response::HTTP_OK
+                );
+            } else {
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function show($id)
+    {
+        try {
+            $hasilSpasial = HasilSpasial::findOrFail($id);
+            return $this->successResponseWithData(
+                new HasilSpasialResource($hasilSpasial),
+                'Data Hasil Spasial berhasil diambil',
+                Response::HTTP_OK
+            );
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data Hasil Spasial tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     public function store(Request $request)
     {
@@ -31,6 +78,7 @@ class ArtikelKawasanController extends Controller
             'konten' => 'required|string',
             'status' => 'required|in:public,private',
             'opd_provinsi_id' => 'required|exists:opd_provinsi,id',
+            'sektor_spasial_id' => 'required|exists:sektor_spasial,id'
         ]);
 
         // Inisialisasi variabel tempDir
@@ -46,15 +94,16 @@ class ArtikelKawasanController extends Controller
                 Storage::putFileAs('geojson', $geojsonFile, $geojsonFilename);
 
                 // Simpan informasi ke database
-                ArtikelKawasan::create([
+                HasilSpasial::create([
                     'judul' => $validate['judul'],
                     'konten' => $validate['konten'],
                     'status' => $validate['status'],
                     'opd_provinsi_id' => $validate['opd_provinsi_id'],
                     'file' => $geojsonPath,
+                    'sektor_spasial_id' => $validate['sektor_spasial_id']
                 ]);
 
-                return $this->successResponse('Artikel Kawasan berhasil dibuat', 201);
+                return $this->successResponse('Hasil Spasial berhasil dibuat', 201);
             }
 
             // Jika file zip diunggah
@@ -130,8 +179,30 @@ class ArtikelKawasanController extends Controller
 
                 while ($record = $shapefile->fetchRecord()) {
                     if ($record->isDeleted()) {
+                        Log::info("Record terhapus, dilewatkan.");
                         continue;
                     }
+
+                    Log::info("Record ditemukan: " . json_encode($record->getDataArray()));
+
+                    $geometry = json_decode($record->getGeoJSON());
+                    $properties = $record->getDataArray();
+
+                    $feature = [
+                        'type' => 'Feature',
+                        'geometry' => $geometry,
+                        'properties' => $properties,
+                    ];
+
+                    $geojson['features'][] = $feature;
+                }
+                while ($record = $shapefile->fetchRecord()) {
+                    if ($record->isDeleted()) {
+                        Log::info("Record terhapus, dilewatkan.");
+                        continue;
+                    }
+
+                    Log::info("Record ditemukan: " . json_encode($record->getDataArray()));
 
                     $geometry = json_decode($record->getGeoJSON());
                     $properties = $record->getDataArray();
@@ -145,6 +216,7 @@ class ArtikelKawasanController extends Controller
                     $geojson['features'][] = $feature;
                 }
 
+
                 // Pastikan ShapefileReader tidak memegang handle file
                 unset($shapefile);
                 gc_collect_cycles(); // Memicu garbage collection
@@ -155,15 +227,16 @@ class ArtikelKawasanController extends Controller
                 Storage::put($geojsonPath, json_encode($geojson, JSON_PRETTY_PRINT));
 
                 // Simpan informasi ke database
-                ArtikelKawasan::create([
+                HasilSpasial::create([
                     'judul' => $validate['judul'],
                     'konten' => $validate['konten'],
                     'status' => $validate['status'],
                     'opd_provinsi_id' => $validate['opd_provinsi_id'],
                     'file' => $geojsonPath,
+                    'sektor_spasial_id' => $validate['sektor_spasial_id']
                 ]);
 
-                return $this->successResponse('Artikel Kawasan berhasil dibuat', 201);
+                return $this->successResponse('Hasil Spasial berhasil dibuat', 201);
             }
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', 400);
@@ -172,7 +245,7 @@ class ArtikelKawasanController extends Controller
             return $this->errorResponse('Error: ' . $e->getMessage(), 400);
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
-            return response()->json(['error' => 'Error: ' . $e->getMessage()], 500);
+            return $this->errorResponse('Error: ' . $e->getMessage(), 500);
         } finally {
             // Pembersihan direktori sementara menggunakan File facade
             if ($tempDir && File::exists($tempDir)) {
@@ -188,7 +261,7 @@ class ArtikelKawasanController extends Controller
             }
         }
 
-        return $this->errorResponse('Gagal membuat artikel kawasan', 400);
+        return $this->errorResponse('Gagal membuat Hasil Spasial', 400);
     }
 
     public function update(Request $request, $id)
@@ -200,10 +273,11 @@ class ArtikelKawasanController extends Controller
             'konten' => 'required|string',
             'status' => 'required|in:public,private',
             'opd_provinsi_id' => 'required|exists:opd_provinsi,id',
+            'sektor_spasial_id' => 'required|exists:sektor_spasial,id'
         ]);
 
-        // Temukan artikel kawasan berdasarkan id
-        $artikelKawasan = ArtikelKawasan::findOrFail($id);
+        // Temukan Hasil Spasial berdasarkan id
+        $artikelKawasan = HasilSpasial::findOrFail($id);
 
         // Inisialisasi variabel tempDir
         $tempDir = null;
@@ -222,7 +296,7 @@ class ArtikelKawasanController extends Controller
                 $geojsonPath = 'geojson/' . $geojsonFilename;
                 Storage::putFileAs('geojson', $geojsonFile, $geojsonFilename);
 
-                // Update data artikel kawasan di database
+                // Update data Hasil Spasial di database
                 $artikelKawasan->update([
                     'judul' => $validate['judul'],
                     'konten' => $validate['konten'],
@@ -231,7 +305,7 @@ class ArtikelKawasanController extends Controller
                     'file' => $geojsonPath,
                 ]);
 
-                return $this->successResponse('Artikel Kawasan berhasil diperbarui', 200);
+                return $this->successResponse('Hasil Spasial berhasil diperbarui', 200);
             }
 
             // Jika file zip diunggah
@@ -335,16 +409,17 @@ class ArtikelKawasanController extends Controller
                 $geojsonPath = 'geojson/' . $geojsonFilename;
                 Storage::put($geojsonPath, json_encode($geojson, JSON_PRETTY_PRINT));
 
-                // Update artikel kawasan dengan data baru
+                // Update Hasil Spasial dengan data baru
                 $artikelKawasan->update([
                     'judul' => $validate['judul'],
                     'konten' => $validate['konten'],
                     'status' => $validate['status'],
                     'opd_provinsi_id' => $validate['opd_provinsi_id'],
                     'file' => $geojsonPath,
+                    'sektor_spasial_id' => $validate['sektor_spasial_id']
                 ]);
 
-                return $this->successResponse('Artikel Kawasan berhasil diperbarui', 200);
+                return $this->successResponse('Hasil Spasial berhasil diperbarui', 200);
             }
 
             // Update data lain jika file tidak diunggah
@@ -353,9 +428,10 @@ class ArtikelKawasanController extends Controller
                 'konten' => $validate['konten'],
                 'status' => $validate['status'],
                 'opd_provinsi_id' => $validate['opd_provinsi_id'],
+                'sektor_spasial_id' => $validate['sektor_spasial_id']
             ]);
 
-            return $this->successResponse('Artikel Kawasan berhasil diperbarui', 200);
+            return $this->successResponse('Hasil Spasial berhasil diperbarui', 200);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal diperbarui', 400);
         } catch (ShapefileException $e) {
@@ -380,7 +456,7 @@ class ArtikelKawasanController extends Controller
     {
         try {
             // Cari artikel berdasarkan ID
-            $artikelKawasan = ArtikelKawasan::findOrFail($id);
+            $artikelKawasan = HasilSpasial::findOrFail($id);
 
             // Hapus file yang terkait jika ada
             if ($artikelKawasan->file) {
@@ -400,9 +476,9 @@ class ArtikelKawasanController extends Controller
             // Hapus artikel dari database
             $artikelKawasan->delete();
 
-            return $this->successResponse('Artikel Kawasan berhasil dihapus', 200);
+            return $this->successResponse('Hasil Spasial berhasil dihapus', 200);
         } catch (ModelNotFoundException $e) {
-            return $this->errorResponse('Artikel Kawasan tidak ditemukan', 404);
+            return $this->errorResponse('Hasil Spasial tidak ditemukan', 404);
         } catch (\Exception $e) {
             Log::error('Exception: ' . $e->getMessage());
             return $this->errorResponse('Error: ' . $e->getMessage(), 500);
@@ -415,7 +491,7 @@ class ArtikelKawasanController extends Controller
             $id = request('id');
             $ids = explode(",", $id);
 
-            $artikelKawasan = ArtikelKawasan::whereIn('id', $ids)->pluck('id')->toArray();
+            $artikelKawasan = HasilSpasial::whereIn('id', $ids)->pluck('id')->toArray();
 
             $notFoundIds = array_diff($ids, $artikelKawasan);
 
@@ -423,9 +499,9 @@ class ArtikelKawasanController extends Controller
                 return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
             }
 
-            ArtikelKawasan::whereIn('id', $artikelKawasan)->delete();
+            HasilSpasial::whereIn('id', $artikelKawasan)->delete();
 
-            return $this->successResponse('Artikel kawasan berhasil dihapus', Response::HTTP_OK);
+            return $this->successResponse('Hasil Spasial berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
