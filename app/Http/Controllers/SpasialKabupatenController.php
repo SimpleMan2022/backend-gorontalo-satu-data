@@ -44,18 +44,18 @@ class SpasialKabupatenController extends Controller
             } else {
                 return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
-        }catch(Exception $e){
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
-   
+
     /**
      * Store a newly created resource in storage.
      */
     public function store(Request $request)
     {
-        try{
+        try {
             $req = $request->validate([
                 'olahan_spasial_id' => 'required|numeric',
                 'kabupaten_id' => 'required|numeric',
@@ -66,7 +66,7 @@ class SpasialKabupatenController extends Controller
             $data = SpasialKabupaten::create($req);
 
             return $this->successResponse('Data Spasial berhasil dibuat', Response::HTTP_CREATED);
-        }catch(Expcetion $e){
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -104,7 +104,7 @@ class SpasialKabupatenController extends Controller
      */
     public function update(Request $request, $id)
     {
-        try{
+        try {
             $req = $request->validate([
                 'olahan_spasial_id' => 'required|numeric',
                 'kabupaten_id' => 'required|numeric',

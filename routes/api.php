@@ -1,7 +1,6 @@
 <?php
 
 use App\Http\Controllers\AntarWaktuController;
-use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
 use App\Http\Controllers\DashboardController;
@@ -26,6 +25,7 @@ use App\Http\Controllers\SektorSpasialController;
 use App\Http\Controllers\OlahanSpasialController;
 use App\Http\Controllers\SpasialKabupatenController;
 use App\Http\Controllers\ForgotPasswordController;
+use App\Http\Controllers\HasilSpasialController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
@@ -161,7 +161,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/multi-delete", "multiDestroy");
     });
 
-    Route::prefix('artikel-kawasan')->controller(ArtikelKawasanController::class)->group(function () {
+    Route::prefix('hasil-spasial')->controller(HasilSpasialController::class)->group(function () {
+        Route::get("", "index");
+        Route::get("/{id}", "show");
         Route::post("", "store");
         Route::post("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
@@ -275,10 +277,19 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix('dashboard')->controller(DashboardController::class)->group(function () {
         Route::get("/admin", "AdminView");
-        Route::get("/admin/chart-donut", "ChartDonut");
-        Route::get("/admin/chart-bar", "ChartBar");
+        Route::get("/admin/chart-donut", "ChartDonutAdmin");
+        Route::get("/admin/chart-bar", "ChartBarAdmin");
 
-        Route::get("/opd", "OpdView");
+        Route::get("/opd-provinsi", "OpdProvinsiView");
+        Route::get("/opd-provinsi/chart-donut", "ChartDonutOpdProvinsi");
+        Route::get("/opd-provinsi/chart-bar", "ChartBarOpdProvinsi");
+
+        Route::get("/opd-kabupaten", "OpdKabupatenView");
+        Route::get("/opd-kabupaten/chart-donut", "ChartDonutOpdKabupaten");
+        Route::get("/opd-kabupaten/chart-bar", "ChartBarOpdKabupaten");
+
+        Route::get("/mobile/enumerator", "EnumeratorView");
+        Route::get("/mobile/enumerator/indikator", "EnumeratorIndikator");
     });
 });
 
