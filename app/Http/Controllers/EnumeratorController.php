@@ -71,7 +71,6 @@ class EnumeratorController extends Controller
                 ]);
 
                 $user->assignRole('enumerator');
-
                 // Check for opd_kabupaten_id and create in EnumeratorKabupaten
                 if ($request->opd_kabupaten_id) {
                     EnumeratorKabupaten::create([
@@ -87,6 +86,7 @@ class EnumeratorController extends Controller
                         'enumerator_id' => $enumerator->id,
                     ]);
                 }
+                $enumerator->assignRole('enumerator');
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {

@@ -15,4 +15,10 @@ class Subjek extends Model
     public function pivot_indikator_subjek() {
         return $this->hasMany(PivotIndikatorSubjek::class);
     }
+
+    public function indikators()
+    {
+        return $this->belongsToMany(Indikator::class, 'pivot_indikator_subjek', 'subjek_id', 'indikator_id');
+    }
+
 }
