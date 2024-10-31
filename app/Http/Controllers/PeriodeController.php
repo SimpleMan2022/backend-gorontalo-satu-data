@@ -14,7 +14,7 @@ use Illuminate\Validation\ValidationException;
 class PeriodeController extends Controller
 {
     use ApiResponse;
-    
+
     public function index(Request $request)
     {
         try {
@@ -51,10 +51,11 @@ class PeriodeController extends Controller
 
             if (Periode::where('tanggal_mulai', '=', $now)
                 ->where('tanggal_selesai', '=', $now)
-                ->exists()) {
+                ->exists()
+            ) {
                 return $this->errorResponse('Terdapat periode yang memiliki tanggal mulai dan tanggal selesai yang sama', Response::HTTP_CONFLICT);
             }
-            
+
 
             if ($periode) {
                 return $this->successResponseWithData(PeriodeResource::make($periode), 'Data periode yang sedang aktif', Response::HTTP_OK);

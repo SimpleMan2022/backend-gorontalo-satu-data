@@ -5447,6 +5447,12 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - name: indikator_id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: ID dari indikator yang akan diambil
       responses:
         "200":
           description: Berhasil mendapatkan data rekap hasil
@@ -5475,59 +5481,25 @@ paths:
                         nama:
                           type: string
                           example: "mantohar sidomuncul - Dinas Pendidikan Kabupaten Bone Bolango - periode 1"
-                        enumerator_id:
+                        nama_opd:
+                          type: string
+                          example: "Dinas Pendidikan Kabupaten Bone Bolango"
+                        enumerator:
                           type: object
                           properties:
                             id:
                               type: integer
                               example: 7
-                            user_id:
-                              type: integer
-                              example: 16
                             nama:
                               type: string
                               example: "mantohar sidomuncul"
                             jabatan:
                               type: string
                               example: "Kabid Informatika"
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-29T03:01:13.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-29T03:01:13.000000Z"
                             enumerator_level:
                               type: string
                               example: "kabupaten"
-                            enumerator_provinsi:
-                              type: array
-                              items:
-                                type: object
-                            enumerator_kabupaten:
-                              type: array
-                              items:
-                                type: object
-                                properties:
-                                  id:
-                                    type: integer
-                                    example: 4
-                                  opd_kabupaten_id:
-                                    type: integer
-                                    example: 9
-                                  enumerator_id:
-                                    type: integer
-                                    example: 7
-                                  created_at:
-                                    type: string
-                                    format: date-time
-                                    example: "2024-10-29T03:01:13.000000Z"
-                                  updated_at:
-                                    type: string
-                                    format: date-time
-                                    example: "2024-10-29T03:01:13.000000Z"
-                        periode_id:
+                        periode:
                           type: object
                           properties:
                             id:
@@ -5544,17 +5516,6 @@ paths:
                               type: string
                               format: date
                               example: "2024-12-15"
-                            opd_provinsi_id:
-                              type: integer
-                              example: 1
-                            created_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-11T06:09:00.000000Z"
-                            updated_at:
-                              type: string
-                              format: date-time
-                              example: "2024-10-11T06:09:00.000000Z"
                         hasil_data:
                           type: array
                           items:
@@ -5581,14 +5542,6 @@ paths:
                                   tipe:
                                     type: string
                                     example: "string"
-                                  created_at:
-                                    type: string
-                                    format: date-time
-                                    example: "2024-10-29T03:03:45.000000Z"
-                                  updated_at:
-                                    type: string
-                                    format: date-time
-                                    example: "2024-10-29T03:03:45.000000Z"
                               rekap_hasil_id:
                                 type: integer
                                 example: 1
