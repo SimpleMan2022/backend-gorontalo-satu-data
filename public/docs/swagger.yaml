@@ -6833,6 +6833,543 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"
+  /dashboard/admin:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data admin view
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data admin view
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: succes
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        total_sektor:
+                          type: integer
+                          example: 1
+                        total_subjek:
+                          type: integer
+                          example: 2
+                        total_userr:
+                          type: integer
+                          example: 10
+                        total_antar_waktu:
+                          type: integer
+                          example: 3
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"                
+  /dashboard/admin/chart-donut:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data chart donut admin
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data admin chart donut
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        status_indikator:
+                          type: string
+                          example: "pending"
+                        jumlah:
+                          type: integer
+                          example: 0
+                        persentase:
+                          type: string
+                          example: "0.00"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"              
+  /dashboard/admin/chart-bar:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data chart bar admin
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data admin chart bar
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    example: []
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /dashboard/opd-provinsi:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data opd provinsi view
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data opd provinsi view
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_variabel:
+                    type: integer
+                    example: 0
+                  total_indikator:
+                    type: integer
+                    example: 0
+                  total_subjek:
+                    type: integer
+                    example: 0
+                  total_enumerator_provinsi:
+                    type: integer
+                    example: 0
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /dashboard/opd-provinsi/chart-donut:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data chart donut opd provinsi
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data opd provinsi chart donut
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        total_rekap_hasil:
+                          type: integer
+                          example: 0
+                        status_rekap_hasil:
+                          type: string
+                          example: "terima"
+                        jumlah:
+                          type: integer
+                          example: 0
+                        persentase:
+                          type: string
+                          example: "0.00"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /dashboard/opd-provinsi/chart-bar:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data chart bar opd provinsi
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data opd provinsi chart bar
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    example: []
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  dashboard/opd-kabupaten:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data opd kabupaten view
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data opd kabupaten view
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  total_variabel:
+                    type: integer
+                    example: 0
+                  total_indikator:
+                    type: integer
+                    example: 0
+                  total_subjek:
+                    type: integer
+                    example: 0
+                  total_enumerator_kabupaten:
+                    type: integer
+                    example: 0
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /dashboard/opd-kabupaten/chart-donut:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data chart donut opd kabupaten
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data opd kabupaten chart donut
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        total_rekap_hasil:
+                          type: integer
+                          example: 0
+                        status_rekap_hasil:
+                          type: string
+                          example: "tolak"
+                        jumlah:
+                          type: integer
+                          example: 0
+                        persentase:
+                          type: string
+                          example: "0.00"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /dashboard/opd-kabupaten/chart-bar:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data chart bar opd kabupaten
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data opd kabupaten chart bar
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    example: []
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  dashboard/mobile/enumerator:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data enumerator view
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data enumerator view
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opd:
+                    type: string
+                    example: "Dinas Kesehatan"
+                  terinput:
+                    type: integer
+                    example: 0
+                  diverifikasi:
+                    type: integer
+                    example: 0
+                  ditolak:
+                    type: integer
+                    example: 0
+                  menunggu:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"              
+  /dashboard/mobile/enumerator/indikator:
+    get:
+      tags:
+        - Dashboard
+      summary: Mendapatkan semua data enumerator indikator 
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data enumerator indikator
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    example: []
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
 components:
   schemas:
     Pagination:
