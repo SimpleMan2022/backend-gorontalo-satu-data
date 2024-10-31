@@ -53,6 +53,22 @@ class HasilSpasialController extends Controller
         }
     }
 
+    public function show($id)
+    {
+        try {
+            $hasilSpasial = HasilSpasial::findOrFail($id);
+            return $this->successResponseWithData(
+                new HasilSpasialResource($hasilSpasial),
+                'Data Hasil Spasial berhasil diambil',
+                Response::HTTP_OK
+            );
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data Hasil Spasial tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function store(Request $request)
     {
         // Validasi input

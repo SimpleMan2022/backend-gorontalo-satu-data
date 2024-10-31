@@ -163,6 +163,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix('hasil-spasial')->controller(HasilSpasialController::class)->group(function () {
         Route::get("", "index");
+        Route::get("/{id}", "show");
         Route::post("", "store");
         Route::post("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
