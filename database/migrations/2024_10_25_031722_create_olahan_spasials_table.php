@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('artikel_kawasan', function (Blueprint $table) {
+        Schema::create('olahan_spasial', function (Blueprint $table) {
             $table->id();
-            $table->string('judul');
-            $table->string('file');
-            $table->text('konten');
-            $table->enum('status', ['public', 'private']);
             $table->foreignId('opd_provinsi_id')->references('id')->on('opd_provinsi')->onDelete('cascade');
+            $table->foreignId('sektor_spasial_id')->references('id')->on('sektor_spasial')->onDelete('cascade');
+            $table->string('judul');
+            $table->text('konten');
+            $table->enum('status', ['public', 'private'])->default('private');
             $table->timestamps();
         });
     }
@@ -27,6 +27,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('artikel');
+        Schema::dropIfExists('olahan_spasials');
     }
 };

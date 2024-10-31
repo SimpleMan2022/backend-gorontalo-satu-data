@@ -19,7 +19,6 @@ class IndikatorController extends Controller
     {
         try {
             $perPage = $request->per_page ?? 10;
-
             $indikatorQuery = Indikator::orderBy('created_at', 'desc');
 
             if ($sektorId = $request->query('sektor_id')) {
@@ -33,8 +32,8 @@ class IndikatorController extends Controller
             if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
                 $indikatorQuery->where('opd_provinsi_id', $opdProvinsiId);
             }
-
             $data = $indikatorQuery->paginate($perPage);
+            
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
@@ -127,6 +126,32 @@ class IndikatorController extends Controller
 
             $indikator = Indikator::findOrFail($id);
             $indikator->update($validated);
+
+            return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal diperbarui', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function multiUpdate(Request $request) {
+        try {
+            $validated = $request->validate([
+                '*.id' => 'required|integer|exists:indikator,id',
+                '*.status' => 'required|in:public,private,pending',
+            ]);
+
+            $ids = collect($validated)->pluck('id');
+            $indikator = Indikator::whereIn('id', $ids)->get();
+
+            foreach ($indikator as $item) {
+                $item->update([
+                    'status' => collect($validated)->where('id', $item->id)->first()['status']
+                ]);
+            }
 
             return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
         } catch (ModelNotFoundException $e) {

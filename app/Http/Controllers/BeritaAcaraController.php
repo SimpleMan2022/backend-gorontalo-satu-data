@@ -8,21 +8,37 @@ use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Models\BeritaAcara;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class BeritaAcaraController extends Controller
 {
     use ApiResponse;
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = BeritaAcara::orderBy('created_at', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $BeritaAcaraQuery = BeritaAcara::orderBy('created_at', 'desc');
+
+            if ($opdKabupatenId = $request->query('opd_kabupaten_id')) {
+                $BeritaAcaraQuery->wehere('opd_kabupaten_id', $opdKabupatenId);
+            }
+
+            if ($indikatorId = $request->query('indikator')) {
+                $BeritaAcaraQuery->where('indikator', $indikatorId);
+            }
+
+            $data = $BeritaAcaraQuery->paginate(($perPage));
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData($data, 'success', Response::HTTP_OK);
+                return $this->successResponseWithDataIndex(
+                    $data,
+                    BeritaAcaraResource::collection($data),
+                    'Data berita acara berhasil diambil',
+                    Response::HTTP_OK
+                );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -35,17 +51,15 @@ class BeritaAcaraController extends Controller
             // Validate request
             $validated = $request->validate([
                 'nama' => 'required|string',
-                'opd_kabupaten_id' => 'required|integer',
+                'opd_kabupaten_id' => 'required|integer|exists:opd_kabupaten,id',
                 'file' => 'required|file|mimes:pdf|max:20480', // Restrict file to only PDF
-                'indikator_id' => 'required|integer',
+                'indikator_id' => 'required|integer|exists:indikator,id',
                 'status' => 'required'
             ]);
 
             // Handle file upload (PDF only)
             if ($request->hasFile('file')) {
                 $timestamp = now()->format('Ymd_His');
-                $originalName = $request->file('file')->getClientOriginalName();
-                $lowercaseName = strtolower(str_replace(' ', '_', pathinfo($originalName, PATHINFO_FILENAME)));
                 $fileName = "berita_acara_{$timestamp}.pdf";
                 $filePath = $request->file('file')->storeAs('berita_acara', $fileName);
                 $validated['file'] = $filePath;
@@ -57,7 +71,7 @@ class BeritaAcaraController extends Controller
             // Create BeritaAcara record
             BeritaAcara::create($validated);
 
-            return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
+            return $this->successResponse('Data berita acara berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
@@ -70,26 +84,18 @@ class BeritaAcaraController extends Controller
         try {
             $data = BeritaAcara::find($id);
 
-            // Mengecek apabila terdapat data dengan id yang sama
             if ($data) {
                 return $this->successResponseWithData(
                     BeritaAcaraResource::make($data),
-                    'success',
+                    'Data berita acara berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data tidak ditemukan.'
-                ]);
+                return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    }
-
-    public function edit(string $id)
-    {
-        //
     }
 
     public function update(Request $request, string $id)
@@ -97,18 +103,30 @@ class BeritaAcaraController extends Controller
         try {
             $validated = $request->validate([
                 'nama' => 'required',
-                'opd_kabupaten_id' => 'required',
-                'file' => 'required',
-                'indikator_id' => 'required',
+                'opd_kabupaten_id' => 'required|integer|exists:opd_kabupaten,id',
+                'file' => 'nullable|file|mimes:pdf|max:20480',
+                'indikator_id' => 'required|integer|exists:indikator,id',
                 'status' => 'required'
             ]);
 
             $berita_acara = BeritaAcara::find($id);
+
+            if ($request->hasFile('file')) {
+                if ($berita_acara->file) {
+                    Storage::delete($berita_acara->file);
+                }
+
+                $timestamp = now()->format('Ymd_His');
+                $fileName = "berita_acara_{$timestamp}.pdf";
+                $filePath = $request->file('file')->storeAs('berita_acara', $fileName);
+                $validated['file'] = $filePath;
+            }
+
             $berita_acara->update($validated);
 
-            return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
+            return $this->successResponse('Data berhasil diubah', Response::HTTP_OK);
         } catch (ValidationException $e) {
-            return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+            return $this->errorResponseWithData($e->errors(), 'Data gagal diubah', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -117,11 +135,15 @@ class BeritaAcaraController extends Controller
     public function destroy(string $id)
     {
         try {
-
             // Menghapus data sektor sesuai request $sektor
-            $berita_acara = BeritaAcara::find($id);
+            $berita_acara = BeritaAcara::findOrFail($id);
+            if ($berita_acara->file) {
+                Storage::delete($berita_acara->file);
+            }
             $berita_acara->delete();
-            return $this->successResponse('successfully deleted data', Response::HTTP_OK);
+            return $this->successResponse('Data berita acara berhasil dihapus', Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -139,6 +161,13 @@ class BeritaAcaraController extends Controller
 
             if (!empty($notFoundIds)) {
                 return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            foreach ($berita_acara as $id) {
+                $b_acara = BeritaAcara::find($id);
+                if ($b_acara && $b_acara->file) {
+                    Storage::delete($b_acara->file);
+                }
             }
 
             BeritaAcara::whereIn('id', $berita_acara)->delete();

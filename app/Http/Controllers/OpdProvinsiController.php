@@ -9,6 +9,7 @@ use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Resources\OpdProvinsiResource;
+use App\Models\PivotOpdSektor;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
@@ -16,6 +17,7 @@ use Illuminate\Support\Facades\Storage;
 class OpdProvinsiController extends Controller
 {
     use ApiResponse;
+
     public function index(Request $request)
     {
         try {
@@ -43,6 +45,7 @@ class OpdProvinsiController extends Controller
         try {
             $validated = $request->validate([
                 'nama' => 'required',
+                'sektor_id' => 'required',
                 'logo' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'lokasi' => 'required'
             ]);
@@ -63,8 +66,22 @@ class OpdProvinsiController extends Controller
                 $validated['logo'] = $logoPath;
             }
 
+            $validated['sektor_id'] = array_filter(explode(',', $validated['sektor_id']), function ($value) {
+                return is_numeric($value);
+            });
 
-            OpdProvinsi::create($validated);
+
+            $opd_provinsi = OpdProvinsi::create([
+                'nama' => $validated['nama'],
+                'logo' => $validated['logo'],
+                'lokasi' => $validated['lokasi']
+            ]);
+            foreach ($validated['sektor_id'] as $sektor_id) {
+                PivotOpdSektor::create([
+                    'opd_provinsi_id' => $opd_provinsi->id,
+                    'sektor_id' => $sektor_id
+                ]);
+            }
             return $this->successResponse('Data OPD Provinsi berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);

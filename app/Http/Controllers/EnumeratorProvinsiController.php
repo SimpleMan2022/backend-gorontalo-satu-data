@@ -15,11 +15,22 @@ use Illuminate\Http\Request;
 class EnumeratorProvinsiController extends Controller
 {
     use ApiResponse;
-    public function index()
+    public function index(Request $request)
     {
         try{
             $perPage = $request->per_page ?? 10;
-            $data = EnumeratorProvinsi::orderBy('created_at', 'desc')->paginate($perPage);
+            $EnumeratorProvinsiQuery = EnumeratorProvinsi::orderBy('created_at', 'desc');
+
+            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
+                $EnumeratorProvinsiQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+
+            if ($enumeratorId = $request->query('enumerator_id')) {
+                $EnumeratorProvinsiQuery->where('enmuerator_id', $enumeratorId);
+            }
+
+            $data = $EnumeratorProvinsiQuery->paginate($perPage);
+
             if ($data->isNotEmpty()){
                 return $this->successResponseWithDataIndex(
                     $data,

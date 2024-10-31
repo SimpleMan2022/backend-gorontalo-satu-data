@@ -18,6 +18,9 @@ class SektorResource extends JsonResource
             'id' => $this->id,
             'nama' => $this->nama,
             'logo' => $this->logo,
+            'opd_provinsi' => $this->pivot_opd_sektor->map(function ($pivot) {
+                return $pivot->opd_provinsi->only('id', 'nama', 'lokasi', 'logo');
+            }),
             'created_at' => $this->created_at,
         ];
     }

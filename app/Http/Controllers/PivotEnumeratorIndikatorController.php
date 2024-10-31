@@ -11,26 +11,38 @@ use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use App\Http\Resources\PivotEnumeratorIndikatorResource;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class PivotEnumeratorIndikatorController extends Controller
 {
     use ApiResponse;
 
-    public function index(Request $request) {
+    public function index(Request $request)
+    {
         try {
-            $perPage = $request->per_page ?? 20;
-            $data = PivotEnumeratorIndikator::orderBy('created_at', 'desc')->paginate($perPage);
+            $perPage = $request->per_page ?? 10;
+
+            $pivotQuery = PivotEnumeratorIndikator::orderBy('created_at', 'desc');
+
+            if ($enumeratorId = $request->query('enumerator_id')) {
+                $pivotQuery->where('enumerator_id', $enumeratorId);
+            }
+
+            if ($indikatorId = $request->query('indikatorId')) {
+                $pivotQuery->where('indikatorId', $indikatorId);
+            }
+
+
+            $data = $pivotQuery->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
-                    $data, 
+                    $data,
                     PivotEnumeratorIndikatorResource::collection($data),
-                    'success', 
+                    'Data indikator berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -38,55 +50,13 @@ class PivotEnumeratorIndikatorController extends Controller
     }
 
 
-    public function byEnumerator(Request $request, $id) {
-        try {
-            $perPage = $request->per_page ?? 20;
-            $data = PivotEnumeratorIndikator::where('enumerator_id', $id)->orderBy('created_at', 'desc')->paginate($perPage);
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex(
-                    $data, 
-                    PivotEnumeratorIndikatorResource::collection($data),
-                    'success', 
-                    Response::HTTP_OK
-                );
-            } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
-            }
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public function byIndikator(Request $request, $id) {
-        try {
-            $perPage = $request->per_page ?? 20;
-            $data = PivotEnumeratorIndikator::where('indikator_id', $id)->orderBy('created_at', 'desc')->paginate($perPage);
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex(
-                    $data, 
-                    PivotEnumeratorIndikatorResource::collection($data),
-                    'success', 
-                    Response::HTTP_OK
-                );
-            } else {
-                return response()->json([
-                    'message' => 'Data masih kosong.'
-                ]);
-            }
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-        }
-    }
-
-    public function store(Request $request) {
+    public function store(Request $request)
+    {
         try {
             $validated = $request->validate([
-                'enumerator_id' => 'required',
-                'indikator_id' => 'required'
+                'enumerator_id' => 'required|exists:enumerator,id',
+                'indikator_id' => 'required|exists:indikator,id'
             ]);
-            // dd($validated);
             PivotEnumeratorIndikator::create($validated);
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
@@ -97,13 +67,9 @@ class PivotEnumeratorIndikatorController extends Controller
     }
 
 
-    public function multiStore(Request $request) {
+    public function multiStore(Request $request)
+    {
         try {
-            // $validated = $request->validate([
-            //     'opd_provinsi_id' => 'required',
-            //     'sektor_id' => 'required'
-            // ]);
-
             $req = $request->validate([
                 '*.enumerator_id' => 'required|integer|exists:enumerator,id',  // Validasi setiap 'nama' di dalam array sebagai string
                 '*.indikator_id' => 'required|integer|exists:indikator,id',  // Validasi setiap 'indikator_id' di dalam array sebagai integer dan harus ada di tabel 'indikators'
@@ -118,7 +84,7 @@ class PivotEnumeratorIndikatorController extends Controller
             }
 
             return $this->successResponse(
-                'success',
+                'Data berhasil dibuat',
                 Response::HTTP_OK
             );
         } catch (ValidationException $e) {
@@ -138,13 +104,11 @@ class PivotEnumeratorIndikatorController extends Controller
             if ($data) {
                 return $this->successResponseWithData(
                     PivotEnumeratorIndikatorResource::make($data),
-                    'success',
+                    'Data Enumerator Indikator berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
-                return response()->json([
-                    'message' => 'Data tidak ditemukan.'
-                ]);
+                return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
@@ -155,13 +119,15 @@ class PivotEnumeratorIndikatorController extends Controller
     {
         try {
             $validated = $request->validate([
-                'enumerator_id' => 'required',
-                'indikator_id' => 'required'
+                'enumerator_id' => 'required|exists:enumerator,id',
+                'indikator_id' => 'required|exists:indikator,id'
             ]);
 
-            $pivot = PivotEnumeratorIndikator::find($id);
+            $pivot = PivotEnumeratorIndikator::findOrFail($id);
             $pivot->update($validated);
             return $this->successResponse('Data berhasil diperbarui', Response::HTTP_CREATED);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal diperbarui', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
@@ -172,11 +138,12 @@ class PivotEnumeratorIndikatorController extends Controller
     public function destroy(string $id)
     {
         try {
-
             // Menghapus data sektor sesuai request $sektor
-            $pivot = PivotEnumeratorIndikator::find($id);
+            $pivot = PivotEnumeratorIndikator::findOrFail($id);
             $pivot->delete();
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

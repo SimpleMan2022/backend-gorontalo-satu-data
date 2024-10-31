@@ -5,6 +5,7 @@ use App\Http\Controllers\ArtikelKawasanController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\BeritaAcaraController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\DataController;
 use App\Http\Controllers\EnumeratorController;
 use App\Http\Controllers\EnumeratorKabupatenController;
 use App\Http\Controllers\EnumeratorProvinsiController;
@@ -20,12 +21,28 @@ use App\Http\Controllers\SubjekController;
 use App\Http\Controllers\PivotOpdSektorController;
 use App\Http\Controllers\HasilDataController;
 use App\Http\Controllers\PivotEnumeratorIndikatorController;
+use App\Http\Controllers\RekapHasilController;
+use App\Http\Controllers\SektorSpasialController;
+use App\Http\Controllers\OlahanSpasialController;
+use App\Http\Controllers\SpasialKabupatenController;
+use App\Http\Controllers\ForgotPasswordController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
     Route::post("register", "create");
     Route::post("login", "login")->name('login');
+    Route::post("login-enumerator", "loginEnumerator")->name('login-enumerator');
+    Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.reset');
+    Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
 });
+
+Route::prefix("data")->controller(DataController::class)->group(function () {
+    Route::get("kabupaten", "getAllKabupaten");
+    Route::get("kecamatan", "getAllKecamatan");
+    Route::get("desa", "getAllDesa");
+});
+
+Route::get("opd-provinsi", [OpdProvinsiController::class, 'index']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
     // Auth Route
@@ -48,7 +65,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('antar-waktu')->controller(AntarWaktuController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
-        // Route::get("/{id}", "show");
+        Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
@@ -63,7 +80,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/by-opd/{opd_provinsi}", "byOpdProvinsi");
         Route::get("/{id}", "show");
         Route::get("/{id}", "show");
-        Route::patch("/{id}/status", "updateStatus");
+        Route::patch("/updateStatus/{id}", "updateStatus");
+        Route::patch("/multiUpdate", "multiUpdate");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
@@ -105,13 +123,11 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix('variabel')->controller(VariabelController::class)->group(function () {
         Route::get("", "index");
-        Route::get("/by-indikator/{indikator}", "byIndikator");
-        Route::patch("/tukar-posisi/{id}", "tukarPosisi");
         Route::post("", "store");
         Route::get("/{id}", "show");
+        Route::patch("/tukar-posisi/{id}", "tukarPosisi");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
-        Route::get("byOpdProvinsi/{id}", "byOpdProvinsi");
         Route::delete("/multi-delete", "multiDestroy");
     });
 
@@ -138,7 +154,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 
     Route::prefix('opd-provinsi')->controller(OpdProvinsiController::class)->group(function () {
-        Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::post("/edit/{id}", "update");
@@ -167,7 +182,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
-        Route::patch("/edit/{id}", "update");
+        Route::post("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
@@ -215,6 +230,44 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("", "index");
         Route::post("", "store");
         Route::get("/{id}", "show");
+        Route::put("/edit/{rekap_hasil_id}", "update");
+        // Route::delete("/delete/{id}", "destroy");
+    });
+
+    Route::prefix('rekap-hasil')->controller(RekapHasilController::class)->group(function () {
+        Route::get("", "index");
+        // Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::put("/multiVerifikasi", "multiUpdate");
+        Route::put("/verifikasi/{rekap_hasil_id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
+    });
+
+    Route::prefix('sektor-spasial')->controller(SektorSpasialController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
+    });
+
+
+    Route::prefix('olahan-spasial')->controller(OlahanSpasialController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
+        Route::patch("/edit/{id}", "update");
+        Route::delete("/delete/{id}", "destroy");
+        Route::delete("/multi-delete", "multiDestroy");
+    });
+
+
+    Route::prefix('spasial-kabupaten')->controller(SpasialKabupatenController::class)->group(function () {
+        Route::get("", "index");
+        Route::post("", "store");
+        Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
@@ -236,7 +289,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/mobile/enumerator", "EnumeratorView");
         Route::get("/mobile/enumerator/indikator", "EnumeratorIndikator");
     });
-
 });
 
 Route::get('/docs', function () {

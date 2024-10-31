@@ -17,8 +17,8 @@ class UserOpdProvinsiResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
-            'opd_provinsi_id' => $this->opd_provinsi,
-            'user_id' => $this->user,
+            'opd_provinsi' => $this->opd_provinsi->only('id', 'nama', 'lokasi'),
+            'user' => $this->user,
             'jabatan' => $this->jabatan,
             'created_at' => $this->created_at,
             'updated_at' => $this->created_at

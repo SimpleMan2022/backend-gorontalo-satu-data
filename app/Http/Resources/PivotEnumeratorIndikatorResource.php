@@ -16,8 +16,8 @@ class PivotEnumeratorIndikatorResource extends JsonResource
     {
         return [
             'id' => $this->id,
-            'enumerator_id' => $this->enumerator,
-            'indikator_id' => $this->indikator,
+            'enumerator' => $this->enumerator->only('id', 'nama', 'jabatan', 'enumerator_level'),
+            'indikator' => $this->indikator->only('id', 'nama', 'status'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];
