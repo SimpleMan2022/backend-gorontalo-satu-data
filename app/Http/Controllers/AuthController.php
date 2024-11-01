@@ -32,7 +32,7 @@ class AuthController extends Controller
 
       $user = User::where('username', $request->username)->firstOrFail();
 
-      if($user->hasRole('enumerator')) {
+      if ($user->hasRole('enumerator')) {
         return $this->errorResponse('Enumerator login menggunakan aplikasi mobile.', Response::HTTP_UNAUTHORIZED);
       }
       $token = $user->createToken('auth_token')->plainTextToken;
@@ -65,7 +65,7 @@ class AuthController extends Controller
 
       $user = User::where('username', $request->username)->firstOrFail();
 
-      if(!$user->hasRole('enumerator')) {
+      if (!$user->hasRole('enumerator')) {
         return $this->errorResponse('Operator login menggunakan aplikasi website.', Response::HTTP_UNAUTHORIZED);
       }
       $token = $user->createToken('auth_token')->plainTextToken;
