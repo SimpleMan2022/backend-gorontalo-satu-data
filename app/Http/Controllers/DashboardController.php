@@ -28,7 +28,7 @@ class DashboardController extends Controller
     {
         try {
             $total_sektor = Sektor::count();
-            $total_subjek = Subjek::count(); 
+            $total_subjek = Subjek::count();
             $total_user = User::count();
             $total_antar_waktu = AntarWaktu::count();
 
@@ -41,13 +41,14 @@ class DashboardController extends Controller
 
             return $this->successResponseWithData(
                 $data,
-                'success', 
+                'Data Admin berhasil diambil',
                 Response::HTTP_OK
             );
         } catch (Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(
+                $e->getMessage(),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -88,10 +89,9 @@ class DashboardController extends Controller
 
             return $this->successResponseWithData(
                 $status_counts,
-                'success',
+                'Data Admin berhasil diambil',
                 Response::HTTP_OK
             );
-
         } catch (Exception $e) {
             return $this->errorResponse(
                 $e->getMessage(),
@@ -107,11 +107,11 @@ class DashboardController extends Controller
             // Retrieve data grouped by 'antar_waktu' and 'sektor' with counts
             $data = AntarWaktu::with(['indikator.sektor'])
                 ->get()
-                ->map(function($antarWaktu) {
+                ->map(function ($antarWaktu) {
                     // Group indikator by sektor and count them
                     $sektorCounts = $antarWaktu->indikator
                         ->groupBy('sektor.nama')
-                        ->map(function($indikators) {
+                        ->map(function ($indikators) {
                             return $indikators->count();
                         });
 
@@ -125,10 +125,9 @@ class DashboardController extends Controller
             // Use the successResponseWithData method from ApiResponse trait
             return $this->successResponseWithData(
                 $data,
-                'success',
+                'Data Admin berhasil diambil',
                 Response::HTTP_OK
             );
-
         } catch (Exception $e) {
             return $this->errorResponse(
                 $e->getMessage(),
@@ -143,20 +142,21 @@ class DashboardController extends Controller
             // Check if opd_provinsi_id is provided
             $opd_provinsi_id = $request->input('opd_provinsi_id');
             if (!$opd_provinsi_id) {
-                return response()->json([
-                    'error' => 'opd_provinsi_id is required'
-                ], Response::HTTP_BAD_REQUEST);
+                return $this->errorResponse(
+                    'opd_provinsi_id is required',
+                    Response::HTTP_BAD_REQUEST
+                );
             }
 
             // Count all entries
-            $total_variabel = Variabel::whereHas('indikator', function($query) use ($opd_provinsi_id) {
+            $total_variabel = Variabel::whereHas('indikator', function ($query) use ($opd_provinsi_id) {
                 $query->where('opd_provinsi_id', $opd_provinsi_id);
             })->count();
 
             $total_indikator = Indikator::where('opd_provinsi_id', $opd_provinsi_id)->count();
 
             // Count the id from pivot_indikator_subjek where indikator_id is related to the opd_provinsi_id
-            $total_subjek = PivotIndikatorSubjek::whereHas('indikator', function($query) use ($opd_provinsi_id) {
+            $total_subjek = PivotIndikatorSubjek::whereHas('indikator', function ($query) use ($opd_provinsi_id) {
                 $query->where('opd_provinsi_id', $opd_provinsi_id);
             })->count('id');
 
@@ -172,13 +172,14 @@ class DashboardController extends Controller
 
             return $this->successResponseWithData(
                 $data,
-                'success', 
+                'Data Opd Provinsi berhasil diambil',
                 Response::HTTP_OK
             );
         } catch (Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(
+                $e->getMessage(),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -188,17 +189,18 @@ class DashboardController extends Controller
             // Validate that opd_provinsi_id is provided
             $opd_provinsi_id = $request->input('opd_provinsi_id');
             if (!$opd_provinsi_id) {
-                return response()->json([
-                    'error' => 'opd_provinsi_id is required'
-                ], Response::HTTP_BAD_REQUEST);
+                return $this->errorResponse(
+                    'opd_provinsi_id is required',
+                    Response::HTTP_BAD_REQUEST
+                );
             }
 
             // Count the total number of indikator filtered by opd_provinsi_id
             $total_rekap_hasil = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
                 $query->where('opd_provinsi_id', $opd_provinsi_id);
             })
-            ->whereIn('status', ['terima', 'revisi', 'tolak', 'v3'])
-            ->count();
+                ->whereIn('status', ['terima', 'revisi', 'tolak', 'v3'])
+                ->count();
 
             // Count the total number of each status in the RekapHasil model, filtered by opd_provinsi_id
             $terima_count = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
@@ -252,10 +254,9 @@ class DashboardController extends Controller
 
             return $this->successResponseWithData(
                 $status_counts,
-                'success',
+                'Data Opd Provinsi berhasil diambil',
                 Response::HTTP_OK
             );
-
         } catch (Exception $e) {
             return $this->errorResponse(
                 $e->getMessage(),
@@ -277,15 +278,15 @@ class DashboardController extends Controller
 
             // Retrieve data grouped by 'antar_waktu' and 'sektor' with counts, filtered by opd_provinsi_id
             $data = AntarWaktu::with(['indikator' => function ($query) use ($opd_provinsi_id) {
-                    // Filter the indikator by the opd_provinsi_id
-                    $query->where('opd_provinsi_id', $opd_provinsi_id);
-                }, 'indikator.sektor'])
+                // Filter the indikator by the opd_provinsi_id
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            }, 'indikator.sektor'])
                 ->get()
-                ->map(function($antarWaktu) {
+                ->map(function ($antarWaktu) {
                     // Group indikator by sektor and count them
                     $sektorCounts = $antarWaktu->indikator
                         ->groupBy('sektor.nama')
-                        ->map(function($indikators) {
+                        ->map(function ($indikators) {
                             return $indikators->count();
                         });
 
@@ -299,10 +300,9 @@ class DashboardController extends Controller
             // Use the successResponseWithData method from ApiResponse trait
             return $this->successResponseWithData(
                 $data,
-                'success',
+                'Data Opd Provinsi berhasil diambil',
                 Response::HTTP_OK
             );
-
         } catch (Exception $e) {
             return $this->errorResponse(
                 $e->getMessage(),
@@ -317,31 +317,33 @@ class DashboardController extends Controller
             // Check if opd_kabupaten_id is provided
             $opd_kabupaten_id = $request->input('opd_kabupaten_id');
             if (!$opd_kabupaten_id) {
-                return response()->json([
-                    'error' => 'opd_kabupaten_id is required'
-                ], Response::HTTP_BAD_REQUEST);
+                return $this->errorResponse(
+                    'opd_kabupaten_id is required',
+                    Response::HTTP_BAD_REQUEST
+                );
             }
 
             // Retrieve the opd_provinsi_id from the OpdKabupaten model
             $opdKabupaten = OpdKabupaten::find($opd_kabupaten_id);
             if (!$opdKabupaten) {
-                return response()->json([
-                    'error' => 'OpdKabupaten not found'
-                ], Response::HTTP_NOT_FOUND);
+                return $this->errorResponse(
+                    'OpdKabupaten not found',
+                    Response::HTTP_NOT_FOUND
+                );
             }
 
             // Extract the opd_provinsi_id
             $opd_provinsi_id = $opdKabupaten->opd_provinsi_id;
 
             // Now proceed with the same logic using the retrieved opd_provinsi_id
-            $total_variabel = Variabel::whereHas('indikator', function($query) use ($opd_provinsi_id) {
+            $total_variabel = Variabel::whereHas('indikator', function ($query) use ($opd_provinsi_id) {
                 $query->where('opd_provinsi_id', $opd_provinsi_id);
             })->count();
 
             $total_indikator = Indikator::where('opd_provinsi_id', $opd_provinsi_id)->count();
 
             // Count the id from pivot_indikator_subjek where indikator_id is related to the opd_provinsi_id
-            $total_subjek = PivotIndikatorSubjek::whereHas('indikator', function($query) use ($opd_provinsi_id) {
+            $total_subjek = PivotIndikatorSubjek::whereHas('indikator', function ($query) use ($opd_provinsi_id) {
                 $query->where('opd_provinsi_id', $opd_provinsi_id);
             })->count('id');
 
@@ -357,7 +359,7 @@ class DashboardController extends Controller
 
             return $this->successResponseWithData(
                 $data,
-                'success', 
+                'Data Opd Kabupaten berhasil diambil',
                 Response::HTTP_OK
             );
         } catch (Exception $e) {
@@ -373,17 +375,19 @@ class DashboardController extends Controller
             // Check if opd_kabupaten_id is provided
             $opd_kabupaten_id = $request->input('opd_kabupaten_id');
             if (!$opd_kabupaten_id) {
-                return response()->json([
-                    'error' => 'opd_kabupaten_id is required'
-                ], Response::HTTP_BAD_REQUEST);
+                return $this->errorResponse(
+                    'opd_kabupaten_id is required',
+                    Response::HTTP_BAD_REQUEST
+                );
             }
 
             // Retrieve the opd_provinsi_id from the OpdKabupaten model
             $opdKabupaten = OpdKabupaten::find($opd_kabupaten_id);
             if (!$opdKabupaten) {
-                return response()->json([
-                    'error' => 'OpdKabupaten not found'
-                ], Response::HTTP_NOT_FOUND);
+                return $this->errorResponse(
+                    'OpdKabupaten not found',
+                    Response::HTTP_NOT_FOUND
+                );
             }
 
             // Extract the opd_provinsi_id
@@ -393,8 +397,8 @@ class DashboardController extends Controller
             $total_rekap_hasil = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
                 $query->where('opd_provinsi_id', $opd_provinsi_id);
             })
-            ->whereIn('status', ['v3', 'revisi', 'tolak', 'v2'])
-            ->count();
+                ->whereIn('status', ['v3', 'revisi', 'tolak', 'v2'])
+                ->count();
 
             // Count the total number of each status in the RekapHasil model, filtered by opd_provinsi_id
             $terima_count = RekapHasil::whereHas('periode', function ($query) use ($opd_provinsi_id) {
@@ -448,10 +452,9 @@ class DashboardController extends Controller
 
             return $this->successResponseWithData(
                 $status_counts,
-                'success',
+                'Data Opd Kabupaten berhasil diambil',
                 Response::HTTP_OK
             );
-
         } catch (Exception $e) {
             return $this->errorResponse(
                 $e->getMessage(),
@@ -474,9 +477,10 @@ class DashboardController extends Controller
             // Retrieve the opd_provinsi_id from the OpdKabupaten model
             $opdKabupaten = OpdKabupaten::find($opd_kabupaten_id);
             if (!$opdKabupaten) {
-                return response()->json([
-                    'error' => 'OpdKabupaten not found'
-                ], Response::HTTP_NOT_FOUND);
+                return $this->errorResponse(
+                    'OpdKabupaten not found',
+                    Response::HTTP_NOT_FOUND
+                );
             }
 
             // Extract the opd_provinsi_id
@@ -484,13 +488,13 @@ class DashboardController extends Controller
 
             // Query AntarWaktu with related Indikator and BeritaAcara
             $data = AntarWaktu::with(['indikator' => function ($query) use ($opd_provinsi_id) {
-                    // Filter indikator by opd_provinsi_id
-                    $query->where('opd_provinsi_id', $opd_provinsi_id);
-                }, 'indikator.beritaAcara'])  // Add BeritaAcara relation
+                // Filter indikator by opd_provinsi_id
+                $query->where('opd_provinsi_id', $opd_provinsi_id);
+            }, 'indikator.beritaAcara'])  // Add BeritaAcara relation
                 ->get()
-                ->map(function($antarWaktu) {
+                ->map(function ($antarWaktu) {
                     // Calculate the total number of BeritaAcara across all indicators for each AntarWaktu
-                    $jumlahBeritaAcara = $antarWaktu->indikator->sum(function($indikator) {
+                    $jumlahBeritaAcara = $antarWaktu->indikator->sum(function ($indikator) {
                         return $indikator->beritaAcara->count();
                     });
 
@@ -508,7 +512,6 @@ class DashboardController extends Controller
                 'message' => 'success',
                 'data' => $data
             ], Response::HTTP_OK);
-
         } catch (Exception $e) {
             return response()->json([
                 'code' => Response::HTTP_INTERNAL_SERVER_ERROR,
@@ -524,17 +527,19 @@ class DashboardController extends Controller
             // Check if enumerator_id is provided
             $enumerator_id = $request->input('enumerator_id');
             if (!$enumerator_id) {
-                return response()->json([
-                    'error' => 'enumerator_id is required'
-                ], Response::HTTP_BAD_REQUEST);
+                return $this->errorResponse(
+                    'enumerator_id is required',
+                    Response::HTTP_BAD_REQUEST
+                );
             }
 
             // Check if the enumerator exists
             $enumerator = Enumerator::find($enumerator_id);
             if (!$enumerator) {
-                return response()->json([
-                    'error' => 'Enumerator not found'
-                ], Response::HTTP_NOT_FOUND);
+                return $this->errorResponse(
+                    'Enumerator not found',
+                    Response::HTTP_NOT_FOUND
+                );
             }
 
             // Check if enumerator_id exists in EnumeratorKabupaten or EnumeratorProvinsi
@@ -546,9 +551,11 @@ class DashboardController extends Controller
 
             // If enumerator is not associated with either Kabupaten or Provinsi, return "no data"
             if (!$isInKabupaten && !$isInProvinsi) {
-                return response()->json([
-                    'message' => 'No data available for this enumerator'
-                ], Response::HTTP_OK);
+                return $this->successResponseWithData(
+                    [],
+                    'Data Enumerator tidak ditemukan',
+                    Response::HTTP_OK
+                );
             }
 
             // Initialize total_indikator count
@@ -594,13 +601,14 @@ class DashboardController extends Controller
 
             return $this->successResponseWithData(
                 $data,
-                'success',
+                'Data Enumerator berhasil diambil',
                 Response::HTTP_OK
             );
         } catch (Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage()
-            ], Response::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->errorResponse(
+                $e->getMessage(),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
         }
     }
 
@@ -612,15 +620,16 @@ class DashboardController extends Controller
             // Validate that enumerator_id is provided
             $enumerator_id = $request->input('enumerator_id');
             if (!$enumerator_id) {
-                return response()->json([
-                    'error' => 'enumerator_id is required'
-                ], Response::HTTP_BAD_REQUEST);
+                return $this->errorResponse(
+                    'enumerator_id is required',
+                    Response::HTTP_BAD_REQUEST
+                );
             }
-    
+
             // Retrieve data from Enumerator with Indikator details through the pivot table
             $data = Enumerator::with(['pivot_enumerator_indikator.indikator' => function ($query) {
-                    $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
-                }])
+                $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
+            }])
                 ->where('id', $enumerator_id)
                 ->get()
                 ->map(function ($enumerator) {
@@ -628,23 +637,23 @@ class DashboardController extends Controller
                         return [
                             'id' => $pivot->indikator->id,
                             'nama_indikator' => $pivot->indikator->nama,
+                            'logo' => $pivot->indikator->opd_provinsi_logo,
                             'sektor' => $pivot->indikator->sektor->nama,
                             'opd' => $pivot->indikator->opd_provinsi->nama,
                         ];
                     });
                 });
-    
+
             return $this->successResponseWithData(
                 $data,
-                'success',
+                'Data Enumerator Indikator berhasil diambil',
                 Response::HTTP_OK
             );
-    
         } catch (Exception $e) {
             return $this->errorResponse(
                 $e->getMessage(),
                 Response::HTTP_INTERNAL_SERVER_ERROR
             );
         }
-    }    
+    }
 }
