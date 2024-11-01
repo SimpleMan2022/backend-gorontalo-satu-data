@@ -637,7 +637,7 @@ class DashboardController extends Controller
                         return [
                             'id' => $pivot->indikator->id,
                             'nama_indikator' => $pivot->indikator->nama,
-                            'logo' => $pivot->indikator->opd_provinsi_logo,
+                            'logo' => $pivot->indikator->opd_provinsi->logo,
                             'sektor' => $pivot->indikator->sektor->nama,
                             'opd' => $pivot->indikator->opd_provinsi->nama,
                         ];
