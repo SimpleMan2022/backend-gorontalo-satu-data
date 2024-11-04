@@ -191,6 +191,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix('enumerator')->controller(EnumeratorController::class)->group(function () {
         Route::get("", "index");
+        Route::get("/by-indikator-mobile", "byIndikatorMobile");
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
