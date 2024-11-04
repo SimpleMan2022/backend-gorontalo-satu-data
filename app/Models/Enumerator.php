@@ -71,4 +71,9 @@ class Enumerator extends Model
 
         return null;
     }
+
+    public function rekap_hasil()
+    {
+        return $this->hasMany(RekapHasil::class);
+    }
 }
