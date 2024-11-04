@@ -17,6 +17,12 @@ class OpdProvinsiResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
+            'sektor' => $this->sektor->map(function ($sektor) {
+                return [
+                    'id' => $sektor->id,
+                    'nama' => $sektor->nama
+                ];
+            }),
             'logo' => $this->logo,
             'lokasi' => $this->lokasi,
             'created_at' => $this->created_at,
