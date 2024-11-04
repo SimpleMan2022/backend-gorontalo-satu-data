@@ -105,6 +105,20 @@ class AuthController extends Controller
     );
   }
 
+  // public function getEnumeratorMobile(Request $request)
+  // {
+  //   return $this->successResponseWithData(
+  //     [
+  //       'id' => $request->user()->id,
+  //       'username' => $request->user()->username,
+  //       'email' => $request->user()->email,
+  //       'enumerator' => $request->user()->enumerator,
+  //     ],
+  //     'Data enumerator berhasil diambil',
+  //     Response::HTTP_OK
+  //   );
+  // }
+
   public function logout(Request $request)
   {
     $request->user()->tokens()->delete();
