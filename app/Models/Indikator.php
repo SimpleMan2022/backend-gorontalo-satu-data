@@ -31,6 +31,11 @@ class Indikator extends Model
         return $this->hasMany(PivotEnumeratorIndikator::class);
     }
 
+    public function enumerators()
+    {
+        return $this->belongsToMany(Enumerator::class, 'pivot_enumerator_indikator'); // Pivot table 'enumerator_indikator'
+    }
+
     public function beritaAcara()
     {
         return $this->hasMany(BeritaAcara::class);
