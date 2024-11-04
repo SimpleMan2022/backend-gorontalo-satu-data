@@ -24,6 +24,10 @@ class UserOpdKabupatenController extends Controller
             $perPage = $request->per_page ?? 10;
             $UserOpdKabupatenQuery = UserOpdKabupaten::orderBy('created_at', 'desc');
 
+            $search = $request->query('search');
+            if ($search) {
+                $UserOpdKabupatenQuery->where('nama', 'like', '%' . $search . '%');
+            }
             if ($userId = $request->query('user_id')) {
                 $UserOpdKabupatenQuery->where('user_id', $userId);
             }

@@ -23,13 +23,23 @@ class EnumeratorController extends Controller
             $perPage = $request->per_page ?? 10;
             $enumeratorQuery = Enumerator::orderBy('created_at', 'desc');
 
+            if ($search = $request->query('search')) {
+                $enumeratorQuery->where(function ($query) use ($search) {
+                    $query->where('nama', 'like', '%' . $search . '%')
+                        ->orWhereHas('user', function ($query) use ($search) {
+                            $query->where('email', 'like', '%' . $search . '%')
+                                ->orWhere('username', 'like', '%' . $search . '%');
+                        });
+                });
+            }
+
             if ($userId = $request->query('user_id')) {
                 $enumeratorQuery->where('user_id', $userId);
             }
 
             $data = $enumeratorQuery->paginate($perPage);
 
-            if ($data->isNotEmpty()){
+            if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
                     EnumeratorResource::collection($data),

@@ -21,6 +21,10 @@ class PeriodeController extends Controller
             $perPage = $request->per_page ?? 10;
             $periodeQuery = Periode::orderBy('created_at', 'desc');
 
+            if ($search = $request->query('search')) {
+                $periodeQuery->where('nama', 'like', '%' . $search . '%');
+            }
+
             if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
                 $periodeQuery->where('opd_provinsi_id', $opdProvinsiId);
             }

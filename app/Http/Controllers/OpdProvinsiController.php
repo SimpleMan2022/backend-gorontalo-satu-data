@@ -22,7 +22,12 @@ class OpdProvinsiController extends Controller
     {
         try {
             $perPage = $request->per_page ?? 10;
-            $data = OpdProvinsi::orderBy('created_at', 'desc')->paginate($perPage);
+            $data = OpdProvinsi::orderBy('created_at', 'desc');
+            $search = $request->query('search');
+            if ($search) {
+                $data->where('nama', 'like', '%' . $search . '%');
+            }
+            $data = $data->paginate($perPage);
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,

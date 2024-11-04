@@ -22,7 +22,9 @@ class OpdKabupatenController extends Controller
             $perPage = $request->per_page ?? 10;
 
             $opdQuery = OpdKabupaten::orderBy('created_at', 'desc');
-
+            if ($search = $request->query('search')) {
+                $opdQuery->where('nama', 'like', '%' . $search . '%');
+            }
             if ($kab_id = $request->query('kabupaten_id')) {
                 $opdQuery->where('kabupaten_id', $kab_id);
             }
