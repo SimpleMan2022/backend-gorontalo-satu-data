@@ -61,7 +61,6 @@ class UserOpdProvinsiController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                // 'password' => 'required',
                 'opd_provinsi_id' => 'required',
                 'jabatan' => 'required',
             ]);
@@ -82,7 +81,12 @@ class UserOpdProvinsiController extends Controller
                 return $this->errorResponse('Username sudah tersedia', Response::HTTP_BAD_REQUEST);
             }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
-            $user = User::create($validated);
+            // dd($validated);
+            $user = User::create([
+                'email' => $validated['email'],
+                'username' => $validated['username'],
+                'password' => $validated['password'],
+            ]);
             $user->assignRole('opd_provinsi');
             if ($user) {
                 UserOpdProvinsi::create([

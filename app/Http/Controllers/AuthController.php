@@ -31,6 +31,7 @@ class AuthController extends Controller
         return $this->errorResponse('Terdapat kesalahan kredensial.', Response::HTTP_UNAUTHORIZED);
       }
 
+
       $user = User::where('username', $request->username)->firstOrFail();
 
       if ($user->hasRole('enumerator')) {
