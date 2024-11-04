@@ -116,6 +116,7 @@ class OpdProvinsiController extends Controller
         try {
             $validated = $request->validate([
                 'nama' => 'required',
+                'sektor_id' => 'required',
                 'logo' => 'nullable|image|mimes:jpeg,png,jpg,webp|max:2048',
                 'lokasi' => 'required',
             ]);
@@ -144,13 +145,30 @@ class OpdProvinsiController extends Controller
                 }
             }
 
-            $opd_provinsi->update($validated);
+            $validated['sektor_id'] = array_filter(explode(',', $validated['sektor_id']), function ($value) {
+                return is_numeric($value);
+            });
+
+            $opd_provinsi->update([
+                'nama' => $validated['nama'],
+                'logo' => $validated['logo'] ?? $opd_provinsi->logo,
+                'lokasi' => $validated['lokasi']
+            ]);
+
+            // Update pivot table
+            PivotOpdSektor::where('opd_provinsi_id', $opd_provinsi->id)->delete();
+            foreach ($validated['sektor_id'] as $sektor_id) {
+                PivotOpdSektor::create([
+                    'opd_provinsi_id' => $opd_provinsi->id,
+                    'sektor_id' => $sektor_id
+                ]);
+            }
 
             return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
-            return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+            return $this->errorResponseWithData($e->errors(), 'Data gagal diubah', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

@@ -77,7 +77,7 @@ class PivotEnumeratorIndikatorController extends Controller
 
             foreach ($req as $item) {
                 // Buat data pada pivot jika belum ada
-                $pivot = PivotEnumeratorIndikator::create([
+                PivotEnumeratorIndikator::create([
                     'enumerator_id' => $item['enumerator_id'],
                     'indikator_id' => $item['indikator_id'],
                 ]);

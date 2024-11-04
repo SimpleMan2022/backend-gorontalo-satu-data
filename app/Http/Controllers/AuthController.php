@@ -32,7 +32,7 @@ class AuthController extends Controller
 
       $user = User::where('username', $request->username)->firstOrFail();
 
-      if($user->hasRole('enumerator')) {
+      if ($user->hasRole('enumerator')) {
         return $this->errorResponse('Enumerator login menggunakan aplikasi mobile.', Response::HTTP_UNAUTHORIZED);
       }
       $token = $user->createToken('auth_token')->plainTextToken;
@@ -65,7 +65,7 @@ class AuthController extends Controller
 
       $user = User::where('username', $request->username)->firstOrFail();
 
-      if(!$user->hasRole('enumerator')) {
+      if (!$user->hasRole('enumerator')) {
         return $this->errorResponse('Operator login menggunakan aplikasi website.', Response::HTTP_UNAUTHORIZED);
       }
       $token = $user->createToken('auth_token')->plainTextToken;
@@ -104,6 +104,20 @@ class AuthController extends Controller
       Response::HTTP_OK
     );
   }
+
+  // public function getEnumeratorMobile(Request $request)
+  // {
+  //   return $this->successResponseWithData(
+  //     [
+  //       'id' => $request->user()->id,
+  //       'username' => $request->user()->username,
+  //       'email' => $request->user()->email,
+  //       'enumerator' => $request->user()->enumerator,
+  //     ],
+  //     'Data enumerator berhasil diambil',
+  //     Response::HTTP_OK
+  //   );
+  // }
 
   public function logout(Request $request)
   {
