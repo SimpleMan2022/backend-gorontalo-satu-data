@@ -543,14 +543,11 @@ class DashboardController extends Controller
             }
 
             // Check if enumerator_id exists in EnumeratorKabupaten or EnumeratorProvinsi
-            $isInKabupaten = EnumeratorKabupaten::where('enumerator_id', $enumerator_id)->exists();
-            $isInProvinsi = EnumeratorProvinsi::where('enumerator_id', $enumerator_id)->exists();
-
-            $enumerator_kabupaten = EnumeratorKabupaten::find($enumerator_id);
-            $enumerator_provinsi = EnumeratorProvinsi::find($enumerator_id);
+            $enumerator_kabupaten = EnumeratorKabupaten::where('enumerator_id', $enumerator_id)->first();
+            $enumerator_provinsi = EnumeratorProvinsi::where('enumerator_id', $enumerator_id)->first();
 
             // If enumerator is not associated with either Kabupaten or Provinsi, return "no data"
-            if (!$isInKabupaten && !$isInProvinsi) {
+            if (!$enumerator_kabupaten && !$enumerator_provinsi) {
                 return $this->successResponseWithData(
                     [],
                     'Data Enumerator tidak ditemukan',
@@ -561,30 +558,26 @@ class DashboardController extends Controller
             // Initialize total_indikator count
             $total_indikator = RekapHasil::where('enumerator_id', $enumerator_id)->count();
 
-            // Set totals based on where the enumerator is located
-            if ($isInKabupaten) {
+            // Set totals and opd based on where the enumerator is located
+            if ($enumerator_kabupaten) {
                 $opd = $enumerator_kabupaten->opd_kabupaten->nama;
                 $total_indikator_diverifikasi = RekapHasil::where('enumerator_id', $enumerator_id)
                     ->where('status', 'v3')
                     ->count();
-
                 $total_indikator_ditolak = RekapHasil::where('enumerator_id', $enumerator_id)
                     ->where('status', 'tolak')
                     ->count();
-
                 $total_indikator_diproses = RekapHasil::where('enumerator_id', $enumerator_id)
                     ->where('status', 'v2')
                     ->count();
-            } else { // If in EnumeratorProvinsi
+            } elseif ($enumerator_provinsi) { // If in EnumeratorProvinsi
                 $opd = $enumerator_provinsi->opd_provinsi->nama;
                 $total_indikator_diverifikasi = RekapHasil::where('enumerator_id', $enumerator_id)
                     ->where('status', 'terima')
                     ->count();
-
                 $total_indikator_ditolak = RekapHasil::where('enumerator_id', $enumerator_id)
                     ->where('status', 'tolak')
                     ->count();
-
                 $total_indikator_diproses = RekapHasil::where('enumerator_id', $enumerator_id)
                     ->where('status', 'v3')
                     ->count();
@@ -611,6 +604,7 @@ class DashboardController extends Controller
             );
         }
     }
+
 
 
 
