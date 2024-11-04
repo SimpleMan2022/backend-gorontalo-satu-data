@@ -31,13 +31,18 @@ class OpdProvinsi extends Model
         return $this->hasMany(Periode::class);
     }
 
-    public function artikel_kawasan()
+    public function hasil_spasial()
     {
-        return $this->hasMany(ArtikelKawasan::class);
+        return $this->hasMany(HasilSpasial::class);
     }
 
     public function pivot_opd_sektor()
     {
         return $this->hasMany(PivotOpdSektor::class);
+    }
+
+    public function sektor()
+    {
+        return $this->belongsToMany(Sektor::class, 'pivot_opd_sektor', 'opd_provinsi_id', 'sektor_id');
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\Request;
 use App\Http\Traits\ApiResponse;
 use App\Mail\SendCodeResetPassword;
+use App\Models\Enumerator;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
@@ -105,19 +106,38 @@ class AuthController extends Controller
     );
   }
 
-  // public function getEnumeratorMobile(Request $request)
-  // {
-  //   return $this->successResponseWithData(
-  //     [
-  //       'id' => $request->user()->id,
-  //       'username' => $request->user()->username,
-  //       'email' => $request->user()->email,
-  //       'enumerator' => $request->user()->enumerator,
-  //     ],
-  //     'Data enumerator berhasil diambil',
-  //     Response::HTTP_OK
-  //   );
-  // }
+  public function getEnumeratorMobile(Request $request)
+  {
+    $enumerator = Enumerator::where('user_id', $request->user()->id)->first();
+    if ($enumerator === null) {
+      return $this->errorResponse('Data enumerator tidak ditemukan', Response::HTTP_NOT_FOUND);
+    }
+
+    $enumeratorData = [
+      'id' => $enumerator->id,
+      'nama' => $enumerator->nama,
+      'jabatan' => $enumerator->jabatan,
+      'enumerator_level' => $enumerator->enumerator_level,
+    ];
+
+    if ($enumerator->enumerator_level === 'kabupaten') {
+      $enumeratorData['nama_opd'] = $enumerator->enumerator_kabupaten->first()->opd_kabupaten->nama;
+    } elseif ($enumerator->enumerator_level === 'provinsi') {
+      $enumeratorData['nama_opd'] = $enumerator->enumerator_provinsi->first()->opd_provinsi->nama;
+    }
+
+    return $this->successResponseWithData(
+      [
+        'user_id' => $request->user()->id,
+        'username' => $request->user()->username,
+        'nama' => $enumerator->nama,
+        'email' => $request->user()->email,
+        'enumerator' => $enumeratorData,
+      ],
+      'Data enumerator berhasil diambil',
+      Response::HTTP_OK
+    );
+  }
 
   public function logout(Request $request)
   {

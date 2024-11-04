@@ -290,10 +290,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     });
 });
 
-Route::prefix('mobile')->group(function () {
+Route::prefix('mobile')->middleware('auth:sanctum')->group(function () {
     Route::get("/dashboard/enumerator", DashboardController::class . "@EnumeratorView");
     Route::get("/dashboard/enumerator/indikator", DashboardController::class . "@EnumeratorIndikator");
-    Route::get("/auth/getEnumerator", AuthController::class . "@getEnumeratorMobile");
+    Route::get("/profile", AuthController::class . "@getEnumeratorMobile");
 });
 
 Route::get('/docs', function () {
