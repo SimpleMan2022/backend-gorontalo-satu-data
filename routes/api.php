@@ -156,7 +156,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('opd-provinsi')->controller(OpdProvinsiController::class)->group(function () {
         Route::post("", "store");
         Route::get("/{id}", "show");
-        Route::post("/edit/{id}", "update");
+        Route::put("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
