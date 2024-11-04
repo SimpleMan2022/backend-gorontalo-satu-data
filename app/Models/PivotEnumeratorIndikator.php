@@ -12,11 +12,13 @@ class PivotEnumeratorIndikator extends Model
     protected $guarded = ['id'];
     protected $table = 'pivot_enumerator_indikator';
 
-    public function enumerator() {
+    public function enumerator()
+    {
         return $this->belongsTo(Enumerator::class);
     }
 
-    public function indikator() {
+    public function indikator()
+    {
         return $this->belongsTo(Indikator::class);
     }
 }

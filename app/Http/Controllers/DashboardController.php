@@ -626,23 +626,35 @@ class DashboardController extends Controller
                 );
             }
 
+            // Get the search query parameter
+            $search = $request->query('search');
+
             // Retrieve data from Enumerator with Indikator details through the pivot table
-            $data = Enumerator::with(['pivot_enumerator_indikator.indikator' => function ($query) {
+            $data = Enumerator::with(['pivot_enumerator_indikator.indikator' => function ($query) use ($search) {
                 $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
+                if ($search) {
+                    $query->where('nama', 'like', '%' . $search . '%');
+                }
             }])
                 ->where('id', $enumerator_id)
                 ->get()
-                ->map(function ($enumerator) {
-                    return $enumerator->pivot_enumerator_indikator->map(function ($pivot) {
-                        return [
-                            'id' => $pivot->indikator->id,
-                            'nama_indikator' => $pivot->indikator->nama,
-                            'logo' => $pivot->indikator->opd_provinsi_logo,
-                            'sektor' => $pivot->indikator->sektor->nama,
-                            'opd' => $pivot->indikator->opd_provinsi->nama,
-                        ];
-                    });
+                ->flatMap(function ($enumerator) {
+                    return $enumerator->pivot_enumerator_indikator
+                        ->filter(function ($pivot) {
+                            return $pivot->indikator !== null;
+                        })
+                        ->map(function ($pivot) {
+                            return [
+                                'id' => $pivot->id,
+                                'nama_sektor' => $pivot->indikator->sektor->nama,
+                                'indikator' => $pivot->indikator->only('id', 'nama'),
+                                'opd_provinsi' => $pivot->indikator->opd_provinsi->only('id', 'nama', 'logo'),
+                                'created_at' => $pivot->created_at,
+                                'updated_at' => $pivot->updated_at,
+                            ];
+                        });
                 });
+
 
             return $this->successResponseWithData(
                 $data,

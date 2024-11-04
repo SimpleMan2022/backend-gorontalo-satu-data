@@ -287,10 +287,13 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("/opd-kabupaten", "OpdKabupatenView");
         Route::get("/opd-kabupaten/chart-donut", "ChartDonutOpdKabupaten");
         Route::get("/opd-kabupaten/chart-bar", "ChartBarOpdKabupaten");
-
-        Route::get("/mobile/enumerator", "EnumeratorView");
-        Route::get("/mobile/enumerator/indikator", "EnumeratorIndikator");
     });
+});
+
+Route::prefix('mobile')->group(function () {
+    Route::get("/dashboard/enumerator", DashboardController::class . "@EnumeratorView");
+    Route::get("/dashboard/enumerator/indikator", DashboardController::class . "@EnumeratorIndikator");
+    Route::get("/auth/getEnumerator", AuthController::class . "@getEnumeratorMobile");
 });
 
 Route::get('/docs', function () {
