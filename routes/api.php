@@ -26,6 +26,7 @@ use App\Http\Controllers\OlahanSpasialController;
 use App\Http\Controllers\SpasialKabupatenController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\HasilSpasialController;
+use App\Http\Controllers\MobileController;
 use Illuminate\Support\Facades\Route;
 
 Route::prefix("auth")->controller(AuthController::class)->group(function () {
@@ -56,7 +57,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::get("", "index")->name('sektor.index');
         Route::post("", "store");
         Route::get("/{id}", "show");
-        Route::post("/edit/{sektor}", "update");
+        Route::patch("/edit/{sektor}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");
     });
@@ -291,8 +292,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 
 Route::prefix('mobile')->middleware('auth:sanctum')->group(function () {
-    Route::get("/dashboard/enumerator", DashboardController::class . "@EnumeratorView");
-    Route::get("/dashboard/enumerator/indikator", DashboardController::class . "@EnumeratorIndikator");
+    Route::get("/dashboard/enumerator", MobileController::class . "@EnumeratorView");
+    Route::get("/dashboard/enumerator/indikator", MobileController::class . "@EnumeratorIndikator");
     Route::get("/profile", AuthController::class . "@getEnumeratorMobile");
 });
 
