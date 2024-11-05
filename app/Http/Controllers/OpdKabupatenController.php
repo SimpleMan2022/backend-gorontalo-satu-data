@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Http\Helpers\ConvertImage;
 use App\Http\Traits\ApiResponse;
-use App\Models\OpdKabupaten;
+use App\Models\{OpdKabupaten, UserOpdKabupaten};
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
@@ -80,6 +80,38 @@ class OpdKabupatenController extends Controller
             return $this->successResponse('Data OPD Kabupaten berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function setPermission(Request $request) {
+        try {
+            if($request->status == 'aktif') {
+                $operator = UserOpdKabupaten::where('opd_kabupaten_id', $request->id)->get();
+    
+                $permissions_kabupaten = [
+                    'kelola_user_opd_kabupaten',
+                    'kelola_opd_kabupaten',
+                ];
+                foreach($operator as $item) {
+                    $user = $item->user;
+                    $user->givePermissionTo($permissions_kabupaten);                
+                }
+                return $this->successResponse('OPD Kabupaten berhasil diizinkan', Response::HTTP_OK);
+            }else {
+                $operator = UserOpdKabupaten::where('opd_kabupaten_id', $request->id)->get();
+    
+                $permissions_kabupaten = [
+                    'kelola_user_opd_kabupaten',
+                    'kelola_opd_kabupaten',
+                ];
+                foreach($operator as $item) {
+                    $user = $item->user;
+                    $user->revokePermissionTo($permissions_kabupaten);                
+                }
+                return $this->successResponse('Perizinan OPD Kabupaten berhasil diubah', Response::HTTP_OK);
+            }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

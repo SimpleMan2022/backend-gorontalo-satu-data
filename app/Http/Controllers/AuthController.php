@@ -101,6 +101,7 @@ class AuthController extends Controller
           'name' => $request->user()->roles->first()->name,
           'permissions' => $request->user()->roles->first()->permissions->pluck('name')
         ],
+        'permissions' => $request->user()->permissions->pluck('name') ?? '-'
       ],
       'Data pengguna berhasil diambil',
       Response::HTTP_OK
