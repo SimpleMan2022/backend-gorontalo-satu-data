@@ -56,6 +56,11 @@ class Enumerator extends Model
         return $this->hasMany(PivotEnumeratorIndikator::class);
     }
 
+    public function enumerator_indikator_status_pending()
+    {
+        return $this->hasMany(PivotEnumeratorIndikator::class)->where('status','pending');
+    }
+
 
     protected $appends = ['enumerator_level'];
 
@@ -72,8 +77,15 @@ class Enumerator extends Model
         return null;
     }
 
-    public function rekap_hasil()
+    public function rekapHasil()
     {
         return $this->hasMany(RekapHasil::class);
+    }
+
+    public function indikators()
+    {
+        return $this->belongsToMany(Indikator::class, 'pivot_enumerator_indikator')
+                    ->withPivot(['indikator_id', 'enumerator_id']) // Tambahkan kolom tambahan dari pivot jika ada
+                    ->withTimestamps(); // Jika pivot memiliki timestamps
     }
 }

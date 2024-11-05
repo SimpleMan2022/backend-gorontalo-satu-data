@@ -25,6 +25,10 @@ class SpasialKabupatenController extends Controller
 
             $spasialQuery = SpasialKabupaten::orderBy('created_at', 'desc');
 
+            // if ($search = $request->query('search')) {
+            //     $spasialQuery->where('tahun', 'like', '%' . $search . '%');
+            // }
+
             if ($olahanSpasialId = $request->query('olahan_spasial_id')) {
                 $spasialQuery->where('olahan_spasial_id', $olahanSpasialId);
             }

@@ -21,6 +21,9 @@ class VariabelController extends Controller
             $perPage = $request->per_page ?? 10;
             $variabelQuery = Variabel::orderBy('created_at', 'desc');
 
+            if ($search = $request->query('search')) {
+                $variabelQuery->where('nama', 'like', '%' . $search . '%');
+            }
             if ($indikatorId = $request->query('indikator_id')) {
                 $variabelQuery->where('indikator_id', $indikatorId);
             }

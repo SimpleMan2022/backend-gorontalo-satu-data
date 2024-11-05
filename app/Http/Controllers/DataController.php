@@ -25,13 +25,12 @@ class DataController extends Controller
     public function getAllKecamatan(Request $request)
     {
         try {
-            $per_page = $request->per_page ?? 10;
             $kecamatanQuery = Kecamatan::orderBy('regency_id', 'asc');
 
             if ($kabQuery = $request->query('kabupaten_id')) {
                 $kecamatanQuery->where('regency_id', $kabQuery);
             }
-            $data = $kecamatanQuery->paginate($per_page);
+            $data = $kecamatanQuery->get();
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex($data, $data->items(), 'Data kecamatan berhasil diambil');
             } else {
@@ -45,13 +44,12 @@ class DataController extends Controller
     public function getAllDesa(Request $request)
     {
         try {
-            $per_page = $request->per_page ?? 10;
             $desaQuery = Desa::orderBy('district_id', 'asc');
 
             if ($kecQuery = $request->query('kecamatan_id')) {
                 $desaQuery->where('district_id', $kecQuery);
             }
-            $data = $desaQuery->paginate($per_page);
+            $data = $desaQuery->get();
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex($data, $data->items(), 'Data desa berhasil diambil');
             } else {

@@ -624,7 +624,7 @@ class DashboardController extends Controller
             $search = $request->query('search');
 
             // Retrieve data from Enumerator with Indikator details through the pivot table
-            $data = Enumerator::with(['pivot_enumerator_indikator.indikator' => function ($query) use ($search) {
+            $data = Enumerator::with(['enumerator_indikator_status_pending.indikator' => function ($query) use ($search) {
                 $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
                 if ($search) {
                     $query->where('nama', 'like', '%' . $search . '%');
@@ -633,7 +633,7 @@ class DashboardController extends Controller
                 ->where('id', $enumerator_id)
                 ->get()
                 ->flatMap(function ($enumerator) {
-                    return $enumerator->pivot_enumerator_indikator
+                    return $enumerator->enumerator_indikator_status_pending
                         ->filter(function ($pivot) {
                             return $pivot->indikator !== null;
                         })

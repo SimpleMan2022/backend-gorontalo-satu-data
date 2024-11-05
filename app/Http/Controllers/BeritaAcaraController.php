@@ -20,7 +20,9 @@ class BeritaAcaraController extends Controller
         try {
             $perPage = $request->per_page ?? 10;
             $BeritaAcaraQuery = BeritaAcara::orderBy('created_at', 'desc');
-
+            if ($search = $request->query('search')) {
+                $BeritaAcaraQuery->where('nama', 'like', '%' . $search . '%');
+            }
             if ($opdKabupatenId = $request->query('opd_kabupaten_id')) {
                 $BeritaAcaraQuery->wehere('opd_kabupaten_id', $opdKabupatenId);
             }

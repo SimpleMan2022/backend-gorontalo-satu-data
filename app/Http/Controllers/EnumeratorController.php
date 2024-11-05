@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Resources\EnumeratorResource;
+use App\Http\Resources\{EnumeratorResource, EnumeratorMobileResource};
 use App\Http\Traits\ApiResponse;
 use App\Models\User;
 use Exception;
@@ -23,16 +23,53 @@ class EnumeratorController extends Controller
             $perPage = $request->per_page ?? 10;
             $enumeratorQuery = Enumerator::orderBy('created_at', 'desc');
 
+            if ($search = $request->query('search')) {
+                $enumeratorQuery->where(function ($query) use ($search) {
+                    $query->where('nama', 'like', '%' . $search . '%')
+                        ->orWhereHas('user', function ($query) use ($search) {
+                            $query->where('email', 'like', '%' . $search . '%')
+                                ->orWhere('username', 'like', '%' . $search . '%');
+                        });
+                });
+            }
+
             if ($userId = $request->query('user_id')) {
                 $enumeratorQuery->where('user_id', $userId);
             }
 
             $data = $enumeratorQuery->paginate($perPage);
 
-            if ($data->isNotEmpty()){
+            if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
                     EnumeratorResource::collection($data),
+                    'Data enumerator berhasil diambil',
+                    Response::HTTP_OK
+                );
+            } else {
+                return $this->errorResponse('Data enumerator masih kosong', Response::HTTP_NOT_FOUND);
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function byIndikatorMobile(Request $request)
+    {
+        try {
+            
+            $enumeratorQuery = Enumerator::orderBy('created_at', 'desc');
+
+            if ($userId = $request->query('user_id')) {
+                $enumeratorQuery->where('user_id', $userId);
+            }
+
+            $data = $enumeratorQuery->first();
+            
+
+            if ($data){
+                return $this->successResponseWithData(
+                    EnumeratorMobileResource::make($data),
                     'Data enumerator berhasil diambil',
                     Response::HTTP_OK
                 );
