@@ -53,7 +53,6 @@ class HasilDataController extends Controller
 
             $enumeratorId = collect($request->all())->pluck('enumerator_id')->first();
 
-            dd($enumeratorId);
 
             if($enumeratorId) {
                 $enumerator = Enumerator::where('id', $enumeratorId)
@@ -197,6 +196,9 @@ class HasilDataController extends Controller
                             $pivotEnumeratorIndikator->update([
                                 'status' => 'submit'
                             ]);
+                        }else {
+                            return $this->errorResponse('Terjadi Kesalahan di Pivot Enumerator Indikator', Response::HTTP_INTERNAL_SERVER_ERROR);
+
                         }
                         
                     }
