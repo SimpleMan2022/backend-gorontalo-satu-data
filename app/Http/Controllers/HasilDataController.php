@@ -70,9 +70,9 @@ class HasilDataController extends Controller
             try {
                 if ($enumerator['enumerator_level'] == 'provinsi') {
                     if (isset($enumerator['enumerator_provinsi'][0]['id'])) {
-                        $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['id'])->first();
+                        $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['opd_provinsi_id'])->first();
                         if(!$opd) {
-                            return $this->errorResponse('OPD Provinsi masih kosong', Response::HTTP_NOT_FOUND);
+                            return $this->errorResponse($enumerator, Response::HTTP_NOT_FOUND);
                         }
                         
                         $now = date('Y-m-d');
@@ -92,7 +92,7 @@ class HasilDataController extends Controller
                     }
                 } else {
                     if(isset($enumerator['enumerator_kabupaten'][0]['id'])) {
-                        $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['id'])->first();
+                        $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['opd_kabupaten_id'])->first();
 
                         if(!$opd) {
                             return $this->errorResponse('OPD Kabupaten masih kosong', Response::HTTP_NOT_FOUND);
