@@ -33,7 +33,8 @@ jobs:
             composer install --optimize-autoloader --no-dev &&
             echo '🗂️ Caching configuration and routes...' &&
             php artisan config:cache &&
-            php artisan route:cache
+            php artisan route:cache &&
+            php artisan optimize:clear
           "  # Ensure that this line ends without a comment
       - name: ✅ Deployment successful
         run: echo "✅ Deployment completed successfully!"
