@@ -53,6 +53,8 @@ class HasilDataController extends Controller
 
             $enumeratorId = collect($request->all())->pluck('enumerator_id')->first();
 
+            dd($enumeratorId);
+
             if($enumeratorId) {
                 $enumerator = Enumerator::where('id', $enumeratorId)
                     ->with('enumerator_kabupaten')
