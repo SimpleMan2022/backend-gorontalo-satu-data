@@ -169,6 +169,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('opd-kabupaten')->controller(OpdKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
+        Route::get("/set-permission/{id}", "setPermission");
         Route::get("/{id}", "show");
         Route::post("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");

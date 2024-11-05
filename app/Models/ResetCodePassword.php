@@ -18,4 +18,6 @@ class ResetCodePassword extends Model
         'token',
         'created_at',
     ];
+
+    public $timestamps = false;
 }
