@@ -131,6 +131,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('user-opd-provinsi')->controller(UserOpdProvinsiController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
+        Route::get("/get-user", "getUser");
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
@@ -142,6 +143,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('user-opd-kabupaten')->controller(UserOpdKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
+        Route::get("/get-user", "getUser");
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
