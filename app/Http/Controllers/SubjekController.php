@@ -8,6 +8,7 @@ use App\Models\{Subjek, PivotIndikatorSubjek};
 use App\Http\Traits\ApiResponse;
 use Exception;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Support\Facades\Validator;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
 
@@ -43,10 +44,21 @@ class SubjekController extends Controller
     public function multiStore(Request $request)
     {
         try {
-            $req = $request->validate([
+            $data = $request->json()->all();
+            $validator = Validator::make($data, [
                 '*.nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
                 '*.indikator_id' => 'required|integer|exists:indikator,id',  // Validasi setiap 'indikator_id' di dalam array sebagai integer dan harus ada di tabel 'indikators'
             ]);
+
+            if ($validator->fails()) {
+                return $this->errorResponseWithData($validator->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+            }
+
+            $req = $validator->validated();
+            // Validasi data
+            if (empty($data)) {
+                return $this->errorResponse('Data tidak boleh kosong', Response::HTTP_BAD_REQUEST);
+            }
 
             foreach ($req as $item) {
 
