@@ -151,6 +151,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Detail sektor berhasil diambil
@@ -491,6 +492,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Detail antar waktu berhasil diambil
@@ -753,6 +755,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
+
         - name: sektor_id
           in: query
           description: Filter berdasarkan ID sektor
@@ -1014,7 +1018,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
-  /indikator/edit{id}:
+  /indikator/edit/{id}:
     patch:
       tags:
         - Indikator
@@ -1053,65 +1057,6 @@ paths:
       responses:
         "200":
           description: Indikator berhasil diperbarui
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 200
-                  status:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "Data berhasil diubah"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BadRequestResponse"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnauthorizedResponse"
-        "404":
-          description: Data tidak ditemukan
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DataNotFoundResponse"
-  /indikator/{id}/status:
-    patch:
-      tags:
-        - Indikator
-      summary: Memperbarui status indikator berdasarkan ID
-      security:
-        - BearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: ID dari indikator yang akan diperbarui
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                status:
-                  type: string
-                  example: "public"
-      responses:
-        "200":
-          description: Stats indikator berhasil diubah
           content:
             application/json:
               schema:
@@ -1187,6 +1132,122 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
+  /indikator/update-status/{id}:
+    patch:
+      tags:
+        - Indikator
+      summary: Mengupdate status indikator
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari indikator yang akan diupdate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "public"
+      responses:
+        "200":
+          description: Status indikator berhasil diupdate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil diubah"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /indikator/multi-update-status:
+    patch:
+      tags:
+        - Indikator
+      summary: Mengupdate status beberapa indikator sekaligus
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  status:
+                    type: string
+                    example: "public"
+      responses:
+        "200":
+          description: Status indikator berhasil diupdate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil diubah"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /indikator/multi-delete:
     delete:
       tags:
@@ -1253,6 +1314,8 @@ paths:
           schema:
             type: integer
             example: 1
+        - $ref: "#/components/parameters/SearchParam"
+
       responses:
         "200":
           description: Berhasil mendapatkan daftar user opd provinsi
@@ -1613,6 +1676,10 @@ paths:
       summary: Mendapatkan semua daftar user opd kabupaten
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan daftar user opd kabupaten
@@ -2001,6 +2068,10 @@ paths:
       summary: Mendapatkan semua daftar opd provinsi
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan daftar OPD Provinsi
@@ -2029,6 +2100,15 @@ paths:
                         nama:
                           type: string
                           example: "Dinas Pendidikan"
+                        sektor:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Pendidikan"
                         logo:
                           type: string
                           example: "logo/mlEQBf5WMGN7Ac4dASPYBxdF4uiQw13jAeoyM5yI.webp"
@@ -2190,6 +2270,9 @@ paths:
             schema:
               type: object
               properties:
+                sektor_id:
+                  type: string
+                  example: "1,2,3"
                 nama:
                   type: string
                   example: "Kominfo Provinsi Gorontalo"
@@ -2338,6 +2421,17 @@ paths:
       summary: Mendapatkan semua daftar opd kabupaten
       security:
         - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
+        - name: opd_provinsi_id
+          in: query
+          description: Filter berdasarkan ID OPD Provinsi
+          required: false
+          schema:
+            type: integer
+            example: 1
       responses:
         "200":
           description: Berhasil mendapatkan daftar OPD Kabupaten
@@ -2729,6 +2823,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan data berita acara
@@ -3132,6 +3227,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan data periode
@@ -3488,6 +3584,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
+
         - in: query
           name: indikator_id
           schema:
@@ -3918,6 +4016,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan data subjek
@@ -4239,6 +4338,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator
@@ -4674,6 +4774,9 @@ paths:
                             status:
                               type: string
                               example: "pending"
+                        status:
+                          type: string
+                          example: "submit"
                         created_at:
                           type: string
                           format: date-time
@@ -5904,6 +6007,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
+
       responses:
         "200":
           description: Berhasil mendapatkan data sektor spasial
@@ -6237,6 +6342,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan data olahan spasial
@@ -7691,7 +7797,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmptyDataResponse"              
+                $ref: "#/components/schemas/EmptyDataResponse"
   /mobile/dashboard/enumerator/indikator:
     get:
       tags:
@@ -7735,7 +7841,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmptyDataResponse"              
+                $ref: "#/components/schemas/EmptyDataResponse"
 components:
   schemas:
     Pagination:
@@ -7845,6 +7951,14 @@ components:
         type: integer
         default: 10
         example: 10
+    SearchParam:
+      name: search
+      in: query
+      description: Pencarian data
+      required: false
+      schema:
+        type: string
+        example: "Pendidikan"
 
   securitySchemes:
     BearerAuth:

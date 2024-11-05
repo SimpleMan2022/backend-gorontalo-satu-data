@@ -21,6 +21,10 @@ class IndikatorController extends Controller
             $perPage = $request->per_page ?? 10;
             $indikatorQuery = Indikator::orderBy('created_at', 'desc');
 
+            $search = $request->query('search');
+            if ($search) {
+                $indikatorQuery->where('nama', 'like', '%' . $search . '%');
+            }
             if ($sektorId = $request->query('sektor_id')) {
                 $indikatorQuery->where('sektor_id', $sektorId);
             }
@@ -33,7 +37,7 @@ class IndikatorController extends Controller
                 $indikatorQuery->where('opd_provinsi_id', $opdProvinsiId);
             }
             $data = $indikatorQuery->paginate($perPage);
-            
+
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
@@ -137,7 +141,8 @@ class IndikatorController extends Controller
         }
     }
 
-    public function multiUpdate(Request $request) {
+    public function multiUpdate(Request $request)
+    {
         try {
             $validated = $request->validate([
                 '*.id' => 'required|integer|exists:indikator,id',

@@ -22,6 +22,9 @@ class SektorSpasialController extends Controller
             $per_page = $request->per_page ?? 10;
             $variabelQuery = SektorSpasial::orderBy('created_at', 'desc');
 
+            if ($search = $request->query('search')) {
+                $variabelQuery->where('nama', 'like', '%' . $search . '%');
+            }
             if ($sektorId = $request->query('sektor_id')) {
                 $variabelQuery->where('sektor_id', $sektorId);
             }

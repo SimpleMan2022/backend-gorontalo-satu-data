@@ -15,12 +15,27 @@ class AntarWaktuController extends Controller
 {
     use ApiResponse;
 
-    public function index()
+    public function index(Request $request)
     {
         try {
-            $data = AntarWaktu::select('id', 'tahun', 'nama')->orderBy('tahun', 'desc')->get();
+            $perPage = $request->per_page ?? 10;
+            $data = AntarWaktu::orderBy('created_at', 'desc');
+            $search = $request->query('search');
+            if ($search) {
+                $data = $data->where(function ($query) use ($search) {
+                    $query->where('nama', 'like', '%' . $search . '%')
+                        ->orWhere('tahun', 'like', '%' . $search . '%');
+                });
+            }
+
+            $data = $data->paginate($perPage);
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithData($data, 'success', Response::HTTP_OK);
+                return $this->successResponseWithDataIndex(
+                    $data,
+                    AntarWaktuResource::collection($data),
+                    'Data Antar Waktu berhasil diambil',
+                    Response::HTTP_OK
+                );
             } else {
                 return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
@@ -50,7 +65,6 @@ class AntarWaktuController extends Controller
         try {
             // Mencari data sektor dengan id
             $data = AntarWaktu::find($id);
-
             // Mengecek apabila terdapat data dengan id yang sama
             if ($data) {
                 return $this->successResponseWithData(

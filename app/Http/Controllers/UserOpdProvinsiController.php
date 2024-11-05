@@ -25,6 +25,10 @@ class UserOpdProvinsiController extends Controller
             $perPage = $request->per_page ?? 10;
             $UserOpdProvinsiQuery = UserOpdProvinsi::orderBy('created_at', 'desc');
 
+            $search = $request->query('search');
+            if ($search) {
+                $UserOpdProvinsiQuery->where('nama', 'like', '%' . $search . '%');
+            }
             if ($request->has('opd_provinsi_id')) {
                 $UserOpdProvinsiQuery->where('opd_provinsi_id', $request->opd_provinsi_id);
             }

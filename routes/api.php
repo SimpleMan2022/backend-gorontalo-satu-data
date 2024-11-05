@@ -75,13 +75,9 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('indikator')->controller(IndikatorController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
-        Route::get("/by-sektor/{sektor}", "bySektor");
-        Route::get("/by-antarwaktu/{antar_waktu}", "byAntarWaktu");
-        Route::get("/by-opd/{opd_provinsi}", "byOpdProvinsi");
         Route::get("/{id}", "show");
-        Route::get("/{id}", "show");
-        Route::patch("/updateStatus/{id}", "updateStatus");
-        Route::patch("/multiUpdate", "multiUpdate");
+        Route::patch("/update-status/{id}", "updateStatus");
+        Route::patch("/multi-update-status", "multiUpdate");
         Route::patch("/edit/{id}", "update");
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/multi-delete", "multiDestroy");

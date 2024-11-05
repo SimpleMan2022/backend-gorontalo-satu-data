@@ -22,6 +22,10 @@ class OlahanSpasialController extends Controller
 
             $olahanQuery = OlahanSpasial::orderBy('created_at', 'desc');
 
+            if ($search = $request->query('search')) {
+                $olahanQuery->where('judul', 'like', '%' . $search . '%');
+            }
+
             if ($opdProvId = $request->query('opd_provinsi_id')) {
                 $olahanQuery->where('opd_provinsi_id', $opdProvId);
             }
