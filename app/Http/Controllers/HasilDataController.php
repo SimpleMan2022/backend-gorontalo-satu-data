@@ -67,36 +67,52 @@ class HasilDataController extends Controller
             }
         
             try {
+                dd($enumerator);
                 if ($enumerator['enumerator_level'] == 'provinsi') {
-                    $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['id'])->first();
-                    
-                    $now = date('Y-m-d');
-                    
-                    $periode = Periode::where('tanggal_mulai', '<=', $now)
-                    ->where('tanggal_selesai', '>=', $now)
-                    ->where('opd_provinsi_id', $opd->id)
-                    ->first();
-    
-                    if($periode) {
-                        $nama_rekap = $enumerator->nama . ' - ' . $opd->nama . ' (Provinsi) ' . ' - ' . $periode->nama;
+                    if (isset($enumerator['enumerator_provinsi'][0]['id'])) {
+                        $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['id'])->first();
+                        if(!$opd) {
+                            return $this->errorResponse('OPD Provinsi masih kosong', Response::HTTP_NOT_FOUND);
+                        }
+                        
+                        $now = date('Y-m-d');
+                        
+                        $periode = Periode::where('tanggal_mulai', '<=', $now)
+                        ->where('tanggal_selesai', '>=', $now)
+                        ->where('opd_provinsi_id', $opd->id)
+                        ->first();
+        
+                        if($periode) {
+                            $nama_rekap = $enumerator->nama . ' - ' . $opd->nama . ' (Provinsi) ' . ' - ' . $periode->nama;
+                        }else {
+                            return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
+                        }
                     }else {
-                        return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
+                        return $this->errorResponse('Enumerator provinsi tidak valid', Response::HTTP_NOT_FOUND);
                     }
                 } else {
-                    $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['id'])->first();
-    
-                    $opd_provinsi = OpdProvinsi::where('id', $opd->opd_provinsi_id)->first();
-    
-                    $now = date('Y-m-d');
-                    $periode = Periode::where('tanggal_mulai', '<=', $now)
-                        ->where('tanggal_selesai', '>=', $now)
-                        ->where('opd_provinsi_id', $opd_provinsi->id)
-                        ->first();
-                        
-                    if($periode) {
-                        $nama_rekap = $enumerator->nama . ' - ' . $opd->nama .  ' - ' . $periode->nama;
+                    if(isset($enumerator['enumerator_kabupaten'][0]['id'])) {
+                        $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['id'])->first();
+
+                        if(!$opd) {
+                            return $this->errorResponse('OPD Kabupaten masih kosong', Response::HTTP_NOT_FOUND);
+                        }
+        
+                        $opd_provinsi = OpdProvinsi::where('id', $opd->opd_provinsi_id)->first();
+        
+                        $now = date('Y-m-d');
+                        $periode = Periode::where('tanggal_mulai', '<=', $now)
+                            ->where('tanggal_selesai', '>=', $now)
+                            ->where('opd_provinsi_id', $opd_provinsi->id)
+                            ->first();
+                            
+                        if($periode) {
+                            $nama_rekap = $enumerator->nama . ' - ' . $opd->nama .  ' - ' . $periode->nama;
+                        }else {
+                            return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
+                        }
                     }else {
-                        return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
+                        return $this->errorResponse('Enumerator kabupaten tidak valid', Response::HTTP_NOT_FOUND);
                     }
                 }
                 
