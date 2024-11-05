@@ -111,6 +111,64 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedResponse"
+  /auth/login-enumerator:
+    post:
+      tags:
+        - Authentication
+      summary: Melakukan autentikasi enumerator
+      description: API untuk mendapatkan token autentikasi enumerator
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "farel"
+                password:
+                  type: string
+                  example: "12345678"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Login berhasil"
+                  data:
+                    type: object
+                    properties:
+                      token_type:
+                        type: string
+                        example: "Bearer"
+                      token:
+                        type: string
+                        example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+
   /auth/logout:
     post:
       tags:
@@ -7761,9 +7819,16 @@ paths:
       summary: Mendapatkan semua data enumerator view
       security:
         - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enumerator_id:
+                  type: integer
+                  example: 1
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator view
@@ -7772,20 +7837,33 @@ paths:
               schema:
                 type: object
                 properties:
-                  opd:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
                     type: string
-                    example: "Dinas Kesehatan"
-                  terinput:
-                    type: integer
-                    example: 0
-                  diverifikasi:
-                    type: integer
-                    example: 0
-                  ditolak:
-                    type: integer
-                    example: 0
-                  menunggu:
-                    $ref: "#/components/schemas/Pagination"
+                    example: Data enumerator berhasil diambil
+                  data:
+                    type: object
+                    properties:
+                      opd:
+                        type: string
+                        example: "Dinas Kesehatan"
+                      terinput:
+                        type: integer
+                        example: 8
+                      diverifikasi:
+                        type: integer
+                        example: 5
+                      ditolak:
+                        type: integer
+                        example: 2
+                      menunggu:
+                        type: integer
+                        example: 1
         "401":
           description: Unauthorized
           content:
@@ -7808,6 +7886,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator indikator
@@ -7824,10 +7903,35 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "success"
+                    example: "Data enumerator indikator berhasil diambil"
                   data:
                     type: array
-                    example: []
+                    items:
+                      type: object
+                      properties:
+                        nama_sektor:
+                          type: string
+                          example: "Kemiskinan"
+                        indikator_id:
+                          type: integer
+                          example: 1
+                        nama_indikator:
+                          type: string
+                          example: "Jumlah Penduduk Miskin"
+                        nama_opd:
+                          type: string
+                          example: "Dinas Kesehatan"
+                        logo_opd:
+                          type: string
+                          example: "logo-opd.png"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
                   pagination:
                     $ref: "#/components/schemas/Pagination"
         "401":
