@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{HasilData, Variabel, RekapHasil, Periode, Enumerator, OpdProvinsi, OpdKabupaten};
+use App\Models\{HasilData, Variabel, RekapHasil, Periode, Enumerator, OpdProvinsi, OpdKabupaten, PivotEnumeratorIndikator};
 use App\Http\Resources\RekapHasilResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
@@ -84,10 +84,30 @@ class RekapHasilController extends Controller
                 'status' => 'required|in:v2,v3,tolak,terima,revisi',
             ]);
 
+            $indikator = RekapHasil::join('hasil_data', 'rekap_hasil.id', '=', 'hasil_data.rekap_hasil_id')
+                ->join('variabel', 'variabel.id', '=', 'hasil_data.variabel_id')
+                ->select('rekap_hasil.*', DB::raw('MAX(variabel.indikator_id) as indikator_id'))
+                ->groupBy('rekap_hasil.id')
+                ->where('rekap_hasil.id', $id)
+                ->first();
+
             $rekapHasil = RekapHasil::findOrFail($id);
+            if ($request->status == 'revisi' || $request->status == 'tolak') {
+                $pivot = PivotEnumeratorIndikator::where('enumerator_id', $rekapHasil->enumerator_id)
+                    ->where('indikator_id', $indikator->indikator_id) // Fix incorrect property access
+                    ->first();
+
+                if ($pivot) {
+                    $pivot->update([
+                        'status' => 'pending'
+                    ]);
+                }
+            }
+
             $rekapHasil->update($validated);
 
             return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
+
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {

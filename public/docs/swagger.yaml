@@ -4716,6 +4716,9 @@ paths:
                             status:
                               type: string
                               example: "pending"
+                        status:
+                          type: string
+                          example: "submit"
                         created_at:
                           type: string
                           format: date-time
@@ -7277,94 +7280,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"
-  dashboard/mobile/enumerator:
-    get:
-      tags:
-        - Dashboard
-      summary: Mendapatkan semua data enumerator view
-      security:
-        - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
-      responses:
-        "200":
-          description: Berhasil mendapatkan data enumerator view
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  opd:
-                    type: string
-                    example: "Dinas Kesehatan"
-                  terinput:
-                    type: integer
-                    example: 0
-                  diverifikasi:
-                    type: integer
-                    example: 0
-                  ditolak:
-                    type: integer
-                    example: 0
-                  menunggu:
-                    $ref: "#/components/schemas/Pagination"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnauthorizedResponse"
-        "404":
-          description: Data masih kosong
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EmptyDataResponse"
-  /dashboard/mobile/enumerator/indikator:
-    get:
-      tags:
-        - Dashboard
-      summary: Mendapatkan semua data enumerator indikator
-      security:
-        - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
-      responses:
-        "200":
-          description: Berhasil mendapatkan data enumerator indikator
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: integer
-                    example: 200
-                  status:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "success"
-                  data:
-                    type: array
-                    example: []
-                  pagination:
-                    $ref: "#/components/schemas/Pagination"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnauthorizedResponse"
-        "404":
-          description: Data masih kosong
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/EmptyDataResponse"
   /hasil-spasial:
     get:
       tags:
@@ -7778,6 +7693,94 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiDataNotFoundResponse"
+  /mobile/dashboard/enumerator:
+    get:
+      tags:
+        - Mobile
+      summary: Mendapatkan semua data enumerator view
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data enumerator view
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opd:
+                    type: string
+                    example: "Dinas Kesehatan"
+                  terinput:
+                    type: integer
+                    example: 0
+                  diverifikasi:
+                    type: integer
+                    example: 0
+                  ditolak:
+                    type: integer
+                    example: 0
+                  menunggu:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /mobile/dashboard/enumerator/indikator:
+    get:
+      tags:
+        - Mobile
+      summary: Mendapatkan semua data enumerator indikator
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data enumerator indikator
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "success"
+                  data:
+                    type: array
+                    example: []
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
 components:
   schemas:
     Pagination:
