@@ -11,18 +11,15 @@ class OpdKabupaten extends Model
     protected $guarded = [];
     protected $table = 'opd_kabupaten';
 
-    public function user_opd_kabupaten()
-    {
+    public function user_opd_kabupaten() {
         return $this->hasMany(UserOpdKabupaten::class);
     }
 
-    public function opd_provinsi()
-    {
+    public function opd_provinsi() {
         return $this->belongsTo(OpdProvinsi::class);
     }
 
-    public function kabupaten()
-    {
+    public function kabupaten() {
         return $this->belongsTo(Kabupaten::class);
     }
 }
