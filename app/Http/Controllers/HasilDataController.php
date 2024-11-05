@@ -50,8 +50,9 @@ class HasilDataController extends Controller
     public function store(Request $request)
     {
         try {
+            $data = $request->json()->all();
 
-            $enumeratorId = collect($request->all())->pluck('enumerator_id')->first();
+            $enumeratorId = collect($data)->pluck('enumerator_id')->first();
 
 
             if($enumeratorId) {
@@ -67,7 +68,6 @@ class HasilDataController extends Controller
             }
         
             try {
-                dd($enumerator);
                 if ($enumerator['enumerator_level'] == 'provinsi') {
                     if (isset($enumerator['enumerator_provinsi'][0]['id'])) {
                         $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['id'])->first();
