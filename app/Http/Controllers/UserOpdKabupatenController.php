@@ -53,6 +53,24 @@ class UserOpdKabupatenController extends Controller
         }
     }
 
+    public function getUser(Request $request) {
+        try {
+            $data = UserOpdKabupaten::where('user_id', $request->user_id)->first();
+
+            if($data){
+                return $this->successResponseWithData(
+                    UserOpdKabupatenResource::make($data),
+                    'Data user OPD Provinsi berhasil diambil',
+                    Response::HTTP_OK
+                );
+            }else {
+                return $this->errorResponse('Data user OPD Provinsi tidak ditemukan', Response::HTTP_NOT_FOUND);
+            }
+        }catch(Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function store(Request $request)
     {
         try {
