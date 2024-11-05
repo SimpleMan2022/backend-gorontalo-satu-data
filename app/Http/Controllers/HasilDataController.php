@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\{HasilData, Variabel, RekapHasil, Periode, Enumerator, OpdProvinsi, OpdKabupaten, PivotEnumeratorIndikator};
 use App\Http\Resources\HasilDataResource;
 use App\Http\Traits\ApiResponse;
+use Illuminate\Support\Facades\Validator;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
@@ -128,10 +129,17 @@ class HasilDataController extends Controller
                 }
     
                 try {
-                    $req = $request->validate([
+                    $val = $request->json()->all();
+                    $validator = Validator::make($val, [
                         '*.variabel_id' => 'required|integer|exists:variabel,id',  // Validasi setiap 'variabel_id' di dalam array sebagai integer dan harus ada di tabel 'variabel'
                         '*.konten' => 'required',  // Validasi setiap 'konten' di dalam array sebagai string
                     ]);
+
+                    if ($validator->fails()) {
+                        return $this->errorResponseWithData($validator->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+                    }
+        
+                    $req = $validator->validated();
         
                     foreach ($req as $item) {
         
