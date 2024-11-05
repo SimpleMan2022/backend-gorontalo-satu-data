@@ -1018,7 +1018,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
-  /indikator/edit{id}:
+  /indikator/edit/{id}:
     patch:
       tags:
         - Indikator
@@ -1057,65 +1057,6 @@ paths:
       responses:
         "200":
           description: Indikator berhasil diperbarui
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  code:
-                    type: number
-                    example: 200
-                  status:
-                    type: boolean
-                    example: true
-                  message:
-                    type: string
-                    example: "Data berhasil diubah"
-        "400":
-          description: Bad Request
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/BadRequestResponse"
-        "401":
-          description: Unauthorized
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/UnauthorizedResponse"
-        "404":
-          description: Data tidak ditemukan
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/DataNotFoundResponse"
-  /indikator/{id}/status:
-    patch:
-      tags:
-        - Indikator
-      summary: Memperbarui status indikator berdasarkan ID
-      security:
-        - BearerAuth: []
-      parameters:
-        - in: path
-          name: id
-          required: true
-          schema:
-            type: integer
-          description: ID dari indikator yang akan diperbarui
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                status:
-                  type: string
-                  example: "public"
-      responses:
-        "200":
-          description: Stats indikator berhasil diubah
           content:
             application/json:
               schema:
@@ -1191,6 +1132,122 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
+  /indikator/update-status/{id}:
+    patch:
+      tags:
+        - Indikator
+      summary: Mengupdate status indikator
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari indikator yang akan diupdate
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: "public"
+      responses:
+        "200":
+          description: Status indikator berhasil diupdate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil diubah"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /indikator/multi-update-status:
+    patch:
+      tags:
+        - Indikator
+      summary: Mengupdate status beberapa indikator sekaligus
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                    example: 1
+                  status:
+                    type: string
+                    example: "public"
+      responses:
+        "200":
+          description: Status indikator berhasil diupdate
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil diubah"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /indikator/multi-delete:
     delete:
       tags:
@@ -4281,6 +4338,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator
@@ -5949,6 +6007,8 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
+
       responses:
         "200":
           description: Berhasil mendapatkan data sektor spasial
@@ -6282,6 +6342,7 @@ paths:
       parameters:
         - $ref: "#/components/parameters/PageParam"
         - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
           description: Berhasil mendapatkan data olahan spasial
