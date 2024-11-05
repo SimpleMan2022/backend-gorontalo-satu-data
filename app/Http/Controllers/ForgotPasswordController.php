@@ -9,11 +9,12 @@ use App\Http\Traits\ApiResponse;
 use Illuminate\Support\Facades\DB;
 use App\Mail\SendCodeResetPassword;
 use Exception;
-use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\ValidationException;
+use App\Models\{User, ResetCodePassword};
+use Symfony\Component\HttpFoundation\Response;
 
 class ForgotPasswordController extends Controller
 {
@@ -27,42 +28,37 @@ class ForgotPasswordController extends Controller
                 'email' => 'required|email|exists:users,email',
             ]);
 
-            // Mengirim link reset password
-            // $status = Password::sendResetLink(
-            //     $request->only('email')
-            // );
-
             // Buat token plain text
             $token = Str::random(60);
 
-            // Hapus token lama jika ada
-            DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+            $user = User::where('email', $request->email)->first();
 
-            // Simpan token yang di-hash ke tabel password_resets
-            $status = DB::table('password_reset_tokens')->insert([
-                'email' => $request->email,
-                'token' => Hash::make($token), // Hash token sebelum menyimpannya ke database
-                'created_at' => Carbon::now(),
-            ]);
-
-            if ($status) {
-                $tokenData = DB::table('password_reset_tokens')
-                    ->where('email', $request->email)
-                    ->first();
-
-                // Jika token ditemukan, kirimkan email kustom
-                if ($tokenData) {
-                    Mail::to($request->email)->send(new SendCodeResetPassword($tokenData));
-                    return response()->json(['message' => $tokenData], 200);
+            if($user){
+                // Hapus token lama jika ada
+                DB::table('password_reset_tokens')->where('email', $request->email)->delete();
+        
+                // Simpan token yang di-hash ke tabel password_resets
+                $status = ResetCodePassword::create([
+                    'email' => $request->email,
+                    'token' => $token, // Hash token sebelum menyimpannya ke database
+                    'created_at' => Carbon::now(),
+                ]);    
+                if ($status) {
+                    Mail::to($request->email)->send(new SendCodeResetPassword($status));
+                    return $this->successResponse(
+                        'Email reset password telah dikirim',
+                        Response::HTTP_OK
+                    );
+                    
                 }
+        
+                throw ValidationException::withMessages([
+                    'email' => [trans($status)],
+                ]);
+            }else {
+                return $this->errorResponse('Email tidak ditemukan', Response::HTTP_BAD_REQUEST);
             }
-
-            throw ValidationException::withMessages([
-                'email' => [trans($status)],
-            ]);
-        } catch (ValidationException $e) {
-            return $this->errorResponseWithData($e->errors(), 'Gagal mengirimkan email reset password', Response::HTTP_BAD_REQUEST);
-        } catch (Exception $e) {
+        }catch(Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -70,28 +66,35 @@ class ForgotPasswordController extends Controller
     // Mengatur ulang password
     public function resetPassword(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email',
-            'token' => 'required',
-            'password' => 'required|min:8|confirmed',
-        ]);
+        try{
+            $request->validate([
+                'email' => 'required|email',
+                'token' => 'required',
+                'password' => 'required|min:8|confirmed',
+            ]);
 
-        // Proses reset password
-        $status = Password::reset(
-            $request->only('email', 'password', 'password_confirmation', 'token'),
-            function ($user, $password) {
-                $user->forceFill([
-                    'password' => Hash::make($password),
-                ])->save();
+            $user = User::whereEmail($request->email)->first();
+            if (!$user) {
+                return $this->errorResponse('Email tidak ditemukan', Response::HTTP_BAD_REQUEST);
             }
-        );
-
-        if ($status === Password::PASSWORD_RESET) {
-            return response()->json(['message' => __($status)], 200);
+            $status = $user->update([
+                'password' => $request->password,
+            ]);
+    
+            if ($status) {
+                // return response()->json(['message' => __($status)], 200);
+                return $this->successResponseWithData(
+                    $status,
+                    'Password berhasil diubah',
+                    Response::HTTP_OK
+                );
+            }
+    
+            throw ValidationException::withMessages([
+                'email' => [trans($status)],
+            ]);
+        }catch(Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
-
-        throw ValidationException::withMessages([
-            'email' => [trans($status)],
-        ]);
     }
 }
