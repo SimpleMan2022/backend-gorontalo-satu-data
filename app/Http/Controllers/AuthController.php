@@ -100,7 +100,7 @@ class AuthController extends Controller
     if ($roleName === 'opd_provinsi') {
       $opd = $request->user()->user_opd_provinsi->first()->opd_provinsi;
     } elseif ($roleName === 'opd_kabupaten') {
-      $opd = $request->user()->enumerator_kabupaten->first()->opd_kabupaten;
+      $opd = $request->user()->user_opd_kabupaten->first()->opd_kabupaten;
     }
 
     $responseData = [
