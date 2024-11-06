@@ -1353,7 +1353,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiDataNotFoundResponse"
-
   paths:
   /user-opd-provinsi:
     get:
@@ -1373,7 +1372,6 @@ paths:
             type: integer
             example: 1
         - $ref: "#/components/parameters/SearchParam"
-
       responses:
         "200":
           description: Berhasil mendapatkan daftar user opd provinsi
@@ -1493,6 +1491,98 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedResponse"
+  /user-opd-provinsi/get-user:
+    get:
+      tags:
+        - User OPD Provinsi
+      summary: Mendapatkan detail get user opd provinsi
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: opd_provinsi_id
+          in: query
+          description: Filter berdasarkan ID get user
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - $ref: "#/components/parameters/SearchParam"
+      responses:
+        '200':
+          description: Data pengguna berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data pengguna berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 49
+                      username:
+                        type: string
+                        example: "estes"
+                      email:
+                        type: string
+                        example: "estes@gmail.com"
+                      role:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 3
+                          name:
+                            type: string
+                            example: "opd_kabupaten"
+                          permissions:
+                            type: array
+                            items:
+                              type: string
+                            example: ["view_hasildata", "view_indikator", "view_subjek", "view_variabel", "kelola_user_opd_kabupaten", "kelola_opd_kabupaten", "verifikasi_enumerator_indikator", "kelola_enumerator", "kelola_berita_acara", "verifikasi_kabupaten"]
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+                        example: []
+                      opd:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 17
+                          tingkat:
+                            type: string
+                            example: "opd_kabupaten"
+                          nama:
+                            type: string
+                            example: "test" 
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data user opd provinsi masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"                                                      
   /user-opd-provinsi/{id}:
     get:
       tags:
@@ -1968,6 +2058,91 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
+  /user-opd-kabupaten/get-user:
+    get:
+      tags:
+        - User OPD Kabupaten
+      summary: Mendapatkan daftar get user opd kabupaten
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
+      responses:
+        '200':
+          description: Data pengguna berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data pengguna berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 47
+                      username:
+                        type: string
+                        example: "alucardvangobel"
+                      email:
+                        type: string
+                        example: "alucard@gmail.com"
+                      role:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          name:
+                            type: string
+                            example: "opd_provinsi"
+                          permissions:
+                            type: array
+                            items:
+                              type: string
+                            example: ["kelola_user_opd_kabupaten", "kelola_opd_kabupaten", "kelola_indikator", "kelola_subjek", "kelola_variabel", "kelola_periode", "kelola_artikel", "view_sektor", "verifikasi_subjek_indikator", "verifikasi_enumerator_indikator", "kelola_enumerator", "verifikasi_provinsi"]
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+                        example: []
+                      opd:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 5
+                          tingkat:
+                            type: string
+                            example: "opd_provinsi"
+                          nama:
+                            type: string
+                            example: "Dinas pendidikan"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data user opd provinsi masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"                        
   /user-opd-kabupaten/edit/{id}:
     patch:
       tags:
@@ -3777,7 +3952,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedResponse"
-
   /variabel/{id}:
     get:
       tags:
@@ -4230,6 +4404,58 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedResponse"
+  /subjek/edit/{id}:
+    patch:
+      tags:
+        - Subjek
+      summary: Memperbarui subjek yang ada
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nama:
+                  type: string
+                  example: "menurut usia 1-5 tahun"
+      responses:
+        "200":
+          description: opd kabupaten berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /subjek/{id}:
     get:
       tags:
@@ -7114,9 +7340,16 @@ paths:
       summary: Mendapatkan semua data opd provinsi view
       security:
         - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                opd_provinsi_id:
+                  type: integer
+                  example: 4
       responses:
         "200":
           description: Berhasil mendapatkan data opd provinsi view
@@ -7158,9 +7391,16 @@ paths:
       summary: Mendapatkan semua data chart donut opd provinsi
       security:
         - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                opd_provinsi_id:
+                  type: integer
+                  example: 4
       responses:
         "200":
           description: Berhasil mendapatkan data opd provinsi chart donut
@@ -7216,9 +7456,16 @@ paths:
       summary: Mendapatkan semua data chart bar opd provinsi
       security:
         - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                opd_provnsi_id:
+                  type: integer
+                  example: 4
       responses:
         "200":
           description: Berhasil mendapatkan data opd provinsi chart bar
@@ -7253,16 +7500,23 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"
-  dashboard/opd-kabupaten:
+  /dashboard/opd-kabupaten:
     get:
       tags:
         - Dashboard
       summary: Mendapatkan semua data opd kabupaten view
       security:
         - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                opd_kabupaten_id:
+                  type: integer
+                  example: 4
       responses:
         "200":
           description: Berhasil mendapatkan data opd kabupaten view
@@ -7304,9 +7558,16 @@ paths:
       summary: Mendapatkan semua data chart donut opd kabupaten
       security:
         - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                opd_kabupaten_id:
+                  type: integer
+                  example: 4
       responses:
         "200":
           description: Berhasil mendapatkan data opd kabupaten chart donut
@@ -7362,9 +7623,16 @@ paths:
       summary: Mendapatkan semua data chart bar opd kabupaten
       security:
         - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                opd_kabupaten_id:
+                  type: integer
+                  example: 4
       responses:
         "200":
           description: Berhasil mendapatkan data opd kabupaten chart bar
@@ -7884,9 +8152,17 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
         - $ref: "#/components/parameters/SearchParam"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enumerator_id:
+                  type: integer
+                  example: 1
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator indikator
@@ -7945,7 +8221,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmptyDataResponse"
+                $ref: "#/components/schemas/EmptyDataResponse"              
 components:
   schemas:
     Pagination:
