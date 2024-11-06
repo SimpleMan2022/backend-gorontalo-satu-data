@@ -46,4 +46,14 @@ class User extends Authenticatable
             'password' => 'hashed',
         ];
     }
+
+    public function user_opd_kabupaten()
+    {
+        return $this->hasOne(UserOpdKabupaten::class);
+    }
+
+    public function user_opd_provinsi()
+    {
+        return $this->hasOne(UserOpdProvinsi::class);
+    }
 }
