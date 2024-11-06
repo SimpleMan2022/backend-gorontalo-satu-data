@@ -8,6 +8,8 @@ use App\Models\Enumerator;
 use App\Models\EnumeratorKabupaten;
 use App\Models\EnumeratorProvinsi;
 use App\Models\RekapHasil;
+use App\Models\Variabel;
+use App\Models\Indikator;
 use Exception;
 use Illuminate\Http\Response;
 
@@ -99,7 +101,22 @@ class MobileController extends Controller
     }
 
 
+    public function variabelByIndikator(Request $request, $indikator) {
+        try {
+            $data = Variabel::where('indikator_id', $indikator)
+                ->select('id', 'indikator_id', 'nama', 'order', 'tipe')
+                ->orderBy('order', 'asc')
+                ->get();
 
+            return $this->successResponseWithData(
+                $data,
+                'Data Variabel berhasil diambil',
+                Response::HTTP_OK
+            );
+        }catch(Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     public function EnumeratorIndikator(Request $request)
     {
