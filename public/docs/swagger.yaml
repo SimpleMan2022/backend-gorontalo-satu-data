@@ -3500,6 +3500,9 @@ paths:
                         opd_provinsi_id:
                           type: object
                           properties:
+                            id: 
+                              type: integer
+                              example: 1
                             nama:
                               type: string
                               example: "Dinas Komunikasi dan Informatika"
@@ -3621,9 +3624,12 @@ paths:
                     type: string
                     format: date
                     example: "2024-01-12"
-                  opd_provinsi_id:
+                  opd_provinsi:
                     type: object
                     properties:
+                      id: 
+                        type: integer
+                        example: 1
                       nama:
                         type: string
                         example: "Dinas Komunikasi dan Informatika"

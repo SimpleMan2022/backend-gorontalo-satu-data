@@ -19,7 +19,7 @@ class PeriodeResource extends JsonResource
             'nama' => $this->nama,
             'tanggal_mulai' => $this->tanggal_mulai,
             'tanggal_selesai' => $this->tanggal_selesai,
-            'opd_provinsi_id' => $this->opd_provinsi->only('nama', 'lokasi'),
+            'opd_provinsi' => $this->opd_provinsi->only('id','nama', 'lokasi'),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

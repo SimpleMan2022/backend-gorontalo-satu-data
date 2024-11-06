@@ -19,42 +19,82 @@ class RekapHasilController extends Controller
     use ApiResponse;
 
     public function index(Request $request)
-    {
-        try {
-            $perPage = $request->per_page ?? 10;
+{
+    try {
+        $hasilQuery = RekapHasil::with(['hasil_data.variabel.indikator', 'enumerator', 'periode.opd_provinsi'])
+            ->orderBy('created_at', 'desc');
 
-            $hasilQuery = RekapHasil::orderBy('created_at', 'desc');
-
-            if ($enumeratorId = $request->query('enumerator_id')) {
-                $hasilQuery->where('enumerator_id', $enumeratorId);
-            }
-
-            if ($periodeId = $request->query('periode_id')) {
-                $hasilQuery->where('periode_id', $periodeId);
-            }
-            if ($indikatorId = $request->query('indikator_id')) {
-                $hasilQuery->join('hasil_data', 'hasil_data.rekap_hasil_id', '=', 'rekap_hasil.id')
-                ->join('variabel','variabel.id', '=', 'hasil_data.variabel_id')
-                ->select('rekap_hasil.*', DB::raw('MAX(variabel.indikator_id) as indikator_id'))
-                ->where('indikator_id', $indikatorId)
-                ->groupBy('rekap_hasil.id');
-            }
-
-            $data = $hasilQuery->paginate($perPage);
-            if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex(
-                    $data,
-                    RekapHasilResource::collection($data),
-                    'Data Hasil berhasil diambil',
-                    Response::HTTP_OK
-                );
-            } else {
-                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
-            }
-        } catch (Exception $e) {
-            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        if ($enumeratorId = $request->query('enumerator_id')) {
+            $hasilQuery->where('enumerator_id', $enumeratorId);
         }
+
+        if ($periodeId = $request->query('periode_id')) {
+            $hasilQuery->where('periode_id', $periodeId);
+        }
+
+        if ($indikatorId = $request->query('indikator_id')) {
+            $hasilQuery->whereHas('hasil_data.variabel', function ($query) use ($indikatorId) {
+                $query->where('indikator_id', $indikatorId);
+            });
+        }
+
+        $data = $hasilQuery->first();
+
+        if ($data) {
+            $formattedData = [
+                'id' => $data->id,
+                'nama' => $data->nama,
+                'nama_opd' => $data->periode->opd_provinsi->nama,
+                'nama_indikator' => $data->hasil_data->first()->variabel->indikator->nama,
+                'enumerator' => [
+                    'id' => $data->enumerator->id,
+                    'nama' => $data->enumerator->nama,
+                    'jabatan' => $data->enumerator->jabatan,
+                    'enumerator_level' => $data->enumerator->enumerator_level,
+                ],
+                'periode' => [
+                    'id' => $data->periode->id,
+                    'nama' => $data->periode->nama,
+                    'tanggal_mulai' => $data->periode->tanggal_mulai,
+                    'tanggal_selesai' => $data->periode->tanggal_selesai,
+                ],
+                'variabel' => $data->hasil_data->map(function ($hasil) {
+                    return [
+                        'id' => $hasil->variabel->id,
+                        'nama' => $hasil->variabel->nama,
+                        'tipe' => $hasil->variabel->tipe,
+                    ];
+                }),
+                'hasil_data' => $data->hasil_data->groupBy('variabel.indikator.id')->map(function ($groupedData) {
+                    return $groupedData->chunk(2)->map(function ($chunk) {
+                        return $chunk->map(function ($hasil) {
+                            return [
+                                'hasil_data_id' => $hasil->id,
+                                'tipe' => $hasil->variabel->tipe,
+                                'konten' => $hasil->konten,
+                            ];
+                        });
+                    });
+                })->flatten(1)->values(),
+                'status' => $data->status,
+                'created_at' => $data->created_at,
+                'updated_at' => $data->updated_at,
+            ];
+
+            return $this->successResponseWithData(
+                $formattedData,
+                'Rekap hasil berhasil diambil',
+                Response::HTTP_OK
+            );
+        } else {
+            return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
+        }
+    } catch (Exception $e) {
+        return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
+
+
 
     public function show(string $id)
     {
@@ -78,7 +118,8 @@ class RekapHasilController extends Controller
         }
     }
 
-    public function update(Request $request, $id) {
+    public function update(Request $request, $id)
+    {
         try {
             $validated = $request->validate([
                 'status' => 'required|in:v2,v3,tolak,terima,revisi',
@@ -107,7 +148,6 @@ class RekapHasilController extends Controller
             $rekapHasil->update($validated);
 
             return $this->successResponse('Data berhasil diubah', Response::HTTP_CREATED);
-
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         } catch (ValidationException $e) {
@@ -118,7 +158,8 @@ class RekapHasilController extends Controller
     }
 
 
-    public function multiUpdate(Request $request) {
+    public function multiUpdate(Request $request)
+    {
         try {
             $validated = $request->validate([
                 '*.id' => 'required|integer|exists:rekap_hasil,id',
