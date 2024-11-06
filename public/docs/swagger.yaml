@@ -8086,6 +8086,60 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiDataNotFoundResponse"
+  /mobile/profile:
+    get:
+      tags:
+        - Mobile
+      summary: Mendapatkan data profile user
+      security:
+        - BearerAuth: []
+      responses:
+        "200":
+          description: Berhasil mendapatkan data profile user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data profile user berhasil diambil
+                  data:
+                    type: object
+                    properties:
+                      user_id:
+                        type: integer
+                        example: 1
+                      username:
+                        type: string
+                        example: "John Doe"
+                      email:
+                        type: string
+                        example: "tes@example.com"
+                      enumerator:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nama:
+                            type: string
+                            example: "John Doe"
+                          jabatan:
+                            type: string
+                            example: "Operator"
+                          enumerator_level:
+                            type: string
+                            example: "Provinsi"
+                          nama_opd:
+                            type: string
+                            example: "Dinas Kesehatan"
   /mobile/dashboard/enumerator:
     get:
       tags:
@@ -8093,16 +8147,13 @@ paths:
       summary: Mendapatkan semua data enumerator view
       security:
         - BearerAuth: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                enumerator_id:
-                  type: integer
-                  example: 1
+      parameters:
+        - name: enumerator_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator view
@@ -8159,16 +8210,12 @@ paths:
         - BearerAuth: []
       parameters:
         - $ref: "#/components/parameters/SearchParam"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                enumerator_id:
-                  type: integer
-                  example: 1
+        - name: enumerator_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator indikator
@@ -8214,8 +8261,6 @@ paths:
                           type: string
                           format: date-time
                           example: "2024-10-13T00:33:23.000000Z"
-                  pagination:
-                    $ref: "#/components/schemas/Pagination"
         "401":
           description: Unauthorized
           content:

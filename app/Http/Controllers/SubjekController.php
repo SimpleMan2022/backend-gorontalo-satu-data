@@ -82,7 +82,7 @@ class SubjekController extends Controller
 
             return $this->successResponse(
                 'Data subjek berhasil dibuat',
-                Response::HTTP_OK
+                Response::HTTP_CREATED
             );
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
@@ -109,7 +109,7 @@ class SubjekController extends Controller
 
                 return $this->successResponse(
                     'Data subjek berhasil dibuat',
-                    Response::HTTP_OK
+                    Response::HTTP_CREATED
                 );
             } else {
                 return $this->errorResponse(
