@@ -107,11 +107,6 @@ class AuthController extends Controller
       'id' => $request->user()->id,
       'username' => $request->user()->username,
       'email' => $request->user()->email,
-      'opd' => [
-        'id' => $opd->id,
-        'tingkat' => $request->user()->roles->first()->name,
-        'nama' => $opd->nama,
-      ],
       'role' => [
         'id' => $request->user()->roles->first()->id,
         'name' => $request->user()->roles->first()->name,
@@ -120,13 +115,6 @@ class AuthController extends Controller
       'permissions' => $request->user()->permissions->pluck('name') ?? '-'
     ];
 
-    if ($roleName !== 'admin') {
-      $responseData['opd'] = [
-        'id' => $opd->id,
-        'tingkat' => $roleName,
-        'nama' => $opd->nama,
-      ];
-    }
     if ($roleName !== 'admin') {
       $responseData['opd'] = [
         'id' => $opd->id,
