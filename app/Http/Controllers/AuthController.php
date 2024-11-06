@@ -91,11 +91,23 @@ class AuthController extends Controller
   public function getUser(Request $request)
   {
     // return $request->user();
+    $opd = null;
+    if ($request->user()->roles->first()->name === 'opd_provinsi') {
+      $opd = $request->user()->user_opd_provinsi->first()->opd_provinsi;
+    } elseif ($request->user()->roles->first()->name === 'opd_kabupaten') {
+      $opd = $request->user()->enumerator_kabupaten->first()->opd_kabupaten;
+    }
+
     return $this->successResponseWithData(
       [
         'id' => $request->user()->id,
         'username' => $request->user()->username,
         'email' => $request->user()->email,
+        'opd' => [
+          'id' => $opd->id,
+          'tingkat' => $request->user()->roles->first()->name,
+          'nama' => $opd->nama,
+        ],
         'role' => [
           'id' => $request->user()->roles->first()->id,
           'name' => $request->user()->roles->first()->name,
