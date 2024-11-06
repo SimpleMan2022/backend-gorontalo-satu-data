@@ -27,12 +27,16 @@ class AuthController extends Controller
         'password' => 'required|min:8'
       ]);
 
-      if (!Auth::attempt($request->only('username', 'password'))) {
+      $credentials = filter_var($request->username, FILTER_VALIDATE_EMAIL) 
+                      ? ['email' => $request->username, 'password' => $request->password] 
+                      : ['username' => $request->username, 'password' => $request->password];
+
+      if (!Auth::attempt($credentials)) {
         return $this->errorResponse('Terdapat kesalahan kredensial.', Response::HTTP_UNAUTHORIZED);
       }
 
 
-      $user = User::where('username', $request->username)->firstOrFail();
+      $user = User::where('username', $request->username)->orWhere('email', $request->username)->firstOrFail();
 
       if ($user->hasRole('enumerator')) {
         return $this->errorResponse('Enumerator login menggunakan aplikasi mobile.', Response::HTTP_UNAUTHORIZED);
@@ -103,13 +107,26 @@ class AuthController extends Controller
       'id' => $request->user()->id,
       'username' => $request->user()->username,
       'email' => $request->user()->email,
+      'opd' => [
+        'id' => $opd->id,
+        'tingkat' => $request->user()->roles->first()->name,
+        'nama' => $opd->nama,
+      ],
       'role' => [
         'id' => $request->user()->roles->first()->id,
-        'name' => $roleName,
+        'name' => $request->user()->roles->first()->name,
         'permissions' => $request->user()->roles->first()->permissions->pluck('name')
       ],
+      'permissions' => $request->user()->permissions->pluck('name') ?? '-'
     ];
 
+    if ($roleName !== 'admin') {
+      $responseData['opd'] = [
+        'id' => $opd->id,
+        'tingkat' => $roleName,
+        'nama' => $opd->nama,
+      ];
+    }
     if ($roleName !== 'admin') {
       $responseData['opd'] = [
         'id' => $opd->id,
