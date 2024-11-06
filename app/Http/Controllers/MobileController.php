@@ -20,7 +20,7 @@ class MobileController extends Controller
     {
         try {
             // Check if enumerator_id is provided
-            $enumerator_id = $request->input('enumerator_id');
+            $enumerator_id = $request->query('enumerator_id');
             if (!$enumerator_id) {
                 return $this->errorResponse(
                     'enumerator_id is required',
@@ -122,7 +122,7 @@ class MobileController extends Controller
     {
         try {
             // Validate that enumerator_id is provided
-            $enumerator_id = $request->input('enumerator_id');
+            $enumerator_id = $request->query('enumerator_id');
             if (!$enumerator_id) {
                 return $this->errorResponse(
                     'enumerator_id is required',

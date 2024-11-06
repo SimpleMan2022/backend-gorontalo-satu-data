@@ -154,7 +154,6 @@ class AuthController extends Controller
       [
         'user_id' => $request->user()->id,
         'username' => $request->user()->username,
-        'nama' => $enumerator->nama,
         'email' => $request->user()->email,
         'enumerator' => $enumeratorData,
       ],
