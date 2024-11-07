@@ -88,4 +88,5 @@ class Enumerator extends Model
                     ->withPivot(['indikator_id', 'enumerator_id']) // Tambahkan kolom tambahan dari pivot jika ada
                     ->withTimestamps(); // Jika pivot memiliki timestamps
     }
+
 }
