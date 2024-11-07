@@ -38,4 +38,8 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 404);
             }
         });
-    })->create();
+    })
+    ->withSchedule(function ($schedule) {
+        $schedule->command('auth:clear-resets')->hourly();
+    })
+    ->create();
