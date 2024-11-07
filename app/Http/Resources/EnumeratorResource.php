@@ -21,37 +21,33 @@ class EnumeratorResource extends JsonResource
             'nama' => $this->nama,
             'jabatan' => $this->jabatan,
             'enumerator_level' => $this->when(
-                $this->enumerator_kabupaten->isNotEmpty() || $this->enumerator_provinsi->isNotEmpty(),
-                function () {
-                    // Cek apakah enumerator berada di tingkat kabupaten atau provinsi
-                    if ($this->enumerator_kabupaten->isNotEmpty()) {
-                        return 'kabupaten';
-                    }
-
-                    if ($this->enumerator_provinsi->isNotEmpty()) {
-                        return 'provinsi';
-                    }
-
-                    return 'unknown'; // Jika tidak ditemukan, bisa diisi dengan 'unknown' atau nilai lain
+            $this->enumerator_kabupaten->isNotEmpty() || $this->enumerator_provinsi->isNotEmpty(),
+            function () {
+                // Cek apakah enumerator berada di tingkat kabupaten atau provinsi
+                if ($this->enumerator_kabupaten->isNotEmpty()) {
+                return 'kabupaten';
                 }
+
+                if ($this->enumerator_provinsi->isNotEmpty()) {
+                return 'provinsi';
+                }
+
+                return 'unknown'; // Jika tidak ditemukan, bisa diisi dengan 'unknown' atau nilai lain
+            }
             ),
-            'opd_kabupaten' => $this->when(
-                $this->enumerator_kabupaten->isNotEmpty(),
-                $this->enumerator_kabupaten->map(function ($kabupaten) {
-                    return [
-                        'id' => $kabupaten->opd_kabupaten->id,
-                        'nama' => $kabupaten->opd_kabupaten->nama,
-                    ];
-                })
-            ),
-            'opd_provinsi' => $this->when(
-                $this->enumerator_provinsi->isNotEmpty(),
-                $this->enumerator_provinsi->map(function ($provinsi) {
-                    return [
-                        'id' => $provinsi->opd_provinsi->id,
-                        'nama' => $provinsi->opd_provinsi->nama,
-                    ];
-                })
+            'opd' => $this->when(
+            $this->enumerator_kabupaten->isNotEmpty() || $this->enumerator_provinsi->isNotEmpty(),
+            function () {
+                if ($this->enumerator_kabupaten->isNotEmpty()) {
+                $opd = $this->enumerator_kabupaten->first()->opd_kabupaten;
+                } else {
+                $opd = $this->enumerator_provinsi->first()->opd_provinsi;
+                }
+                return [
+                'id' => $opd->id,
+                'nama' => $opd->nama,
+                ];
+            }
             ),
             'created_at' => $this->created_at,
             'updated_at' => $this->created_at

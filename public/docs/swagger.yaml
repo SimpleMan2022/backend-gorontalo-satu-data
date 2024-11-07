@@ -200,6 +200,93 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedResponse"
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Lupa password
+      description: API untuk melakukan lupa password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Email reset password telah dikirim"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      description: API untuk melakukan reset password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "12345678"
+                password_confirmation:
+                  type: string
+                  example: "12345678"
+                token:
+                  type: string
+                  example: "eyJhbGciOi"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Password berhasil direset"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
   /sektor:
     get:
       tags:
@@ -908,6 +995,17 @@ paths:
                               nama:
                                 type: string
                                 example: "Nama Sekolah"
+                        subjek:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              nama:
+                                type: string
+                                example: "Kabupaten"
                         status:
                           type: string
                           example: "pending"
@@ -4294,6 +4392,18 @@ paths:
                         nama:
                           type: string
                           example: menurut usia 1-5 bulan
+                        indikator: 
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Agregat sebaran fasilitas kesehatan negeri"
+                            status:
+                              type: string
+                              example: "public"
                         created_at:
                           type: string
                           format: date-time
