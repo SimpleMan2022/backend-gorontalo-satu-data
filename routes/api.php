@@ -266,7 +266,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/multi-delete", "multiDestroy");
     });
 
-
     Route::prefix('spasial-kabupaten')->controller(SpasialKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
@@ -292,8 +291,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 });
 
 Route::prefix('mobile')->middleware('auth:sanctum')->group(function () {
+    Route::get("/dashboard/variabel/{indikator}", MobileController::class . "@variabelByIndikator");
     Route::get("/dashboard/enumerator", MobileController::class . "@EnumeratorView");
     Route::get("/dashboard/enumerator/indikator", MobileController::class . "@EnumeratorIndikator");
+    Route::get("/dashboard/enumerator/riwayat", MobileController::class . "@RiwayatEnumerator");
     Route::get("/profile", AuthController::class . "@getEnumeratorMobile");
     Route::post('/hasil-data', HasilDataController::class . "@store");
 });

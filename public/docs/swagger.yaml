@@ -8243,7 +8243,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data enumerator indikator berhasil diambil"
+                    example: "Data Enumerator Indikator berhasil diambil"
                   data:
                     type: array
                     items:
@@ -8251,27 +8251,47 @@ paths:
                       properties:
                         nama_sektor:
                           type: string
-                          example: "Kemiskinan"
+                          example: "Pendidikan"
                         indikator_id:
                           type: integer
-                          example: 1
+                          example: 99
                         nama_indikator:
                           type: string
-                          example: "Jumlah Penduduk Miskin"
+                          example: "Sebaran sekolah tingkat SMA dengan kondisi bangunan baik"
+                        variabel_id:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 125
+                              indikator_id:
+                                type: integer
+                                example: 99
+                              nama:
+                                type: string
+                                example: "Nama Sekolah"
+                              order:
+                                type: integer
+                                example: 0
+                              tipe:
+                                type: string
+                                example: "string"
                         nama_opd:
                           type: string
-                          example: "Dinas Kesehatan"
+                          example: "Dinas pendidikan"
                         logo_opd:
                           type: string
-                          example: "logo-opd.png"
+                          example: "logo/RASwffHM9jleqR1IlbSQmuodgBAMfyFAEHczmBGk.webp"
                         created_at:
                           type: string
                           format: date-time
-                          example: "2024-10-13T00:33:23.000000Z"
+                          example: "2024-11-06T06:56:35.000000Z"
                         updated_at:
                           type: string
                           format: date-time
-                          example: "2024-10-13T00:33:23.000000Z"
+                          example: "2024-11-06T06:56:35.000000Z"
         "401":
           description: Unauthorized
           content:
@@ -8284,6 +8304,81 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"     
+  /mobile/dashboard/enumerator/riwayat:
+    get:
+      tags:
+        - Mobile
+      summary: Mendapatkan semua data riwayat enumerator
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/SearchParam"
+        - name: enumerator_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Data Riwayat Enumerator berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data Riwayat Enumerator berhasil diambil"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nama_sektor:
+                          type: string
+                          example: "Infrastruktur"
+                        indikator_id:
+                          type: integer
+                          example: 77
+                        status:
+                          type: string
+                          example: "submit"
+                        nama_indikator:
+                          type: string
+                          example: "Sebaran Jumlah Kantor Desa berkondisi buruk"
+                        nama_opd:
+                          type: string
+                          example: "Dinas Desa"
+                        logo_opd:
+                          type: string
+                          example: "logo/vi7LIC1F2Nz6yXu25JLoUBKvQGSaqOvVFd0ptkOz.webp"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T16:02:20.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
   /mobile/hasil-data:
     post:
       tags:
@@ -8337,7 +8432,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UnauthorizedResponse"         
+                $ref: "#/components/schemas/UnauthorizedResponse" 
 components:
   schemas:
     Pagination:
