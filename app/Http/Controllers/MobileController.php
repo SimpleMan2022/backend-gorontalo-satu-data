@@ -177,4 +177,61 @@ class MobileController extends Controller
             );
         }
     }
+
+    public function RiwayatEnumerator(Request $request)
+    {
+        try {
+            // Validate that enumerator_id is provided
+            $enumerator_id = $request->query('enumerator_id');
+            if (!$enumerator_id) {
+                return $this->errorResponse(
+                    'enumerator_id is required',
+                    Response::HTTP_BAD_REQUEST
+                );
+            }
+
+            // Get the search query parameter
+            $search = $request->query('search');
+
+            // Retrieve data from Enumerator with Indikator details through the pivot table
+            $data = Enumerator::with(['pivot_enumerator_indikator.indikator' => function ($query) use ($search) {
+                $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
+                if ($search) {
+                    $query->where('nama', 'like', '%' . $search . '%');
+                }
+            }])
+                ->where('id', $enumerator_id)
+                ->get()
+                ->flatMap(function ($enumerator) {
+                    return $enumerator->pivot_enumerator_indikator
+                        ->filter(function ($pivot) {
+                            return $pivot->indikator !== null;
+                        })
+                        ->map(function ($pivot) {
+                            return [
+                                'nama_sektor' => $pivot->indikator->sektor->nama,
+                                'indikator_id' => $pivot->indikator->id,
+                                'status' => $pivot->status,
+                                'nama_indikator' => $pivot->indikator->nama,
+                                'nama_opd' => $pivot->indikator->opd_provinsi->nama,
+                                'logo_opd' => $pivot->indikator->opd_provinsi->logo,
+                                'created_at' => $pivot->created_at,
+                                'updated_at' => $pivot->updated_at,
+                            ];
+                        });
+                });
+
+
+            return $this->successResponseWithData(
+                $data,
+                'Data Riwayat Enumerator berhasil diambil',
+                Response::HTTP_OK
+            );
+        } catch (Exception $e) {
+            return $this->errorResponse(
+                $e->getMessage(),
+                Response::HTTP_INTERNAL_SERVER_ERROR
+            );
+        }
+    }
 }
