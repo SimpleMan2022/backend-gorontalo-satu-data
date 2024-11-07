@@ -4790,7 +4790,7 @@ paths:
                         enumerator_level:
                           type: string
                           example: "kabupaten"
-                        opd_kabupaten:
+                        opd:
                           type: object
                           properties:
                             id:
@@ -8268,13 +8268,6 @@ paths:
       summary: Mendapatkan semua data enumerator view
       security:
         - BearerAuth: []
-      parameters:
-        - name: enumerator_id
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 1
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator view
@@ -8331,12 +8324,6 @@ paths:
         - BearerAuth: []
       parameters:
         - $ref: "#/components/parameters/SearchParam"
-        - name: enumerator_id
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 1
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator indikator
