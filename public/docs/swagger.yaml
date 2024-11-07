@@ -897,6 +897,17 @@ paths:
                             lokasi:
                               type: string
                               example: "Jl. Pendidikan No. 1"
+                        variabel:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              nama:
+                                type: string
+                                example: "Nama Sekolah"
                         status:
                           type: string
                           example: "pending"
@@ -4320,8 +4331,8 @@ paths:
               type: object
               properties:
                 indikator_id:
-                  type: integer
-                  example: 4
+                  type: string
+                  example: 1,2,3
                 nama:
                   type: string
                   example: menurut usia 1-5 bulan
@@ -4375,8 +4386,8 @@ paths:
                     type: string
                     example: rumah sakit
                   indikator_id:
-                    type: integer
-                    example: 9
+                    type: string
+                    example: 1,2,3
                 required:
                   - nama
                   - indikator_id
@@ -8272,7 +8283,61 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmptyDataResponse"              
+                $ref: "#/components/schemas/EmptyDataResponse"     
+  /mobile/hasil-data:
+    post:
+      tags:
+        - Mobile
+      summary: Menambahkan hasil data baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: array
+              items:
+                type: object
+                properties:
+                  enumerator_id:
+                    type: integer
+                    example: 1
+                  indikator_id:
+                    type: integer
+                    example: 1
+                  konten:
+                    type: string
+                    example: "Deskripsi singkat"     
+      responses:
+        "200":
+          description: hasil data berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"         
 components:
   schemas:
     Pagination:
