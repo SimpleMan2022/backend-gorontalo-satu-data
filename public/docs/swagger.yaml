@@ -8243,7 +8243,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data enumerator indikator berhasil diambil"
+                    example: "Data Enumerator Indikator berhasil diambil"
                   data:
                     type: array
                     items:
@@ -8251,27 +8251,47 @@ paths:
                       properties:
                         nama_sektor:
                           type: string
-                          example: "Kemiskinan"
+                          example: "Pendidikan"
                         indikator_id:
                           type: integer
-                          example: 1
+                          example: 99
                         nama_indikator:
                           type: string
-                          example: "Jumlah Penduduk Miskin"
+                          example: "Sebaran sekolah tingkat SMA dengan kondisi bangunan baik"
+                        variabel_id:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 125
+                              indikator_id:
+                                type: integer
+                                example: 99
+                              nama:
+                                type: string
+                                example: "Nama Sekolah"
+                              order:
+                                type: integer
+                                example: 0
+                              tipe:
+                                type: string
+                                example: "string"
                         nama_opd:
                           type: string
-                          example: "Dinas Kesehatan"
+                          example: "Dinas pendidikan"
                         logo_opd:
                           type: string
-                          example: "logo-opd.png"
+                          example: "logo/RASwffHM9jleqR1IlbSQmuodgBAMfyFAEHczmBGk.webp"
                         created_at:
                           type: string
                           format: date-time
-                          example: "2024-10-13T00:33:23.000000Z"
+                          example: "2024-11-06T06:56:35.000000Z"
                         updated_at:
                           type: string
                           format: date-time
-                          example: "2024-10-13T00:33:23.000000Z"
+                          example: "2024-11-06T06:56:35.000000Z"
         "401":
           description: Unauthorized
           content:
