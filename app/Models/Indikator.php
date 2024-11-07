@@ -41,4 +41,9 @@ class Indikator extends Model
         return $this->hasMany(BeritaAcara::class);
     }
 
+    public function subjek()
+    {
+        return $this->belongsToMany(Subjek::class, 'pivot_indikator_subjek'); // Pivot table 'indikator_subjek'
+    }
+
 }

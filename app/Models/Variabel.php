@@ -15,4 +15,8 @@ class Variabel extends Model
     public function indikator() {
         return $this->belongsTo(Indikator::class);
     }
+
+    public function pivot_indikator_subjek() {
+        return $this->hasMany(PivotIndikatorSubjek::class);
+    }
 }
