@@ -134,7 +134,10 @@ class MobileController extends Controller
             $search = $request->query('search');
 
             // Retrieve data from Enumerator with Indikator details through the pivot table
-            $data = Enumerator::with(['enumerator_indikator_status_pending.indikator' => function ($query) use ($search) {
+            $data = Enumerator::with(['enumerator_indikator_status_pending.indikator.variabel' => function($query) use ($search){
+                $query->select(['id', 'indikator_id', 'nama', 'order', 'tipe']);
+
+            }])->with(['enumerator_indikator_status_pending.indikator' => function ($query) use ($search) {
                 $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
                 if ($search) {
                     $query->where('nama', 'like', '%' . $search . '%');
@@ -152,6 +155,7 @@ class MobileController extends Controller
                                 'nama_sektor' => $pivot->indikator->sektor->nama,
                                 'indikator_id' => $pivot->indikator->id,
                                 'nama_indikator' => $pivot->indikator->nama,
+                                'variabel_id' => $pivot->indikator->variabel,
                                 'nama_opd' => $pivot->indikator->opd_provinsi->nama,
                                 'logo_opd' => $pivot->indikator->opd_provinsi->logo,
                                 'created_at' => $pivot->created_at,

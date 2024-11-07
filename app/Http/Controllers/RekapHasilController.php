@@ -111,7 +111,15 @@ class RekapHasilController extends Controller
         }
     }
 
+<<<<<<< Updated upstream
 
+=======
+    // public function byIndikator(Request $request) {
+    //     try {
+            
+    //     }
+    // }
+>>>>>>> Stashed changes
 
     public function show(string $id)
     {
