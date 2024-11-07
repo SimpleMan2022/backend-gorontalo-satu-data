@@ -295,6 +295,7 @@ Route::prefix('mobile')->middleware('auth:sanctum')->group(function () {
     Route::get("/dashboard/variabel/{indikator}", MobileController::class . "@variabelByIndikator");
     Route::get("/dashboard/enumerator", MobileController::class . "@EnumeratorView");
     Route::get("/dashboard/enumerator/indikator", MobileController::class . "@EnumeratorIndikator");
+    Route::get("/dashboard/enumerator/riwayat", MobileController::class . "@RiwayatEnumerator");
     Route::get("/profile", AuthController::class . "@getEnumeratorMobile");
     Route::post('/hasil-data', HasilDataController::class . "@store");
 });
