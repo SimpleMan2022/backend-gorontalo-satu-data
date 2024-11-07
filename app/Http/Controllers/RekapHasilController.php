@@ -61,6 +61,7 @@ class RekapHasilController extends Controller
                         $chunk->map(function ($hasil) {
                             return [
                                 'hasil_data_id' => $hasil->id,
+                                'nama' => $hasil->variabel->nama,
                                 'tipe' => $hasil->variabel->tipe,
                                 'konten' => $hasil->konten,
                             ];
