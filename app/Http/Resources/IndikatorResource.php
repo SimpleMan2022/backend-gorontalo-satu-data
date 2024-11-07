@@ -20,6 +20,9 @@ class IndikatorResource extends JsonResource
             'sektor' => $this->sektor->only('id', 'nama'),
             'antar_waktu' => $this->antar_waktu->only('id', 'tahun', 'nama'),
             'opd_provinsi' => $this->opd_provinsi->only('id', 'nama', 'lokasi'),
+            'variabel' => $this->variabel->map(function ($variabel) {
+                return $variabel->only('id', 'nama');
+            }),
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->created_at,
