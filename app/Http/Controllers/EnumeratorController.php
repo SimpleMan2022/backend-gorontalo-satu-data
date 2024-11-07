@@ -64,18 +64,7 @@ class EnumeratorController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-    // $user = $request->user();
-    // if ($user->hasRole('user_opd_provinsi')) {
-    //     $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
-    //     $enumeratorQuery->whereHas('enumeratorProvinsi', function ($query) use ($opdProvinsiId) {
-    //         $query->where('opd_provinsi_id', $opdProvinsiId);
-    //     });
-    // } elseif ($user->hasRole('user_opd_kabupaten')) {
-    //     $opdKabupatenId = $user->user_opd_kabupaten()->first()->opd_kabupaten_id;
-    //     $enumeratorQuery->whereHas('enumeratorKabupaten', function ($query) use ($opdKabupatenId) {
-    //         $query->where('opd_kabupaten_id', $opdKabupatenId);
-    //     });
-    // }
+   
 
     public function byIndikatorMobile(Request $request)
     {
