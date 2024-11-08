@@ -8,7 +8,7 @@ use App\Models\User;
 use Exception;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
-use App\Models\Enumerator;
+use App\Models\{Enumerator, RekapHasil};
 use App\Models\EnumeratorKabupaten;
 use App\Models\EnumeratorProvinsi;
 use Illuminate\Http\Request;
@@ -245,7 +245,22 @@ class EnumeratorController extends Controller
             $enumerator = Enumerator::find($id);
             $enumerator->delete();
 
-            return $this->successResponse('Data berhasil diambil', Response::HTTP_OK);
+            // Check for rekap hasil with status 'v3' and delete them
+
+            if($enumerator->enumerator_level == 'provinsi'){
+                $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v2')->get();
+                foreach ($rekapHasilV3 as $rekap) {
+                    $rekap->delete();
+                }
+            }else if($enumerator->enumerator_level == 'kabupaten') {
+                $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v3')->get();
+                foreach ($rekapHasilV3 as $rekap) {
+                    $rekap->delete();
+                }
+            }
+
+
+            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
@@ -264,7 +279,19 @@ class EnumeratorController extends Controller
                 return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
             }
 
-            Enumerator::whereIn('id', $enumerator)->delete();
+            $enumeratorId = Enumerator::whereIn('id', $enumerator)->delete();
+
+            if($enumerator->enumerator_level == 'provinsi'){
+                $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v2')->get();
+                foreach ($rekapHasilV3 as $rekap) {
+                    $rekap->delete();
+                }
+            }else if($enumerator->enumerator_level == 'kabupaten') {
+                $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v3')->get();
+                foreach ($rekapHasilV3 as $rekap) {
+                    $rekap->delete();
+                }
+            }
             return $this->successResponse('Data enumerator berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
