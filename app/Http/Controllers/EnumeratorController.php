@@ -257,7 +257,7 @@ class EnumeratorController extends Controller
             $enumerator = Enumerator::find($id);
             $enumerator->delete();
 
-            return $this->successResponse('Data berhasil diambil', Response::HTTP_OK);
+            return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
