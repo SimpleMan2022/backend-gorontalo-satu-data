@@ -5998,6 +5998,9 @@ paths:
                         nama_opd:
                           type: string
                           example: "Dinas Pendidikan Kabupaten Bone Bolango"
+                        nama_indikator:
+                          type: string
+                          example: Sebaran Jumlah Sekolah
                         enumerator:
                           type: object
                           properties:
@@ -6030,7 +6033,7 @@ paths:
                               type: string
                               format: date
                               example: "2024-12-15"
-                        hasil_data:
+                        variabel:
                           type: array
                           items:
                             type: object
@@ -6038,30 +6041,31 @@ paths:
                               id:
                                 type: integer
                                 example: 1
-                              variabel_id:
-                                type: object
-                                properties:
-                                  id:
-                                    type: integer
-                                    example: 2
-                                  indikator_id:
-                                    type: integer
-                                    example: 6
-                                  nama:
-                                    type: string
-                                    example: "Nama Pelabuhan"
-                                  order:
-                                    type: integer
-                                    example: 0
-                                  tipe:
-                                    type: string
-                                    example: "string"
-                              rekap_hasil_id:
-                                type: integer
-                                example: 1
-                              konten:
+                              nama:
                                 type: string
-                                example: "pelabuhan itim"
+                                example: Nama Sekolah
+                              tipe: 
+                                type: string
+                                example: teks
+                        hasil_data:
+                          type: array
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                hasil_data_id:
+                                  type: integer
+                                  example: 6
+                                nama:
+                                  type: string
+                                  example: "Nama Sekolah"
+                                tipe:
+                                  type: string
+                                  example: "string"
+                                konten:
+                                  type: string
+                                  example: "SMP 1 Medan"
                         status:
                           type: string
                           example: "v2"
