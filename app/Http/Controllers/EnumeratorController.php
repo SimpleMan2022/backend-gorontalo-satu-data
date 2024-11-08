@@ -135,6 +135,7 @@ class EnumeratorController extends Controller
                         'enumerator_id' => $enumerator->id,
                     ]);
                 }
+                // $enumerator->assignRole('enumerator');
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
