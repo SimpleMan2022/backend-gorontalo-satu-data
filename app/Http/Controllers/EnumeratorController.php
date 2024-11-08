@@ -19,7 +19,7 @@ class EnumeratorController extends Controller
     use ApiResponse;
 
     public function index(Request $request)
-    {   
+    {
         // dd($request->user()->user_opd_provinsi()->first()->opd_provinsi_id);
         try {
             $user = $request->user();
@@ -36,7 +36,7 @@ class EnumeratorController extends Controller
                 $enumeratorQuery->whereHas('enumerator_kabupaten', function ($query) use ($opdKabupatenId) {
                     $query->where('opd_kabupaten_id', $opdKabupatenId);
                 });
-        }
+            }
 
             if ($search = $request->query('search')) {
                 $enumeratorQuery->where(function ($query) use ($search) {
@@ -64,12 +64,12 @@ class EnumeratorController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-   
+
 
     public function byIndikatorMobile(Request $request)
     {
         try {
-            
+
             $enumeratorQuery = Enumerator::orderBy('created_at', 'desc');
 
             if ($userId = $request->query('user_id')) {
@@ -77,9 +77,9 @@ class EnumeratorController extends Controller
             }
 
             $data = $enumeratorQuery->first();
-            
 
-            if ($data){
+
+            if ($data) {
                 return $this->successResponseWithData(
                     EnumeratorMobileResource::make($data),
                     'Data enumerator berhasil diambil',
@@ -135,7 +135,6 @@ class EnumeratorController extends Controller
                         'enumerator_id' => $enumerator->id,
                     ]);
                 }
-                $enumerator->assignRole('enumerator');
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
