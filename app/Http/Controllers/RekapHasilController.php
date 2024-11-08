@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{HasilData, Variabel, RekapHasil, Periode, Enumerator, OpdProvinsi, OpdKabupaten, PivotEnumeratorIndikator};
+use App\Models\{HasilData, Variabel, RekapHasil, Periode, Enumerator, Indikator, OpdProvinsi, OpdKabupaten, PivotEnumeratorIndikator};
 use App\Http\Resources\RekapHasilResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
@@ -17,6 +17,7 @@ use Illuminate\Support\Facades\DB;
 class RekapHasilController extends Controller
 {
     use ApiResponse;
+
 
     public function index(Request $request)
     {
@@ -33,15 +34,15 @@ class RekapHasilController extends Controller
             }
 
             if ($indikatorId = $request->query('indikator_id')) {
-                $hasilQuery->whereHas('hasil_data.variabel', function ($query) use ($indikatorId) {
-                    $query->where('indikator_id', $indikatorId);
+                $hasilQuery->whereHas('hasil_data.variabel.indikator', function ($query) use ($indikatorId) {
+                    $query->where('id', $indikatorId);
                 });
             }
 
             $data = $hasilQuery->first();
 
             if ($data) {
-                // Collect all hasil_data
+                // Jika data ditemukan, format hasil seperti biasa
                 $allHasilData = HasilData::with('variabel')
                     ->whereHas('rekap_hasil', function ($query) use ($request) {
                         if ($enumeratorId = $request->query('enumerator_id')) {
@@ -70,10 +71,9 @@ class RekapHasilController extends Controller
                 }
 
                 $formattedData = [
-                    'id' => $data->id,
-                    'nama' => $data->nama,
+                    'id' => (int) $indikatorId,
+                    'nama' => $data->hasil_data->first()->variabel->indikator->nama,
                     'nama_opd' => $data->periode->opd_provinsi->nama,
-                    'nama_indikator' => $data->hasil_data->first()->variabel->indikator->nama,
                     'enumerator' => [
                         'id' => $data->enumerator->id,
                         'nama' => $data->enumerator->nama,
@@ -105,7 +105,48 @@ class RekapHasilController extends Controller
                     Response::HTTP_OK
                 );
             } else {
-                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
+                // Jika `indikator_id` ada tapi data tidak ditemukan, lakukan query tambahan untuk mendapatkan informasi indikator dan variabel
+                if ($indikatorId) {
+                    $indikator = Indikator::with(['variabel', 'enumerators', 'opd_provinsi'])
+                        ->where('id', $indikatorId)
+                        ->first();
+
+                    if ($indikator) {
+                        // Format data tanpa `hasil_data`
+                        $formattedData = [
+                            'id' => (int) $indikatorId,
+                            'nama' => $indikator->nama,
+                            'nama_opd' => $indikator->opd_provinsi->nama,
+                            'enumerator' => $indikator->enumerators()->first() ? [
+                                'id' => $indikator->enumerators()->first()->id,
+                                'nama' => $indikator->enumerators()->first()->nama,
+                                'jabatan' => $indikator->enumerators()->first()->jabatan,
+                                'enumerator_level' => $indikator->enumerators()->first()->enumerator_level,
+                            ] : null,
+                            'periode' => $indikator->opd_provinsi()->first()->periode()->first()->nama ?? null,
+                            'variabel' => $indikator->variabel->map(function ($variabel) {
+                                return [
+                                    'id' => $variabel->id,
+                                    'nama' => $variabel->nama,
+                                    'tipe' => $variabel->tipe,
+                                ];
+                            }),
+                            'hasil_data' => [],
+                            'status' => 'pending',
+                            'created_at' => null,
+                            'updated_at' => null,
+                        ];
+
+                        return $this->successResponseWithData(
+                            $formattedData,
+                            'Indikator ditemukan tanpa hasil data',
+                            Response::HTTP_OK
+                        );
+                    }
+                }
+
+                // Jika data masih kosong, kembalikan pesan 404
+                return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
