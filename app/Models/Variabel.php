@@ -12,7 +12,13 @@ class Variabel extends Model
     protected $guarded = [];
     protected $table = 'variabel';
 
-    public function indikator() {
+    public function indikator()
+    {
         return $this->belongsTo(Indikator::class);
+    }
+
+    public function pivot_indikator_subjek()
+    {
+        return $this->hasMany(PivotIndikatorSubjek::class);
     }
 }

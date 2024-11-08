@@ -30,7 +30,7 @@ class UserSeeder extends Seeder
 
         //create permissions for admin
         $permissions_admin = [
-            'view_hasildata',
+            'view_hasil_data',
             'view_indikator',
             'view_subjek',
             'view_variabel',
@@ -41,6 +41,10 @@ class UserSeeder extends Seeder
             'kelola_user_opd_kabupaten',
             'kelola_opd_kabupaten',
             'kelola_opd_provinsi',
+            'kelola_sektor_spasial',
+            'view_sektor_spasial',
+            'view_olahan_spasial',
+            'view_hasil_spasial',
         ];
 
         // Create each permission
@@ -76,6 +80,11 @@ class UserSeeder extends Seeder
             'verifikasi_provinsi',
             'kelola_user_opd_kabupaten',
             'kelola_opd_kabupaten',
+            'view_sektor_spasial',
+            'view_olahan_spasial',
+            'view_hasil_spasial',
+            'kelola_olahan_spasial',
+            'kelola_hasil_spasial',
         ];
 
         // Create each permission
@@ -130,7 +139,7 @@ class UserSeeder extends Seeder
 
         // Create permissions for opd kabupaten
         $permissions_kabupaten = [
-            'view_hasildata',
+            'view_hasil_data',
             'view_indikator',
             'view_subjek',
             'view_variabel',
@@ -156,7 +165,7 @@ class UserSeeder extends Seeder
 
         // Create permissions for enumerator
         $permissions_enumerator = [
-            'view_hasildata',
+            'view_hasil_data',
             'view_indikator',
             'view_sektor',
             'view_variabel',

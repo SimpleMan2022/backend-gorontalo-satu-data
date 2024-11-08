@@ -200,6 +200,93 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedResponse"
+  /auth/forgot-password:
+    post:
+      tags:
+        - Authentication
+      summary: Lupa password
+      description: API untuk melakukan lupa password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Email reset password telah dikirim"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+  /auth/reset-password:
+    post:
+      tags:
+        - Authentication
+      summary: Reset password
+      description: API untuk melakukan reset password
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                  example: "user@example.com"
+                password:
+                  type: string
+                  example: "12345678"
+                password_confirmation:
+                  type: string
+                  example: "12345678"
+                token:
+                  type: string
+                  example: "eyJhbGciOi"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Password berhasil direset"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
   /sektor:
     get:
       tags:
@@ -908,6 +995,17 @@ paths:
                               nama:
                                 type: string
                                 example: "Nama Sekolah"
+                        subjek:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              nama:
+                                type: string
+                                example: "Kabupaten"
                         status:
                           type: string
                           example: "pending"
@@ -4294,6 +4392,18 @@ paths:
                         nama:
                           type: string
                           example: menurut usia 1-5 bulan
+                        indikator: 
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Agregat sebaran fasilitas kesehatan negeri"
+                            status:
+                              type: string
+                              example: "public"
                         created_at:
                           type: string
                           format: date-time
@@ -4680,7 +4790,7 @@ paths:
                         enumerator_level:
                           type: string
                           example: "kabupaten"
-                        opd_kabupaten:
+                        opd:
                           type: object
                           properties:
                             id:
@@ -5888,6 +5998,9 @@ paths:
                         nama_opd:
                           type: string
                           example: "Dinas Pendidikan Kabupaten Bone Bolango"
+                        nama_indikator:
+                          type: string
+                          example: Sebaran Jumlah Sekolah
                         enumerator:
                           type: object
                           properties:
@@ -5920,7 +6033,7 @@ paths:
                               type: string
                               format: date
                               example: "2024-12-15"
-                        hasil_data:
+                        variabel:
                           type: array
                           items:
                             type: object
@@ -5928,30 +6041,31 @@ paths:
                               id:
                                 type: integer
                                 example: 1
-                              variabel_id:
-                                type: object
-                                properties:
-                                  id:
-                                    type: integer
-                                    example: 2
-                                  indikator_id:
-                                    type: integer
-                                    example: 6
-                                  nama:
-                                    type: string
-                                    example: "Nama Pelabuhan"
-                                  order:
-                                    type: integer
-                                    example: 0
-                                  tipe:
-                                    type: string
-                                    example: "string"
-                              rekap_hasil_id:
-                                type: integer
-                                example: 1
-                              konten:
+                              nama:
                                 type: string
-                                example: "pelabuhan itim"
+                                example: Nama Sekolah
+                              tipe: 
+                                type: string
+                                example: teks
+                        hasil_data:
+                          type: array
+                          items:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                hasil_data_id:
+                                  type: integer
+                                  example: 6
+                                nama:
+                                  type: string
+                                  example: "Nama Sekolah"
+                                tipe:
+                                  type: string
+                                  example: "string"
+                                konten:
+                                  type: string
+                                  example: "SMP 1 Medan"
                         status:
                           type: string
                           example: "v2"
@@ -8158,13 +8272,6 @@ paths:
       summary: Mendapatkan semua data enumerator view
       security:
         - BearerAuth: []
-      parameters:
-        - name: enumerator_id
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 1
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator view
@@ -8221,12 +8328,6 @@ paths:
         - BearerAuth: []
       parameters:
         - $ref: "#/components/parameters/SearchParam"
-        - name: enumerator_id
-          in: query
-          required: true
-          schema:
-            type: integer
-            example: 1
       responses:
         "200":
           description: Berhasil mendapatkan data enumerator indikator
@@ -8243,7 +8344,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: "Data enumerator indikator berhasil diambil"
+                    example: "Data Enumerator Indikator berhasil diambil"
                   data:
                     type: array
                     items:
@@ -8251,27 +8352,47 @@ paths:
                       properties:
                         nama_sektor:
                           type: string
-                          example: "Kemiskinan"
+                          example: "Pendidikan"
                         indikator_id:
                           type: integer
-                          example: 1
+                          example: 99
                         nama_indikator:
                           type: string
-                          example: "Jumlah Penduduk Miskin"
+                          example: "Sebaran sekolah tingkat SMA dengan kondisi bangunan baik"
+                        variabel_id:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 125
+                              indikator_id:
+                                type: integer
+                                example: 99
+                              nama:
+                                type: string
+                                example: "Nama Sekolah"
+                              order:
+                                type: integer
+                                example: 0
+                              tipe:
+                                type: string
+                                example: "string"
                         nama_opd:
                           type: string
-                          example: "Dinas Kesehatan"
+                          example: "Dinas pendidikan"
                         logo_opd:
                           type: string
-                          example: "logo-opd.png"
+                          example: "logo/RASwffHM9jleqR1IlbSQmuodgBAMfyFAEHczmBGk.webp"
                         created_at:
                           type: string
                           format: date-time
-                          example: "2024-10-13T00:33:23.000000Z"
+                          example: "2024-11-06T06:56:35.000000Z"
                         updated_at:
                           type: string
                           format: date-time
-                          example: "2024-10-13T00:33:23.000000Z"
+                          example: "2024-11-06T06:56:35.000000Z"
         "401":
           description: Unauthorized
           content:
@@ -8284,6 +8405,81 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"     
+  /mobile/dashboard/enumerator/riwayat:
+    get:
+      tags:
+        - Mobile
+      summary: Mendapatkan semua data riwayat enumerator
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/SearchParam"
+        - name: enumerator_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        200:
+          description: Data Riwayat Enumerator berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data Riwayat Enumerator berhasil diambil"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nama_sektor:
+                          type: string
+                          example: "Infrastruktur"
+                        indikator_id:
+                          type: integer
+                          example: 77
+                        status:
+                          type: string
+                          example: "submit"
+                        nama_indikator:
+                          type: string
+                          example: "Sebaran Jumlah Kantor Desa berkondisi buruk"
+                        nama_opd:
+                          type: string
+                          example: "Dinas Desa"
+                        logo_opd:
+                          type: string
+                          example: "logo/vi7LIC1F2Nz6yXu25JLoUBKvQGSaqOvVFd0ptkOz.webp"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T16:02:20.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
   /mobile/hasil-data:
     post:
       tags:
@@ -8337,7 +8533,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UnauthorizedResponse"         
+                $ref: "#/components/schemas/UnauthorizedResponse" 
 components:
   schemas:
     Pagination:

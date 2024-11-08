@@ -266,7 +266,6 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/multi-delete", "multiDestroy");
     });
 
-
     Route::prefix('spasial-kabupaten')->controller(SpasialKabupatenController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");

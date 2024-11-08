@@ -7,3 +7,7 @@ Route::get('/', function () {
         'message' => 'Welcome to the API 😊',
     ]);
 });
+
+Route::get('/tes', function () {
+    return view('emails.reset_password');
+});

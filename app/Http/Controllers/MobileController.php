@@ -20,7 +20,7 @@ class MobileController extends Controller
     {
         try {
             // Check if enumerator_id is provided
-            $enumerator_id = $request->query('enumerator_id');
+            $enumerator_id = Enumerator::where('user_id', $request->user()->id)->first()->id;
             if (!$enumerator_id) {
                 return $this->errorResponse(
                     'enumerator_id is required',
@@ -101,7 +101,8 @@ class MobileController extends Controller
     }
 
 
-    public function variabelByIndikator(Request $request, $indikator) {
+    public function variabelByIndikator(Request $request, $indikator)
+    {
         try {
             $data = Variabel::where('indikator_id', $indikator)
                 ->select('id', 'indikator_id', 'nama', 'order', 'tipe')
@@ -113,7 +114,7 @@ class MobileController extends Controller
                 'Data Variabel berhasil diambil',
                 Response::HTTP_OK
             );
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -121,8 +122,8 @@ class MobileController extends Controller
     public function EnumeratorIndikator(Request $request)
     {
         try {
+            $enumerator_id = Enumerator::where('user_id', $request->user()->id)->first()->id;
             // Validate that enumerator_id is provided
-            $enumerator_id = $request->query('enumerator_id');
             if (!$enumerator_id) {
                 return $this->errorResponse(
                     'enumerator_id is required',
@@ -134,9 +135,8 @@ class MobileController extends Controller
             $search = $request->query('search');
 
             // Retrieve data from Enumerator with Indikator details through the pivot table
-            $data = Enumerator::with(['enumerator_indikator_status_pending.indikator.variabel' => function($query) use ($search){
+            $data = Enumerator::with(['enumerator_indikator_status_pending.indikator.variabel' => function ($query) use ($search) {
                 $query->select(['id', 'indikator_id', 'nama', 'order', 'tipe']);
-
             }])->with(['enumerator_indikator_status_pending.indikator' => function ($query) use ($search) {
                 $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
                 if ($search) {

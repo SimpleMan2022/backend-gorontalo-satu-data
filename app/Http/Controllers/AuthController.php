@@ -27,9 +27,9 @@ class AuthController extends Controller
         'password' => 'required|min:8'
       ]);
 
-      $credentials = filter_var($request->username, FILTER_VALIDATE_EMAIL) 
-                      ? ['email' => $request->username, 'password' => $request->password] 
-                      : ['username' => $request->username, 'password' => $request->password];
+      $credentials = filter_var($request->username, FILTER_VALIDATE_EMAIL)
+        ? ['email' => $request->username, 'password' => $request->password]
+        : ['username' => $request->username, 'password' => $request->password];
 
       if (!Auth::attempt($credentials)) {
         return $this->errorResponse('Terdapat kesalahan kredensial.', Response::HTTP_UNAUTHORIZED);
@@ -98,9 +98,9 @@ class AuthController extends Controller
     $roleName = $request->user()->roles->first()->name;
 
     if ($roleName === 'opd_provinsi') {
-      $opd = $request->user()->user_opd_provinsi->first()->opd_provinsi;
+      $opd = $request->user()->user_opd_provinsi->opd_provinsi;
     } elseif ($roleName === 'opd_kabupaten') {
-      $opd = $request->user()->user_opd_kabupaten->first()->opd_kabupaten;
+      $opd = $request->user()->user_opd_kabupaten->opd_kabupaten;
     }
 
     $responseData = [

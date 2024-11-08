@@ -17,6 +17,9 @@ class SubjekResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
+            'indikator' => $this->pivot_indikator_subjek->map(function ($pivot) {
+                return $pivot->indikator->only('id', 'nama');
+            }),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at
         ];

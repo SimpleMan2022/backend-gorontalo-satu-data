@@ -17,11 +17,26 @@ use Illuminate\Support\Facades\Hash;
 class EnumeratorController extends Controller
 {
     use ApiResponse;
+
     public function index(Request $request)
     {
+        // dd($request->user()->user_opd_provinsi()->first()->opd_provinsi_id);
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
             $enumeratorQuery = Enumerator::orderBy('created_at', 'desc');
+
+            if ($user->hasRole('opd_provinsi')) {
+                $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
+                $enumeratorQuery->whereHas('enumerator_provinsi', function ($query) use ($opdProvinsiId) {
+                    $query->where('opd_provinsi_id', $opdProvinsiId);
+                });
+            } elseif ($user->hasRole('opd_kabupaten')) {
+                $opdKabupatenId = $user->user_opd_kabupaten()->first()->opd_kabupaten_id;
+                $enumeratorQuery->whereHas('enumerator_kabupaten', function ($query) use ($opdKabupatenId) {
+                    $query->where('opd_kabupaten_id', $opdKabupatenId);
+                });
+            }
 
             if ($search = $request->query('search')) {
                 $enumeratorQuery->where(function ($query) use ($search) {
@@ -31,10 +46,6 @@ class EnumeratorController extends Controller
                                 ->orWhere('username', 'like', '%' . $search . '%');
                         });
                 });
-            }
-
-            if ($userId = $request->query('user_id')) {
-                $enumeratorQuery->where('user_id', $userId);
             }
 
             $data = $enumeratorQuery->paginate($perPage);
@@ -54,10 +65,11 @@ class EnumeratorController extends Controller
         }
     }
 
+
     public function byIndikatorMobile(Request $request)
     {
         try {
-            
+
             $enumeratorQuery = Enumerator::orderBy('created_at', 'desc');
 
             if ($userId = $request->query('user_id')) {
@@ -65,9 +77,9 @@ class EnumeratorController extends Controller
             }
 
             $data = $enumeratorQuery->first();
-            
 
-            if ($data){
+
+            if ($data) {
                 return $this->successResponseWithData(
                     EnumeratorMobileResource::make($data),
                     'Data enumerator berhasil diambil',
@@ -123,7 +135,7 @@ class EnumeratorController extends Controller
                         'enumerator_id' => $enumerator->id,
                     ]);
                 }
-                $enumerator->assignRole('enumerator');
+                // $enumerator->assignRole('enumerator');
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
         } catch (ValidationException $e) {
@@ -258,8 +270,6 @@ class EnumeratorController extends Controller
                     $rekap->delete();
                 }
             }
-
-
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
