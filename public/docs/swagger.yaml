@@ -4845,14 +4845,6 @@ paths:
                 jabatan:
                   type: string
                   example: "enumerator"
-                opd_kabupaten_id:
-                  type: integer
-                  example: 1
-                  nullable: true
-                opd_provinsi_id:
-                  type: integer
-                  example: 1
-                  nullable: true
       responses:
         "201":
           description: enumerator berhasil ditambahkan
@@ -4987,14 +4979,6 @@ paths:
                 jabatan:
                   type: string
                   example: "enumerator"
-                opd_kabupaten_id:
-                  type: integer
-                  example: 1
-                  nullable: true
-                opd_provinsi_id:
-                  type: integer
-                  example: 1
-                  nullable: true
       responses:
         "201":
           description: enumerator berhasil diperbarui
@@ -6853,15 +6837,9 @@ paths:
             schema:
               type: object
               properties:
-                sektor_id:
-                  type: integer
-                  example: 4
                 sektor_spasial_id:
                   type: integer
                   example: 2
-                opd_provinsi_id:
-                  type: integer
-                  example: 1
                 judul:
                   type: string
                   example: Sebaraan Jumlah Fasilitas
@@ -6999,15 +6977,9 @@ paths:
             schema:
               type: object
               properties:
-                sektor_id:
-                  type: integer
-                  example: 4
                 sektor_spasial_id:
                   type: integer
                   example: 2
-                opd_provinsi_id:
-                  type: integer
-                  example: 1
                 judul:
                   type: string
                   example: Sebaraan Jumlah Fasilitas
