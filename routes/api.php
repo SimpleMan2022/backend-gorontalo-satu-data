@@ -26,6 +26,7 @@ use App\Http\Controllers\OlahanSpasialController;
 use App\Http\Controllers\SpasialKabupatenController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\HasilSpasialController;
+use App\Http\Controllers\LandingController;
 use App\Http\Controllers\MobileController;
 use Illuminate\Support\Facades\Route;
 
@@ -35,6 +36,13 @@ Route::prefix("auth")->controller(AuthController::class)->group(function () {
     Route::post("login-enumerator", "loginEnumerator")->name('login-enumerator');
     Route::post('forgot-password', [ForgotPasswordController::class, 'sendResetLink'])->name('password.reset');
     Route::post('reset-password', [ForgotPasswordController::class, 'resetPassword']);
+});
+
+Route::prefix("landing")->controller(LandingController::class)->group(function () {
+    Route::get("sektor", "getSektor");
+    Route::get("antar-waktu", "getAntarWaktu");
+    Route::get("indikator", "getIndikatorandDataSearch");
+    Route::get("opd-provinsi", "getOpdProvinsi");
 });
 
 Route::prefix("data")->controller(DataController::class)->group(function () {
