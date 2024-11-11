@@ -18,6 +18,7 @@ class PeriodeController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
             $periodeQuery = Periode::orderBy('created_at', 'desc');
 
@@ -25,7 +26,8 @@ class PeriodeController extends Controller
                 $periodeQuery->where('nama', 'like', '%' . $search . '%');
             }
 
-            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
+            if ($user->hasRole('opd_provinsi')) {
+                $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
                 $periodeQuery->where('opd_provinsi_id', $opdProvinsiId);
             }
             $data = $periodeQuery->paginate($perPage);
