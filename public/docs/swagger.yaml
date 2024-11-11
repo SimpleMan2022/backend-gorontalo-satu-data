@@ -4393,17 +4393,19 @@ paths:
                           type: string
                           example: menurut usia 1-5 bulan
                         indikator: 
-                          type: object
-                          properties:
-                            id:
-                              type: integer
-                              example: 1
-                            nama:
-                              type: string
-                              example: "Agregat sebaran fasilitas kesehatan negeri"
-                            status:
-                              type: string
-                              example: "public"
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              nama:
+                                type: string
+                                example: "Agregat sebaran fasilitas kesehatan negeri"
+                              status:
+                                type: string
+                                example: "public"
                         created_at:
                           type: string
                           format: date-time
@@ -8534,6 +8536,276 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedResponse" 
+  /landing/sektor:
+    get:
+      tags:
+        - Landing
+      summary: Mendapatkan semua data sektor
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data sektor
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data sektor berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nama:
+                          type: string
+                          example: "Pendidikan"
+                        logo:
+                          type: string
+                          example: "logo/1.webp"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T16:02:20.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /landing/antar-waktu:
+    get:
+      tags:
+        - Landing
+      summary: Mendapatkan semua data antar waktu
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data antar waktu
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data antar waktu berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        tahun:
+                          type: string
+                          example: "2021"
+                        nama:
+                          type: string
+                          example: "Triwulan 1"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T16:02:20.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /landing/opd-provinsi:
+    get:
+      tags:
+        - Landing
+      summary: Mendapatkan semua data opd provinsi view
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data opd provinsi view
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data opd provinsi berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nama:
+                          type: string
+                          example: "Dinas Kesehatan"
+                        logo:
+                          type: string
+                          example: "logo/1.webp"
+                        lokasi:
+                          type: string
+                          example: "Gorontalo Barat"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T16:02:20.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /landing/indikator:
+    get:
+      tags:
+        - Landing
+      summary: Mendapatkan semua data indikator
+      parameters:
+        - $ref: "#/components/parameters/SearchParam"
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: sektor_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: opd_provinsi_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Berhasil mendapatkan data indikator
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data indikator berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nama:
+                          type: string
+                          example: "Sebaran Jumlah Fasilitas"
+                        sektor:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Pendidikan"
+                        opd_provinsi:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Dinas Kesehatan"
+                        status:
+                          type: string
+                          example: "public"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T16:02:20.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
 components:
   schemas:
     Pagination:
@@ -8548,7 +8820,7 @@ components:
         current_page:
           type: number
           example: 1
-        total_pages:
+        last_page:
           type: number
           example: 1
 

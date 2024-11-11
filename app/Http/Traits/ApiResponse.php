@@ -2,6 +2,9 @@
 
 namespace App\Http\Traits;
 
+use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Pagination\Paginator;
+
 trait ApiResponse
 {
     protected static $response1 = [
@@ -21,12 +24,16 @@ trait ApiResponse
         self::$response1['status'] = true;
         self::$response1['message'] = $message;
         self::$response1['data'] = $data_resource;
-        self::$response1['pagination'] = [
-            'current_page' => $data_model->currentPage(),
-            'per_page' => $data_model->perPage(),
-            'total' => $data_model->total(),
-            'last_page' => $data_model->lastPage()
-        ];
+        if ($data_model instanceof LengthAwarePaginator || $data_model instanceof Paginator) {
+            self::$response1['pagination'] = [
+                'current_page' => $data_model->currentPage(),
+                'per_page' => $data_model->perPage(),
+                'total' => $data_model->total(),
+                'last_page' => $data_model->lastPage()
+            ];
+        } else {
+            self::$response1['pagination'] = null;
+        }
         return response()->json(self::$response1, self::$response1['code']);
     }
     public static function successResponseWithData($data = null, $message = null, $code = 200)
