@@ -18,10 +18,9 @@ class OlahanSpasialController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
-
-            $olahanQuery = OlahanSpasial::orderBy('created_at', 'desc');
-
+            $olahanQuery = OlahanSpasial::where('opd_provinsi_id', $user->user_opd_provinsi()->first()->opd_provinsi_id)->orderBy('created_at', 'desc');
             if ($search = $request->query('search')) {
                 $olahanQuery->where('judul', 'like', '%' . $search . '%');
             }
@@ -29,7 +28,6 @@ class OlahanSpasialController extends Controller
             if ($opdProvId = $request->query('opd_provinsi_id')) {
                 $olahanQuery->where('opd_provinsi_id', $opdProvId);
             }
-
 
             if ($sektorSpasial = $request->query('sektor_spasial_id')) {
                 $olahanQuery->where('sektor_spasial_id', $sektorSpasial);
@@ -55,12 +53,13 @@ class OlahanSpasialController extends Controller
     {
         try {
             $req = $request->validate([
-                'opd_provinsi_id' => 'required|exists:opd_provinsi,id',
                 'sektor_spasial_id' => 'required|exists:sektor_spasial,id',
                 'judul' => 'required|string',
                 'konten' => 'required|string',
                 'status' => 'required|in:public,private',
             ]);
+
+            $req['opd_provinsi_id'] = $request->user()->user_opd_provinsi()->first()->opd_provinsi_id;
 
             OlahanSpasial::create($req);
 
@@ -97,13 +96,15 @@ class OlahanSpasialController extends Controller
     public function update(Request $request, $id)
     {
         try {
+            $user = $request->user();
             $req = $request->validate([
-                'opd_provinsi_id' => 'required|exists:opd_provinsi,id',
                 'sektor_spasial_id' => 'required|exists:sektor_spasial,id',
                 'judul' => 'required|string',
                 'konten' => 'required|string',
                 'status' => 'required|in:public,private',
             ]);
+
+            $req['opd_provinsi_id'] = $user->user_opd_provinsi()->first()->opd_provinsi_id;
 
             $data = OlahanSpasial::find($id);
 

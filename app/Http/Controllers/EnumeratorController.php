@@ -20,7 +20,6 @@ class EnumeratorController extends Controller
 
     public function index(Request $request)
     {
-        // dd($request->user()->user_opd_provinsi()->first()->opd_provinsi_id);
         try {
             $user = $request->user();
             $perPage = $request->per_page ?? 10;
@@ -96,13 +95,18 @@ class EnumeratorController extends Controller
     public function store(Request $request)
     {
         try {
+            $user = $request->user();
             $validated = $request->validate([
                 'email' => 'required|email|unique:users',
                 'nama' => 'required',
                 'jabatan' => 'required',
-                'opd_kabupaten_id' => 'nullable|integer|prohibited_if:opd_provinsi_id,!=null',
-                'opd_provinsi_id' => 'nullable|integer|prohibited_if:opd_kabupaten_id,!=null',
             ]);
+
+            if ($user->hasRole('opd_provinsi')) {
+                $validated['opd_provinsi_id'] = $user->user_opd_provinsi()->first()->opd_provinsi_id;
+            } elseif ($user->hasRole('opd_kabupaten')) {
+                $validated['opd_kabupaten_id'] = $user->user_opd_kabupaten()->first()->opd_kabupaten_id;
+            }
 
             // Mengubah menjadi huruf kecil
             $lowercaseString = strtolower($request->nama);
@@ -110,28 +114,27 @@ class EnumeratorController extends Controller
             $validated['username'] = str_replace(' ', '', $lowercaseString);
 
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
-            $user = User::create($validated);
-            if ($user) {
+            $newUser = User::create($validated);
+            if ($newUser) {
                 // Create Enumerator entry
                 $enumerator = Enumerator::create([
                     'nama' => $request->nama,
-                    'user_id' => $user->id,
+                    'user_id' => $newUser->id,
                     'jabatan' => $request->jabatan,
                 ]);
-
-                $user->assignRole('enumerator');
+                $newUser->assignRole('enumerator');
                 // Check for opd_kabupaten_id and create in EnumeratorKabupaten
-                if ($request->opd_kabupaten_id) {
+                if ($user->hasRole('opd_kabupaten')) {
                     EnumeratorKabupaten::create([
-                        'opd_kabupaten_id' => $request->opd_kabupaten_id,
+                        'opd_kabupaten_id' => $user->user_opd_provinsi()->first()->opd_kabupaten_id,
                         'enumerator_id' => $enumerator->id,
                     ]);
                 }
 
                 // Check for opd_provinsi_id and create in EnumeratorProvinsi
-                if ($request->opd_provinsi_id) {
+                if ($user->hasRole('opd_provinsi')) {
                     EnumeratorProvinsi::create([
-                        'opd_provinsi_id' => $request->opd_provinsi_id,
+                        'opd_provinsi_id' => $user->user_opd_provinsi()->first()->opd_provinsi_id,
                         'enumerator_id' => $enumerator->id,
                     ]);
                 }
@@ -172,6 +175,7 @@ class EnumeratorController extends Controller
     public function update(Request $request, string $id)
     {
         try {
+            $loginUser = $request->user();
             // Temukan enumerator terlebih dahulu
             $enumerator = Enumerator::find($id);
 
@@ -190,14 +194,18 @@ class EnumeratorController extends Controller
                 'email' => 'required|email|unique:users,email,' . $user->id . ',id',
                 'nama' => 'required',
                 'jabatan' => 'required',
-                'opd_kabupaten_id' => 'nullable|integer|prohibited_if:opd_provinsi_id,!=null',
-                'opd_provinsi_id' => 'nullable|integer|prohibited_if:opd_kabupaten_id,!=null',
             ]);
+
+            if ($loginUser->hasRole('opd_provinsi')) {
+                $validated['opd_provinsi_id'] = $loginUser->user_opd_provinsi()->first()->opd_provinsi_id;
+            } elseif ($loginUser->hasRole('opd_kabupaten')) {
+                $validated['opd_kabupaten_id'] = $loginUser->user_opd_kabupaten()->first()->opd_kabupaten_id;
+            }
 
             // Update data user
             $user->update([
                 'email' => $validated['email'],
-                'nama' => $request->nama,
+                'username' => $request->nama,
             ]);
 
             // Update data enumerator
@@ -205,41 +213,6 @@ class EnumeratorController extends Controller
                 'nama' => $request->nama,
                 'jabatan' => $request->jabatan,
             ]);
-
-            // Cek jika perpindahan dari opd_kabupaten ke opd_provinsi
-            if ($request->opd_provinsi_id) {
-                // Hapus data di EnumeratorKabupaten jika ada perpindahan ke opd_provinsi
-                EnumeratorKabupaten::where('enumerator_id', $id)->delete();
-
-                // Cek apakah EnumeratorProvinsi sudah ada
-                $enumeratorProvinsi = EnumeratorProvinsi::where('enumerator_id', $id)->first();
-                if ($enumeratorProvinsi) {
-                    $enumeratorProvinsi->update([
-                        'opd_provinsi_id' => $request->opd_provinsi_id,
-                    ]);
-                } else {
-                    EnumeratorProvinsi::create([
-                        'opd_provinsi_id' => $request->opd_provinsi_id,
-                        'enumerator_id' => $id,
-                    ]);
-                }
-            } elseif ($request->opd_kabupaten_id) {
-                // Hapus data di EnumeratorProvinsi jika ada perpindahan ke opd_kabupaten
-                EnumeratorProvinsi::where('enumerator_id', $id)->delete();
-
-                // Cek apakah EnumeratorKabupaten sudah ada
-                $enumeratorKabupaten = EnumeratorKabupaten::where('enumerator_id', $id)->first();
-                if ($enumeratorKabupaten) {
-                    $enumeratorKabupaten->update([
-                        'opd_kabupaten_id' => $request->opd_kabupaten_id,
-                    ]);
-                } else {
-                    EnumeratorKabupaten::create([
-                        'opd_kabupaten_id' => $request->opd_kabupaten_id,
-                        'enumerator_id' => $id,
-                    ]);
-                }
-            }
 
             return $this->successResponse('Data enumerator berhasil diubah', Response::HTTP_OK);
         } catch (ValidationException $e) {
