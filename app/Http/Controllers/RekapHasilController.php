@@ -56,19 +56,17 @@ class RekapHasilController extends Controller
                     ->get();
 
                 // Group hasil_data into pairs
-                $groupedHasilData = collect();
-                foreach ($allHasilData->chunk(2) as $chunk) {
-                    $groupedHasilData->push(
-                        $chunk->map(function ($hasil) {
-                            return [
-                                'hasil_data_id' => $hasil->id,
-                                'nama' => $hasil->variabel->nama,
-                                'tipe' => $hasil->variabel->tipe,
-                                'konten' => $hasil->konten,
-                            ];
-                        })->values()
-                    );
-                }
+                $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
+                    return $items->map(function ($hasil) {
+                        return [
+                            'hasil_data_id' => $hasil->id,
+                            'nama' => $hasil->variabel->nama,
+                            'tipe' => $hasil->variabel->tipe,
+                            'konten' => $hasil->konten,
+                        ];
+                    })->values();
+                })->values();
+                
 
                 $formattedData = [
                     'id' => (int) $indikatorId,
