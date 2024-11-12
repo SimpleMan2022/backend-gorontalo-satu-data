@@ -8473,9 +8473,9 @@ paths:
                   enumerator_id:
                     type: integer
                     example: 1
-                  indikator_id:
+                  variabel_id:
                     type: integer
-                    example: 1
+                    example: 7
                   konten:
                     type: string
                     example: "Deskripsi singkat"     
