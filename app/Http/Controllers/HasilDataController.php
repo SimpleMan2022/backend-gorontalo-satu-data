@@ -3,7 +3,17 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{HasilData, Variabel, RekapHasil, Periode, Enumerator, OpdProvinsi, OpdKabupaten, PivotEnumeratorIndikator};
+use App\Models\{
+    HasilData, 
+    Variabel, 
+    RekapHasil, 
+    Periode, 
+    Enumerator, 
+    OpdProvinsi, 
+    OpdKabupaten, 
+    PivotEnumeratorIndikator,
+    Indikator
+};
 use App\Http\Resources\HasilDataResource;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Support\Facades\Validator;
@@ -54,7 +64,11 @@ class HasilDataController extends Controller
             $data = $request->json()->all();
 
             $enumeratorId = collect($data)->pluck('enumerator_id')->first();
-
+            
+            $variabel_id = collect($data)->pluck('variabel_id')->first();
+            $variabel =Variabel::where('id', $variabel_id)->first();
+            $indikator = Indikator::where('id', $variabel->indikator_id)->first();
+            
 
             if($enumeratorId) {
                 $enumerator = Enumerator::where('id', $enumeratorId)
@@ -122,6 +136,7 @@ class HasilDataController extends Controller
                         'nama' => $nama_rekap,
                         'enumerator_id' => $enumerator->id ?? $enumeratorId,
                         'periode_id' => $periode->id,
+                        'indikator_id' => $indikator->id ?? $variabel->indikator_id,
                         'status' => $enumerator['enumerator_level'] == 'provinsi' ? 'v3' : 'v2',
                     ]);
                 }else {
@@ -221,7 +236,7 @@ class HasilDataController extends Controller
                                 'status' => 'submit'
                             ]);
                         }else {
-                            return $this->errorResponse('Terjadi Kesalahan di Pivot Enumerator Indikator', Response::HTTP_INTERNAL_SERVER_ERROR);
+                            return $this->errorResponse('Enumerator Indikator belum dikaitkan', Response::HTTP_INTERNAL_SERVER_ERROR);
 
                         }
                         
@@ -275,6 +290,10 @@ class HasilDataController extends Controller
             $data = $request->json()->all();
 
             $enumeratorId = collect($data)->pluck('enumerator_id')->first();
+
+            $variabel_id = collect($data)->pluck('variabel_id')->first();
+            $variabel =Variabel::where('id', $variabel_id)->first();
+            $indikator = Indikator::where('id', $variabel->indikator_id)->first();
 
             if($enumeratorId) {
                 $enumerator = Enumerator::where('id', $enumeratorId)
@@ -343,6 +362,7 @@ class HasilDataController extends Controller
                         'nama' => $nama_rekap,
                         'enumerator_id' => $enumeratorId ?? $rekap_hasil->enumerator_id,
                         'periode_id' => $periode->id ?? $rekap_hasil->periode_id,
+                        'indikator_id' => $indikator->id ?? $variabel->indikator_id,
                         'status' => $enumerator['enumerator_level'] == 'provinsi' ? 'v3' : 'v2',
                     ]);
                 }else {
