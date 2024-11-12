@@ -182,7 +182,8 @@ class MobileController extends Controller
     {
         try {
             // Validate that enumerator_id is provided
-            $enumerator_id = $request->query('enumerator_id');
+            $enumerator_id = Enumerator::where('user_id', $request->user()->id)->first()->id;
+            // Validate that enumerator_id is provided
             if (!$enumerator_id) {
                 return $this->errorResponse(
                     'enumerator_id is required',

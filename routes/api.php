@@ -304,7 +304,8 @@ Route::prefix('mobile')->middleware('auth:sanctum')->group(function () {
     Route::get("/dashboard/enumerator/indikator", MobileController::class . "@EnumeratorIndikator");
     Route::get("/dashboard/enumerator/riwayat", MobileController::class . "@RiwayatEnumerator");
     Route::get("/profile", AuthController::class . "@getEnumeratorMobile");
-    Route::post('/hasil-data', HasilDataController::class . "@store");
+    Route::post("/hasil-data", HasilDataController::class . "@store");
+    Route::put("/hasil-data/edit/{rekap_hasil_id}", HasilDataController::class . "@update");
 });
 
 Route::get('/docs', function () {
