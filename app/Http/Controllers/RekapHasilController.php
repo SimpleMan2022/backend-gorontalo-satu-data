@@ -22,7 +22,7 @@ class RekapHasilController extends Controller
     public function index(Request $request)
     {
         try {
-            $hasilQuery = RekapHasil::with(['hasil_data.variabel.indikator', 'enumerator', 'periode.opd_provinsi'])
+            $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi'])
                 ->orderBy('created_at', 'desc');
 
             if ($enumeratorId = $request->query('enumerator_id')) {
@@ -34,7 +34,7 @@ class RekapHasilController extends Controller
             }
 
             if ($indikatorId = $request->query('indikator_id')) {
-                $hasilQuery->whereHas('hasil_data.variabel.indikator', function ($query) use ($indikatorId) {
+                $hasilQuery->whereHas('indikator', function ($query) use ($indikatorId) {
                     $query->where('id', $indikatorId);
                 });
             }
@@ -152,7 +152,6 @@ class RekapHasilController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
-
 
     public function show(string $id)
     {

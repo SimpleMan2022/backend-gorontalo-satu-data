@@ -22,4 +22,8 @@ class RekapHasil extends Model
     public function periode() {
         return $this->belongsTo(Periode::class);
     }
+
+    public function indikator() {
+        return $this->belongsTo(Indikator::class);
+    }
 }

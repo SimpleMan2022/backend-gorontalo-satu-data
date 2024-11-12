@@ -14,8 +14,9 @@ return new class extends Migration
         Schema::create('rekap_hasil', function (Blueprint $table) {
             $table->id();
             $table->string('nama');
-            $table->foreignId('enumerator_id')->references('id')->on('enumerator')->onDelete('cascade');
-            $table->foreignId('periode_id')->references('id')->on('periode')->onDelete('cascade');
+            $table->foreignId('enumerator_id')->nullable()->references('id')->on('enumerator')->onDelete('set null');
+            $table->foreignId('periode_id')->references('id')->on('periode')->onDelete('restrict');
+            $table->foreignId('indikator_id')->references('id')->on('indikator')->onDelete('cascade');
             $table->enum('status',['v2','v3','tolak','revisi','terima']);
             $table->timestamps();
         });
