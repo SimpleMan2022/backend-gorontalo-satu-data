@@ -102,11 +102,7 @@ class SektorController extends Controller
             // Membuat Validasi
             $validated = $request->validate([
                 'nama' => 'required',
-                'logo' => [
-                    'nullable',
-                    'url', // Validasi bahwa input adalah URL
-                    'regex:/^https?:\/\/.+\.(webp)$/i' // Validasi format .webp di URL
-                ]
+                'logo' => 'required|starts_with:/logo/sector'
             ]);
 
             $data = Sektor::find($sektor);
