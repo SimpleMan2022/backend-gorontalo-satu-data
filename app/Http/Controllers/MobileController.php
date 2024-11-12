@@ -191,36 +191,63 @@ class MobileController extends Controller
                 );
             }
 
-            // Get the search query parameter
-            $search = $request->query('search');
+            $query = RekapHasil::with(['indikator.opd_provinsi' => function ($query) {
+                $query->select(['id', 'nama', 'logo']);
+            }])->with(['indikator.sektor' => function ($query) {
+                $query->select(['id', 'nama']);
+            }])->where('enumerator_id', $enumerator_id);
 
-            // Retrieve data from Enumerator with Indikator details through the pivot table
-            $data = Enumerator::with(['pivot_enumerator_indikator.indikator' => function ($query) use ($search) {
-                $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
-                if ($search) {
-                    $query->where('nama', 'like', '%' . $search . '%');
-                }
-            }])
-                ->where('id', $enumerator_id)
-                ->get()
-                ->flatMap(function ($enumerator) {
-                    return $enumerator->pivot_enumerator_indikator
-                        ->filter(function ($pivot) {
-                            return $pivot->indikator !== null;
-                        })
-                        ->map(function ($pivot) {
-                            return [
-                                'nama_sektor' => $pivot->indikator->sektor->nama,
-                                'indikator_id' => $pivot->indikator->id,
-                                'status' => $pivot->status,
-                                'nama_indikator' => $pivot->indikator->nama,
-                                'nama_opd' => $pivot->indikator->opd_provinsi->nama,
-                                'logo_opd' => $pivot->indikator->opd_provinsi->logo,
-                                'created_at' => $pivot->created_at,
-                                'updated_at' => $pivot->updated_at,
-                            ];
-                        });
-                });
+            if ($status = $request->query('status')) {
+                $query->where('status', $status);
+            }
+
+            $data = $query->get()->map(function ($rekap) {
+                return [
+                    'id' => $rekap->id,
+                    'nama_indikator' => $rekap->indikator->nama,
+                    'nama_sektor' => $rekap->indikator->sektor->nama,
+                    'status' => $rekap->status,
+                    'nama_opd' => $rekap->indikator->opd_provinsi->nama,
+                    'logo_opd' => $rekap->indikator->opd_provinsi->logo,
+                    'created_at' => $rekap->created_at,
+                    'updated_at' => $rekap->updated_at,
+                ];
+            });
+
+            
+            // Get the search query parameter
+            // $search = $request->query('search');
+
+            // // Retrieve data from Enumerator with Indikator details through the pivot table
+            // $data = Enumerator::with(['rekapHasil' => function ($query) use ($search) {
+            //     $query->select(['id', 'nama', 'status']);
+            // }])->with(['pivot_enumerator_indikator.indikator' => function ($query) use ($search) {
+            //     $query->select(['id', 'nama', 'sektor_id', 'opd_provinsi_id']);
+            //     if ($search) {
+            //         $query->where('nama', 'like', '%' . $search . '%');
+            //     }
+            // }])
+            //     ->where('id', $enumerator_id)
+            //     ->get()
+            //     ->flatMap(function ($enumerator) {
+            //         return $enumerator->pivot_enumerator_indikator
+            //             ->filter(function ($pivot) {
+            //                 return $pivot->indikator !== null;
+            //             })
+            //             ->map(function ($pivot) {
+            //                 return [
+            //                     'nama_sektor' => $pivot->indikator->sektor->nama,
+            //                     'indikator_id' => $pivot->indikator->id,
+            //                     'status' => $pivot->status,
+            //                     'nama_indikator' => $pivot->indikator->nama,    
+            //                     'status_rekap' => $pivot->indikator->rekap_hasil->last(),
+            //                     'nama_opd' => $pivot->indikator->opd_provinsi->nama,
+            //                     'logo_opd' => $pivot->indikator->opd_provinsi->logo,
+            //                     'created_at' => $pivot->created_at,
+            //                     'updated_at' => $pivot->updated_at,
+            //                 ];
+            //             });
+            //     });
 
 
             return $this->successResponseWithData(
