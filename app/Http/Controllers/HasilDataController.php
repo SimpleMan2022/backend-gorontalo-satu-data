@@ -62,8 +62,8 @@ class HasilDataController extends Controller
     {
         try {
             $data = $request->json()->all();
-
-            $enumeratorId = collect($data)->pluck('enumerator_id')->first();
+            // dd($request->user());
+            $enumeratorId = $request->user();
             
             $variabel_id = collect($data)->pluck('variabel_id')->first();
             $variabel =Variabel::where('id', $variabel_id)->first();
@@ -71,10 +71,11 @@ class HasilDataController extends Controller
             
 
             if($enumeratorId) {
-                $enumerator = Enumerator::where('id', $enumeratorId)
+                $enumerator = Enumerator::where('user_id', $enumeratorId->id)
                     ->with('enumerator_kabupaten')
                     ->with('enumerator_provinsi')
                     ->first();
+                // dd($enumeratorId);
                 if(!$enumerator) {
                     return $this->errorResponse('Enumerator tidak valid', Response::HTTP_NOT_FOUND);                    return $this->errorResponse('Enumerator masih kosong', Response::HTTP_NOT_FOUND);
                 }
@@ -289,14 +290,15 @@ class HasilDataController extends Controller
         try {
             $data = $request->json()->all();
 
-            $enumeratorId = collect($data)->pluck('enumerator_id')->first();
+            $enumeratorId = $request->user();;
+            // $enumeratorId = collect($data)->pluck('enumerator_id')->first();
 
             $variabel_id = collect($data)->pluck('variabel_id')->first();
             $variabel =Variabel::where('id', $variabel_id)->first();
             $indikator = Indikator::where('id', $variabel->indikator_id)->first();
 
             if($enumeratorId) {
-                $enumerator = Enumerator::where('id', $enumeratorId)
+                $enumerator = Enumerator::where('user_id', $enumeratorId->id)
                 ->with('enumerator_kabupaten')
                 ->with('enumerator_provinsi')
                 ->first();
