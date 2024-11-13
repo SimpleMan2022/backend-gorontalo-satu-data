@@ -230,6 +230,8 @@ class EnumeratorController extends Controller
             $enumerator = Enumerator::find($id);
             $enumerator->delete();
 
+            User::where('id', $enumerator->user_id)->delete();  
+
             // Check for rekap hasil with status 'v3' and delete them
 
             if ($enumerator->enumerator_level == 'provinsi') {
@@ -255,21 +257,27 @@ class EnumeratorController extends Controller
             $id = request('id');
             $ids = explode(",", $id);
 
-            $enumerator = Enumerator::whereIn('id', $ids)->pluck('id')->toArray();
-            $notFoundIds = array_diff($ids, $enumerator);
+            $enumeratorId = Enumerator::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $enumerator = Enumerator::whereIn('id',$ids)->get();
+
+            $notFoundIds = array_diff($ids, $enumeratorId);
 
             if (!empty($notFoundIds)) {
                 return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
             }
 
-            $enumeratorId = Enumerator::whereIn('id', $enumerator)->delete();
+            // Hapus data user
+            User::whereIn('id', $enumerator->pluck('user_id'))->delete();
 
-            if ($enumerator->enumerator_level == 'provinsi') {
+            $enumeratorDelete = Enumerator::whereIn('id', $enumeratorId)->delete();
+            // dd($enuemrator[0]->enumerator_level);
+            if ($enumerator[0]->enumerator_level == 'provinsi') {
                 $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v2')->get();
                 foreach ($rekapHasilV3 as $rekap) {
                     $rekap->delete();
                 }
-            } else if ($enumerator->enumerator_level == 'kabupaten') {
+            } else if ($enumerator[0]->enumerator_level == 'kabupaten') {
                 $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v3')->get();
                 foreach ($rekapHasilV3 as $rekap) {
                     $rekap->delete();
