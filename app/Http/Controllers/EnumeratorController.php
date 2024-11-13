@@ -126,7 +126,7 @@ class EnumeratorController extends Controller
                 // Check for opd_kabupaten_id and create in EnumeratorKabupaten
                 if ($user->hasRole('opd_kabupaten')) {
                     EnumeratorKabupaten::create([
-                        'opd_kabupaten_id' => $user->user_opd_provinsi()->first()->opd_kabupaten_id,
+                        'opd_kabupaten_id' => $user->user_opd_kabupaten()->first()->opd_kabupaten_id,
                         'enumerator_id' => $enumerator->id,
                     ]);
                 }
@@ -232,12 +232,12 @@ class EnumeratorController extends Controller
 
             // Check for rekap hasil with status 'v3' and delete them
 
-            if($enumerator->enumerator_level == 'provinsi'){
+            if ($enumerator->enumerator_level == 'provinsi') {
                 $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v2')->get();
                 foreach ($rekapHasilV3 as $rekap) {
                     $rekap->delete();
                 }
-            }else if($enumerator->enumerator_level == 'kabupaten') {
+            } else if ($enumerator->enumerator_level == 'kabupaten') {
                 $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v3')->get();
                 foreach ($rekapHasilV3 as $rekap) {
                     $rekap->delete();
@@ -264,12 +264,12 @@ class EnumeratorController extends Controller
 
             $enumeratorId = Enumerator::whereIn('id', $enumerator)->delete();
 
-            if($enumerator->enumerator_level == 'provinsi'){
+            if ($enumerator->enumerator_level == 'provinsi') {
                 $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v2')->get();
                 foreach ($rekapHasilV3 as $rekap) {
                     $rekap->delete();
                 }
-            }else if($enumerator->enumerator_level == 'kabupaten') {
+            } else if ($enumerator->enumerator_level == 'kabupaten') {
                 $rekapHasilV3 = RekapHasil::where('enumerator_id', $id)->where('status', 'v3')->get();
                 foreach ($rekapHasilV3 as $rekap) {
                     $rekap->delete();
