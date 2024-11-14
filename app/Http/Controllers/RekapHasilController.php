@@ -43,7 +43,35 @@ class RekapHasilController extends Controller
 
             if ($data) {
                 // Jika data ditemukan, format hasil seperti biasa
-                $allHasilData = HasilData::with('variabel')
+                // if($request->user()->hasRole('opd_provinsi')) {
+                //     $allHasilData = HasilData::with(['variabel','rekap_hasil'])
+                //         ->whereHas('rekap_hasil', function ($query) use ($request) {
+                //             if ($enumeratorId = $request->query('enumerator_id')) {
+                //                 $query->where('enumerator_id', $enumeratorId);
+                //             }
+                //             if ($periodeId = $request->query('periode_id')) {
+                //                 $query->where('periode_id', $periodeId);
+                //             }
+                //         })
+                //         ->select('hasil_data.*', DB::raw('MAX(rekap_hasil.status) as rekap_hasil_status'))
+                //         ->orderBy('created_at', 'desc')
+                //         ->where('rekap_hasil.status','v2')
+                //         ->get();
+                // } else if($request->user()->hasRole('opd_kabupaten')) {
+                //     $allHasilData = HasilData::with('variabel')
+                //         ->whereHas('rekap_hasil', function ($query) use ($request) {
+                //             if ($enumeratorId = $request->query('enumerator_id')) {
+                //                 $query->where('enumerator_id', $enumeratorId);
+                //             }
+                //             if ($periodeId = $request->query('periode_id')) {
+                //                 $query->where('periode_id', $periodeId);
+                //             }
+                //         })
+                //         ->orderBy('created_at', 'desc')
+                //         ->where('rekap_hasil.status','v3')
+                //         ->get();
+                // } else {
+                    $allHasilData = HasilData::with('variabel')
                     ->whereHas('rekap_hasil', function ($query) use ($request) {
                         if ($enumeratorId = $request->query('enumerator_id')) {
                             $query->where('enumerator_id', $enumeratorId);
@@ -54,6 +82,7 @@ class RekapHasilController extends Controller
                     })
                     ->orderBy('created_at', 'desc')
                     ->get();
+                // }
 
                 // Group hasil_data into pairs
                 $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
