@@ -43,35 +43,8 @@ class RekapHasilController extends Controller
 
             if ($data) {
                 // Jika data ditemukan, format hasil seperti biasa
-                // if($request->user()->hasRole('opd_provinsi')) {
-                //     $allHasilData = HasilData::with(['variabel','rekap_hasil'])
-                //         ->whereHas('rekap_hasil', function ($query) use ($request) {
-                //             if ($enumeratorId = $request->query('enumerator_id')) {
-                //                 $query->where('enumerator_id', $enumeratorId);
-                //             }
-                //             if ($periodeId = $request->query('periode_id')) {
-                //                 $query->where('periode_id', $periodeId);
-                //             }
-                //         })
-                //         ->select('hasil_data.*', DB::raw('MAX(rekap_hasil.status) as rekap_hasil_status'))
-                //         ->orderBy('created_at', 'desc')
-                //         ->where('rekap_hasil.status','v2')
-                //         ->get();
-                // } else if($request->user()->hasRole('opd_kabupaten')) {
-                //     $allHasilData = HasilData::with('variabel')
-                //         ->whereHas('rekap_hasil', function ($query) use ($request) {
-                //             if ($enumeratorId = $request->query('enumerator_id')) {
-                //                 $query->where('enumerator_id', $enumeratorId);
-                //             }
-                //             if ($periodeId = $request->query('periode_id')) {
-                //                 $query->where('periode_id', $periodeId);
-                //             }
-                //         })
-                //         ->orderBy('created_at', 'desc')
-                //         ->where('rekap_hasil.status','v3')
-                //         ->get();
-                // } else {
-                    $allHasilData = HasilData::with('variabel')
+                
+                    $allHasilData = HasilData::with(['variabel', 'rekap_hasil'])
                     ->whereHas('rekap_hasil', function ($query) use ($request) {
                         if ($enumeratorId = $request->query('enumerator_id')) {
                             $query->where('enumerator_id', $enumeratorId);
@@ -81,20 +54,39 @@ class RekapHasilController extends Controller
                         }
                     })
                     ->orderBy('created_at', 'desc')
-                    ->get();
-                // }
+                    ->get();                
 
                 // Group hasil_data into pairs
+                
                 $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
-                    return $items->map(function ($hasil) {
-                        return [
-                            'hasil_data_id' => $hasil->id,
-                            'nama' => $hasil->variabel->nama,
-                            'tipe' => $hasil->variabel->tipe,
-                            'konten' => $hasil->konten,
-                        ];
-                    })->values();
+                    return [
+                        'id' => $items[0]->rekap_hasil->id,
+                        'nama' => $items[0]->rekap_hasil->nama,
+                        'status' => $items[0]->rekap_hasil->status,
+                        // 'Status' => $items->rekap_hasil->status,
+                        'hasil_data' => $items->map(function ($hasil) {
+                            return [
+                                'hasil_data_id' => $hasil->id,
+                                'nama' => $hasil->variabel->nama,
+                                'tipe' => $hasil->variabel->tipe,
+                                'konten' => $hasil->konten,
+                            ];
+                        })->values()
+                    ];
                 })->values();
+
+                // $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
+                //     return $items->map(function ($hasil) {
+                //         return [
+                //             'hasil_data_id' => $hasil->id,
+                //             'nama' => $hasil->variabel->nama,
+                //             'tipe' => $hasil->variabel->tipe,
+                //             'konten' => $hasil->konten,
+                //         ];
+                //     })->values();
+                // })->values();
+
+                // return $groupedHasilData;
                 
 
                 $formattedData = [
@@ -179,6 +171,12 @@ class RekapHasilController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    // public function byIndikator(Request $request) {
+    //     try {
+            
+    //     }
+    // }
 
     public function show(string $id)
     {
