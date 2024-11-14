@@ -83,6 +83,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // Indikator
     Route::prefix('indikator')->controller(IndikatorController::class)->group(function () {
         Route::get("", "index");
+        Route::get("export-data/{id}", "exportData");
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::patch("/update-status/{id}", "updateStatus");

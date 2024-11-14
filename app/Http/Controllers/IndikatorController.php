@@ -3,13 +3,16 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{Indikator};
+use App\Models\{Indikator, RekapHasil};
 use App\Http\Resources\IndikatorResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
+use App\Exports\RekapHasilExport;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
+use Maatwebsite\Excel\Facades\Excel;
+use Str;
 
 class IndikatorController extends Controller
 {
@@ -50,6 +53,27 @@ class IndikatorController extends Controller
             }
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function exportData(Request $request, $id)
+    { 
+        try {
+            $random = Str::random(10);
+            $rekap_hasil = RekapHasil::with(['indikator','indikator.variabel','hasil_data'])->where('indikator_id', $id)->get();
+            return Excel::download(new RekapHasilExport($rekap_hasil), `Data Indikator ${rekap}.xlsx`);  
+            
+            // $body = [];
+
+            // foreach ($rekap_hasil as $rekap) {
+            //     foreach ($rekap->hasil_data as $item) {
+            //         $body[] = $item->konten;
+            //     }
+            // }
+
+            // return $rekap_hasil;
+        } catch (ModelNotFoundException $e) {
+            return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         }
     }
 
