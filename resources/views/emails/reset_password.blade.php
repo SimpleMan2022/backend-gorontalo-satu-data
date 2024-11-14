@@ -112,7 +112,7 @@
             </div>
             <h1>Gorontalo Satu Data</h1>
             <p>Untuk melanjutkan proses reset password akun Gorontalo Satu Data Makro Anda, silakan klik tombol di bawah ini:</p>
-            <a href="{{ url('api/reset-password?token='.$token->token) }}" class="reset-button">Reset Password</a>
+            <a href="36.67.194.180/auth/reset-password?token={{ $token->token }}" class="reset-button">Reset Password</a>
             <div class="footer">
                 <p>Jika Anda tidak meminta reset password, Anda dapat mengabaikan email ini.</p>
                 <p>&copy; 2024 Gorontalo Satu Data Makro. All rights reserved.</p>
