@@ -83,6 +83,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     // Indikator
     Route::prefix('indikator')->controller(IndikatorController::class)->group(function () {
         Route::get("", "index");
+        Route::get("export-data/{id}", "exportData");
         Route::post("", "store");
         Route::get("/{id}", "show");
         Route::patch("/update-status/{id}", "updateStatus");
@@ -107,6 +108,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('subjek')->controller(SubjekController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
+        Route::post("/pivot-store", "storePivot");
         Route::post("/multi-store", "multiStore");
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");

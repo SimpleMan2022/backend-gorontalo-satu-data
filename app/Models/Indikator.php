@@ -30,7 +30,7 @@ class Indikator extends Model
     }
     public function variabel()
     {
-        return $this->hasMany(Variabel::class);
+        return $this->hasMany(Variabel::class)->orderBy('order','ASC');
     }
     public function pivot_enumerator_indikator()
     {
