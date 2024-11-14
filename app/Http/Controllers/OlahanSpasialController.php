@@ -20,7 +20,12 @@ class OlahanSpasialController extends Controller
         try {
             $user = $request->user();
             $perPage = $request->per_page ?? 10;
-            $olahanQuery = OlahanSpasial::where('opd_provinsi_id', $user->user_opd_provinsi()->first()->opd_provinsi_id)->orderBy('created_at', 'desc');
+            $olahanQuery = OlahanSpasial::orderBy('created_at', 'desc');
+
+            if ($user->hasRole('opd_provinsi')) {
+                $olahanQuery->where('opd_provinsi_id', $user->user_opd_provinsi()->first()->opd_provinsi_id);
+            }
+
             if ($search = $request->query('search')) {
                 $olahanQuery->where('judul', 'like', '%' . $search . '%');
             }
