@@ -108,6 +108,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::prefix('subjek')->controller(SubjekController::class)->group(function () {
         Route::get("", "index");
         Route::post("", "store");
+        Route::post("/pivot-store", "storePivot");
         Route::post("/multi-store", "multiStore");
         Route::get("/{id}", "show");
         Route::patch("/edit/{id}", "update");
