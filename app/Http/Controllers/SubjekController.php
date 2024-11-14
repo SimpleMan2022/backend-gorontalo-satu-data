@@ -101,37 +101,36 @@ class SubjekController extends Controller
     {
         try {
             $req = $request->validate([
-            'nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
-            'indikator_id' => 'required|string',  // Validasi setiap 'indikator_id' di dalam array sebagai string
+                'nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
+                'opd_provinsi_id' => 'required',  // Validasi setiap 'indikator_id' di dalam array sebagai string
             ]);
 
             // Cek apakah subjek sudah ada berdasarkan nama (case insensitive)
-            $subjek = Subjek::whereRaw('LOWER(nama) = ?', [strtolower($request->nama)])->first();
-
-            // Jika subjek belum ada, maka buat baru
-            if (!$subjek) {
-            $subjek = Subjek::create([
-                'nama' => $request->nama,
-            ]);
-            }
-
-            // Pisahkan indikator_id berdasarkan koma dan hilangkan spasi
-            $indikatorIds = array_filter(array_map('trim', explode(',', $request->indikator_id)), function($value) {
-            return $value !== '';
-            });
-
-            foreach ($indikatorIds as $indikatorId) {
-            if (!empty($indikatorId)) {
-                // Buat data pada pivot jika belum ada
-                PivotIndikatorSubjek::firstOrCreate([
-                'indikator_id' => $indikatorId,
-                'subjek_id' => $subjek->id,
-                ]);
-            }
-            }
+            $subjek = Subjek::create($req);
 
             return $this->successResponse(
-            'Data subjek berhasil dibuat',
+                'Data subjek berhasil dibuat',
+                Response::HTTP_CREATED
+            );
+        } catch (ValidationException $e) {
+            return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function storePivot(Request $request)
+    {
+        try {
+            $req = $request->validate([
+                'subjek_id' => 'required|integer',  // Validasi setiap 'nama' di dalam array sebagai string
+                'indikator_id' => 'required|integer',  // Validasi setiap 'indikator_id' di dalam array sebagai string                
+            ]);
+
+            PivotIndikatorSubjek::create($req);
+
+            return $this->successResponse(
+            'Data pivot berhasil dibuat',
             Response::HTTP_CREATED
             );
         } catch (ValidationException $e) {

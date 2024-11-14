@@ -62,16 +62,6 @@ class IndikatorController extends Controller
             $random = Str::random(10);
             $rekap_hasil = RekapHasil::with(['indikator','indikator.variabel','hasil_data'])->where('indikator_id', $id)->get();
             return Excel::download(new RekapHasilExport($rekap_hasil), 'Data Indikator'. $rekap_hasil[0]->indikator->nama .'.xlsx');  
-            
-            // $body = [];
-
-            // foreach ($rekap_hasil as $rekap) {
-            //     foreach ($rekap->hasil_data as $item) {
-            //         $body[] = $item->konten;
-            //     }
-            // }
-
-            // return $rekap_hasil;
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         }
