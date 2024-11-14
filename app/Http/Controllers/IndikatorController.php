@@ -61,7 +61,7 @@ class IndikatorController extends Controller
         try {
             $random = Str::random(10);
             $rekap_hasil = RekapHasil::with(['indikator','indikator.variabel','hasil_data'])->where('indikator_id', $id)->get();
-            return Excel::download(new RekapHasilExport($rekap_hasil), `Data Indikator ${rekap}.xlsx`);  
+            return Excel::download(new RekapHasilExport($rekap_hasil), 'Data Indikator'. $rekap_hasil[0]->indikator->nama .'.xlsx');  
             
             // $body = [];
 
