@@ -2,17 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use Exception;
+use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Http\Traits\ApiResponse;
+use App\Exports\RekapHasilExport;
+use Maatwebsite\Excel\Facades\Excel;
 use App\Models\{Indikator, RekapHasil};
 use App\Http\Resources\IndikatorResource;
-use App\Http\Traits\ApiResponse;
-use Exception;
-use App\Exports\RekapHasilExport;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Validation\ValidationException;
-use Maatwebsite\Excel\Facades\Excel;
-use Str;
+use Symfony\Component\HttpFoundation\Response;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 
 class IndikatorController extends Controller
 {
@@ -21,9 +21,17 @@ class IndikatorController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
             $indikatorQuery = Indikator::orderBy('created_at', 'desc');
 
+            if ($user->hasRole('opd_provinsi')) {
+                $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
+                $indikatorQuery->where('opd_provinsi_id', $opdProvinsiId);
+            } elseif ($user->hasRole('opd_kabupaten')) {
+                $opdProvinsiId = $user->user_opd_kabupaten()->first()->opd_kabupaten()->first()->opd_provinsi_id;
+                $indikatorQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
             $search = $request->query('search');
             if ($search) {
                 $indikatorQuery->where('nama', 'like', '%' . $search . '%');
@@ -36,9 +44,6 @@ class IndikatorController extends Controller
                 $indikatorQuery->where('antar_waktu_id', $antarWaktuId);
             }
 
-            if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
-                $indikatorQuery->where('opd_provinsi_id', $opdProvinsiId);
-            }
             $data = $indikatorQuery->paginate($perPage);
 
             if ($data->isNotEmpty()) {
@@ -57,9 +62,10 @@ class IndikatorController extends Controller
     }
 
     public function exportData(Request $request, $id)
-    { 
+    {
         try {
             $random = Str::random(10);
+
             $rekap_hasil = RekapHasil::with(['indikator','indikator.variabel','hasil_data'])->where('indikator_id', $id)->get();
             return Excel::download(new RekapHasilExport($rekap_hasil), 'Data Indikator'. $rekap_hasil[0]->indikator->nama .'.xlsx');  
         } catch (ModelNotFoundException $e) {

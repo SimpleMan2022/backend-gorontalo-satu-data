@@ -68,37 +68,15 @@ class ForgotPasswordController extends Controller
     {
         try {
             $validated = $request->validate([
-                'email' => 'required|email',
                 'token' => 'required',
                 'password' => 'required|min:8|confirmed',
             ]);
 
-
-            $status = Password::reset(
-                $request->only('email', 'password', 'password_confirmation', 'token'),
-                function (User $user, string $password) {
-                    $user->forceFill([
-                        'password' => Hash::make($password)
-                    ])->setRememberToken(Str::random(60));
-
-                    $user->save();
-
-                    event(new PasswordReset($user));
-                }
-            );
-
-            if ($status) {
-                // return response()->json(['message' => __($status)], 200);
-                return $this->successResponseWithData(
-                    $status,
-                    'Password berhasil diubah',
-                    Response::HTTP_OK
-                );
-            }
-
-            throw ValidationException::withMessages([
-                'email' => [trans($status)],
-            ]);
+            $resetCode = ResetCodePassword::where('token', $validated['token'])->first();
+            $user = User::where('email', $resetCode->email)->first();
+            $user->password = Hash::make($validated['password']);
+            $user->save();
+            return $this->successResponse('Password berhasil diubah', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_BAD_REQUEST);
         }
