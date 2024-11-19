@@ -164,12 +164,16 @@ class AuthController extends Controller
 
   public function logout(Request $request)
   {
-    $request->user()->tokens()->delete();
-
-    return $this->successResponse(
-      'Logout berhasil',
-      Response::HTTP_OK
-    );
+    try {
+      $request->user()->tokens()->delete();
+  
+      return $this->successResponse(
+        'Logout berhasil',
+        Response::HTTP_OK
+      );
+    }catch(Exception $e){
+      return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
   }
 
   public function forgotPassword(Request $request)
