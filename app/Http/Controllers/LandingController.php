@@ -88,6 +88,11 @@ class LandingController extends Controller
             if ($request->query('search')) {
                 $data = $data->where('nama', 'like', '%' . $request->search . '%');
             }
+
+            if ($request->query('antar_waktu')) {
+                $data = $data->where('antar_waktu_id', $request->antar_waktu_id);
+            }
+
             if ($perPage === 'all') {
                 $data = $data->get();
             } else {
