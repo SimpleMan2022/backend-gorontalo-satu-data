@@ -8387,13 +8387,12 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/SearchParam"
-        - name: enumerator_id
+        - name: status
           in: query
-          required: true
+          required: false
           schema:
-            type: integer
-            example: 1
+            type: string
+            example: "v3"
       responses:
         200:
           description: Data Riwayat Enumerator berhasil diambil
