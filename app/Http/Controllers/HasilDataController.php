@@ -357,6 +357,7 @@ class HasilDataController extends Controller
                     }
                 }
                 
+                dd($enumerator['enumerator_level']);
                 if($periode) {
                     $rekap_hasil = RekapHasil::find($rekap_hasil_id);
         

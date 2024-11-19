@@ -182,11 +182,11 @@ class MobileController extends Controller
     {
         try {
             // Validate that enumerator_id is provided
-            $enumerator_id = Enumerator::where('user_id', $request->user()->id)->first()->id;
+            $enumerator_id = Enumerator::where('user_id', $request->user()->id)->first();
             // Validate that enumerator_id is provided
             if (!$enumerator_id) {
                 return $this->errorResponse(
-                    'enumerator_id is required',
+                    'Silahkan login menggunakan enumerator terlebih dahulu',
                     Response::HTTP_BAD_REQUEST
                 );
             }
@@ -195,24 +195,56 @@ class MobileController extends Controller
                 $query->select(['id', 'nama', 'logo']);
             }])->with(['indikator.sektor' => function ($query) {
                 $query->select(['id', 'nama']);
-            }])->where('enumerator_id', $enumerator_id);
+            }])->where('enumerator_id', $enumerator_id->id);
 
             if ($status = $request->query('status')) {
                 $query->where('status', $status);
             }
 
-            $data = $query->get()->map(function ($rekap) {
-                return [
-                    'id' => $rekap->id,
-                    'nama_indikator' => $rekap->indikator->nama,
-                    'nama_sektor' => $rekap->indikator->sektor->nama,
-                    'status' => $rekap->status,
-                    'nama_opd' => $rekap->indikator->opd_provinsi->nama,
-                    'logo_opd' => $rekap->indikator->opd_provinsi->logo,
-                    'created_at' => $rekap->created_at,
-                    'updated_at' => $rekap->updated_at,
-                ];
-            });
+            // dd($enumerator_id->enumerator_level);
+
+            switch ($enumerator_id->enumerator_level) {
+                case 'provinsi':
+                    $data = $query->get()->map(function ($rekap) {
+                        return [
+                            'id' => $rekap->id,
+                            'nama_indikator' => $rekap->indikator->nama,
+                            'nama_sektor' => $rekap->indikator->sektor->nama,
+                            'status' => $rekap->status === 'v3' ? 'menunggu' : $rekap->status,
+                            'nama_opd' => $rekap->indikator->opd_provinsi->nama,
+                            'logo_opd' => $rekap->indikator->opd_provinsi->logo,
+                            'created_at' => $rekap->created_at,
+                        ];
+                    });
+                    break;
+                case 'kabupaten':
+                    $data = $query->get()->map(function ($rekap) {
+                        return [
+                            'id' => $rekap->id,
+                            'nama_indikator' => $rekap->indikator->nama,
+                            'nama_sektor' => $rekap->indikator->sektor->nama,
+                            'status' => $rekap->status === 'v2' ? 'menunggu' : ($rekap->status === 'v3' ? 'diterima' : $rekap->status),
+                            'nama_opd' => $rekap->indikator->opd_provinsi->nama,
+                            'logo_opd' => $rekap->indikator->opd_provinsi->logo,
+                            'created_at' => $rekap->created_at,
+                        ];
+                    });
+                    break;
+                // Add more cases if needed
+            }
+
+            // $data = $query->get()->map(function ($rekap) {
+            //     return [
+            //         'id' => $rekap->id,
+            //         'nama_indikator' => $rekap->indikator->nama,
+            //         'nama_sektor' => $rekap->indikator->sektor->nama,
+            //         'status' => $rekap->status,
+            //         'nama_opd' => $rekap->indikator->opd_provinsi->nama,
+            //         'logo_opd' => $rekap->indikator->opd_provinsi->logo,
+            //         'created_at' => $rekap->created_at,
+            //         'updated_at' => $rekap->updated_at,
+            //     ];
+            // });
 
             
             // Get the search query parameter
