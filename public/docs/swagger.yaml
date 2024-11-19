@@ -8708,6 +8708,12 @@ paths:
           schema:
             type: integer
             example: 1
+        - name: antar_waktu_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
       responses:
         "200":
           description: Berhasil mendapatkan data indikator
