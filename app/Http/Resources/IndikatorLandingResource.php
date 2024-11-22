@@ -19,6 +19,7 @@ class IndikatorLandingResource extends JsonResource
             'nama' => $this->nama,
             'sektor' => $this->sektor->only('id', 'nama'),
             'opd_provinsi' => $this->opd_provinsi->only('id', 'nama'),
+            'antar_waktu' => $this->antar_waktu->only('id', 'tahun', 'nama'),
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->created_at,
