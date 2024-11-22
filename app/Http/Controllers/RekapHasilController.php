@@ -112,7 +112,7 @@ class RekapHasilController extends Controller
                             'tipe' => $hasil->variabel->tipe,
                         ];
                     }),
-                    'hasil_data' => $groupedHasilData,
+                    'rekap_hasil' => $groupedHasilData,
                     'status' => $data->status,
                     'created_at' => $data->created_at,
                     'updated_at' => $data->updated_at,
