@@ -17,6 +17,7 @@ class SubjekResource extends JsonResource
         return [
             'id' => $this->id,
             'nama' => $this->nama,
+            'opd_provinsi_id' => $this->opd_provinsi,
             'indikator' => $this->pivot_indikator_subjek->map(function ($pivot) {
                 return $pivot->indikator->only('id', 'nama');
             }),

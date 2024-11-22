@@ -19,11 +19,16 @@ class SubjekController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
             $data = Subjek::orderBy('created_at', 'desc');
 
             if ($search = $request->query('search')) {
                 $data->where('nama', 'like', '%' . $search . '%');
+            }
+            if ($user->hasRole('opd_provinsi')) {
+                $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
+                $data->where('opd_provinsi_id', $opdProvinsiId);
             }
             $data = $data->paginate($perPage);
             if ($data->isNotEmpty()) {
@@ -102,9 +107,11 @@ class SubjekController extends Controller
         try {
             $req = $request->validate([
                 'nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
-                'opd_provinsi_id' => 'required',  // Validasi setiap 'indikator_id' di dalam array sebagai string
+                // 'opd_provinsi_id' => 'required',  // Validasi setiap 'indikator_id' di dalam array sebagai string
             ]);
 
+            $req['opd_provinsi_id'] = $request->user()->user_opd_provinsi()->first()->opd_provinsi_id;
+            
             // Cek apakah subjek sudah ada berdasarkan nama (case insensitive)
             $subjek = Subjek::create($req);
 
