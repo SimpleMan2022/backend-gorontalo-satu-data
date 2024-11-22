@@ -21,4 +21,7 @@ class Subjek extends Model
         return $this->belongsToMany(Indikator::class, 'pivot_indikator_subjek', 'subjek_id', 'indikator_id');
     }
 
+    public function opd_provinsi() {
+        return $this->belongsTo(OpdProvinsi::class);
+    }
 }
