@@ -29,6 +29,11 @@ class SubjekController extends Controller
             if ($user->hasRole('opd_provinsi')) {
                 $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
                 $data->where('opd_provinsi_id', $opdProvinsiId);
+                if ($indikatorId = $request->query('indikator_id')) {
+                    $data->whereHas('indikators', function ($query) use ($indikatorId) {
+                        $query->where('indikator.id', $indikatorId);
+                    });
+                }
             }
             $data = $data->paginate($perPage);
             if ($data->isNotEmpty()) {
@@ -111,7 +116,7 @@ class SubjekController extends Controller
             ]);
 
             $req['opd_provinsi_id'] = $request->user()->user_opd_provinsi()->first()->opd_provinsi_id;
-            
+
             // Cek apakah subjek sudah ada berdasarkan nama (case insensitive)
             $subjek = Subjek::create($req);
 
