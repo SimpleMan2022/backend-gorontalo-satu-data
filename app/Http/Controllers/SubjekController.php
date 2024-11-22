@@ -238,6 +238,28 @@ class SubjekController extends Controller
         }
     }
 
+    public function multiDestroyPivot()
+    {
+        try {
+            $id = request('id');
+            $ids = explode(",", $id);
+
+            $subjek = PivotIndikatorSubjek::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $subjek);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            PivotIndikatorSubjek::whereIn('id', $subjek)->delete();
+
+            return $this->successResponse('Data subjek berhasil dihapus', Response::HTTP_OK);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function multiDestroy()
     {
         try {

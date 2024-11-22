@@ -117,6 +117,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::delete("/delete/{id}", "destroy");
         Route::delete("/delete-pivot/{id}", "destroyPivot");
         Route::delete("/multi-delete", "multiDestroy");
+        Route::delete("/multi-delete-pivot", "multiDestroyPivot");
     });
 
     // Subjek
