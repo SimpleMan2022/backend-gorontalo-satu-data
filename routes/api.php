@@ -24,6 +24,7 @@ use App\Http\Controllers\RekapHasilController;
 use App\Http\Controllers\SektorSpasialController;
 use App\Http\Controllers\OlahanSpasialController;
 use App\Http\Controllers\SpasialKabupatenController;
+use App\Http\Controllers\IntegrasiController;
 use App\Http\Controllers\ForgotPasswordController;
 use App\Http\Controllers\HasilSpasialController;
 use App\Http\Controllers\LandingController;
@@ -42,6 +43,7 @@ Route::prefix("landing")->controller(LandingController::class)->group(function (
     Route::get("sektor", "getSektor");
     Route::get("antar-waktu", "getAntarWaktu");
     Route::get("indikator", "getIndikatorandDataSearch");
+    Route::get("indikator/{id}", "getIndikator");
     Route::get("opd-provinsi", "getOpdProvinsi");
 });
 
@@ -308,6 +310,12 @@ Route::prefix('mobile')->middleware('auth:sanctum')->group(function () {
     Route::get("/profile", AuthController::class . "@getEnumeratorMobile");
     Route::post("/hasil-data", HasilDataController::class . "@store");
     Route::put("/hasil-data/edit/{rekap_hasil_id}", HasilDataController::class . "@update");
+});
+
+Route::prefix('integrasi')->group(function () {
+    Route::get('/get-desa/{id}', [IntegrasiController::class, 'getDesa']);
+    Route::get('/get-kecamatan/{id}', [IntegrasiController::class, 'getKecamatan']);
+    Route::get('/get-kabupaten/{id}', [IntegrasiController::class, 'getKabupaten']);
 });
 
 Route::get('/docs', function () {

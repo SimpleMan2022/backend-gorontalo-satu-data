@@ -114,6 +114,58 @@ class LandingController extends Controller
         }
     }
 
+    public function getIndikator(Request $request, $id) 
+    {
+        try {
+            // Mencari data sektor dengan id
+            $data = Indikator::with('rekap_hasil.hasil_data')->where('id', $id)->get();
+
+            $perKabupaten = $data->flatMap(function ($indikator) {
+                return $indikator->rekap_hasil->flatMap(function ($rekap) {
+                    return $rekap->hasil_data->filter(function ($hasil) {
+                        return str_contains($hasil->konten, 'Kabupaten'); // Filter untuk konten kabupaten
+                    })->pluck('konten'); // Ambil hanya nilai konten
+                });
+            })->groupBy(function ($kabupaten) {
+                return $kabupaten; // Kelompokkan berdasarkan nama kabupaten
+            })->map(function ($group) {
+                return $group->count(); // Hitung jumlah data per kabupaten
+            });
+
+            $data = $data->map(function ($item) use ($perKabupaten) {
+                // $item->perkabupaten = $perKabupaten;
+                return [
+                    'id' => $item->id,
+                    'nama_indikator' => $item->nama,
+                    'nama_sektor' => $item->sektor->nama,
+                    'antar_waktu' => $item->antar_waktu->nama,
+                    'opd_provinsi' => $item->opd_provinsi->nama,
+                    'logo_opd' => $item->opd_provinsi->logo,
+                    'rekap_hasil' => $item->rekap_hasil,
+                    'updated_at' => $item->updated_at,
+                    'created_at' => $item->created_at,
+                    'perkabupaten' => $perKabupaten,
+                ];
+            });
+
+            // Mengecek apabila terdapat data dengan id yang sama
+            if ($data) {
+                return $this->successResponseWithData(
+                    $data,
+                    'Data indikator berhasil diambil',
+                    Response::HTTP_OK
+                );
+            } else {
+                return $this->errorResponse(
+                    'Data tidak ditemukan',
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+        }catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
     public function getOpdProvinsi(Request $request)
     {
         try {
