@@ -16,9 +16,20 @@ class OpdProvinsi extends Model
         return $this->hasMany(UserOpdProvinsi::class);
     }
 
+/*************  ✨ Codeium Command ⭐  *************/
+    /**
+     * Get the indikators associated with the OpdProvinsi.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
+/******  079624e2-a110-4b2f-984b-e8a18a5ce2fd  *******/
     public function indikator()
     {
         return $this->hasMany(Indikator::class);
+    }
+    public function subjek()
+    {
+        return $this->hasMany(Subjek::class);
     }
 
     public function opd_kabupaten()
