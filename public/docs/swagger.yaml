@@ -8760,6 +8760,18 @@ paths:
                             nama:
                               type: string
                               example: "Dinas Kesehatan"
+                        antar_waktu:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            tahun:
+                              type: string
+                              example: "2024"
+                            nama:
+                              type: string
+                              example: "Triwulan 1"
                         status:
                           type: string
                           example: "public"
