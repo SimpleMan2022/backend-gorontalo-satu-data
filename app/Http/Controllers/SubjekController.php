@@ -51,6 +51,7 @@ class SubjekController extends Controller
         }
     }
 
+
     public function multiStore(Request $request)
     {
         try {
@@ -221,6 +222,7 @@ class SubjekController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
 
     public function destroyPivot($id)
     {
