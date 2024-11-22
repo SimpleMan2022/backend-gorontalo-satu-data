@@ -29,11 +29,11 @@ class SubjekController extends Controller
             if ($user->hasRole('opd_provinsi')) {
                 $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
                 $data->where('opd_provinsi_id', $opdProvinsiId);
-                if ($indikatorId = $request->query('indikator_id')) {
-                    $data->whereHas('indikators', function ($query) use ($indikatorId) {
-                        $query->where('indikator.id', $indikatorId);
-                    });
-                }
+            }
+            if ($indikatorId = $request->query('indikator_id')) {
+                $data->whereHas('indikators', function ($query) use ($indikatorId) {
+                    $query->where('indikator.id', $indikatorId);
+                });
             }
             $data = $data->paginate($perPage);
             if ($data->isNotEmpty()) {
