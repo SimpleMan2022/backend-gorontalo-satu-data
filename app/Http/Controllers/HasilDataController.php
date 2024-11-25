@@ -357,13 +357,12 @@ class HasilDataController extends Controller
                     }
                 }
                 
-                dd($enumerator['enumerator_level']);
                 if($periode) {
                     $rekap_hasil = RekapHasil::find($rekap_hasil_id);
         
                     $rekap_hasil->update([
                         'nama' => $nama_rekap,
-                        'enumerator_id' => $enumeratorId ?? $rekap_hasil->enumerator_id,
+                        'enumerator_id' => $enumerator->id ?? $rekap_hasil->enumerator_id,
                         'periode_id' => $periode->id ?? $rekap_hasil->periode_id,
                         'indikator_id' => $indikator->id ?? $variabel->indikator_id,
                         'status' => $enumerator['enumerator_level'] == 'provinsi' ? 'v3' : 'v2',
