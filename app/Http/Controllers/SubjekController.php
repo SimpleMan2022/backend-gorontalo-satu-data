@@ -57,49 +57,49 @@ class SubjekController extends Controller
         try {
             $data = $request->json()->all();
             $validator = Validator::make($data, [
-            '*.nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
-            '*.indikator_id' => 'required|string',  // Validasi setiap 'indikator_id' di dalam array sebagai string
+                '*.nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
+                '*.indikator_id' => 'required|string',  // Validasi setiap 'indikator_id' di dalam array sebagai string
             ]);
 
             if ($validator->fails()) {
-            return $this->errorResponseWithData($validator->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+                return $this->errorResponseWithData($validator->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
             }
 
             $req = $validator->validated();
             // Validasi data
             if (empty($data)) {
-            return $this->errorResponse('Data tidak boleh kosong', Response::HTTP_BAD_REQUEST);
+                return $this->errorResponse('Data tidak boleh kosong', Response::HTTP_BAD_REQUEST);
             }
 
             foreach ($req as $item) {
-            // Cek apakah subjek sudah ada berdasarkan nama
-            $subjek = Subjek::whereRaw('LOWER(nama) = ?', [strtolower($request->nama)])->first();
+                // Cek apakah subjek sudah ada berdasarkan nama
+                $subjek = Subjek::whereRaw('LOWER(nama) = ?', [strtolower($request->nama)])->first();
 
-            // Jika subjek belum ada, maka buat baru
-            if (!$subjek) {
-                $subjek = Subjek::create([
-                'nama' => $item['nama'],
-                ]);
-            }
-
-            // Pisahkan indikator_id berdasarkan koma dan hilangkan spasi
-            $indikatorIds = array_filter(array_map('trim', explode(',', $item['indikator_id'])), function($value) {
-                return $value !== '';
-            });
-            foreach ($indikatorIds as $indikatorId) {
-                if (!empty($indikatorId)) {
-                // Buat data pada pivot jika belum ada
-                PivotIndikatorSubjek::firstOrCreate([
-                    'indikator_id' => $indikatorId,
-                    'subjek_id' => $subjek->id,
-                ]);
+                // Jika subjek belum ada, maka buat baru
+                if (!$subjek) {
+                    $subjek = Subjek::create([
+                        'nama' => $item['nama'],
+                    ]);
                 }
-            }
+
+                // Pisahkan indikator_id berdasarkan koma dan hilangkan spasi
+                $indikatorIds = array_filter(array_map('trim', explode(',', $item['indikator_id'])), function ($value) {
+                    return $value !== '';
+                });
+                foreach ($indikatorIds as $indikatorId) {
+                    if (!empty($indikatorId)) {
+                        // Buat data pada pivot jika belum ada
+                        PivotIndikatorSubjek::firstOrCreate([
+                            'indikator_id' => $indikatorId,
+                            'subjek_id' => $subjek->id,
+                        ]);
+                    }
+                }
             }
 
             return $this->successResponse(
-            'Data subjek berhasil dibuat',
-            Response::HTTP_CREATED
+                'Data subjek berhasil dibuat',
+                Response::HTTP_CREATED
             );
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
@@ -143,8 +143,8 @@ class SubjekController extends Controller
             PivotIndikatorSubjek::create($req);
 
             return $this->successResponse(
-            'Data pivot berhasil dibuat',
-            Response::HTTP_CREATED
+                'Data pivot berhasil dibuat',
+                Response::HTTP_CREATED
             );
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
