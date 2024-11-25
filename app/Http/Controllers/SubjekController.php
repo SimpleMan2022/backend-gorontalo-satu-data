@@ -29,11 +29,11 @@ class SubjekController extends Controller
             if ($user->hasRole('opd_provinsi')) {
                 $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
                 $data->where('opd_provinsi_id', $opdProvinsiId);
-                if ($indikatorId = $request->query('indikator_id')) {
-                    $data->whereHas('indikators', function ($query) use ($indikatorId) {
-                        $query->where('indikator.id', $indikatorId);
-                    });
-                }
+            }
+            if ($indikatorId = $request->query('indikator_id')) {
+                $data->whereHas('indikators', function ($query) use ($indikatorId) {
+                    $query->where('indikator.id', $indikatorId);
+                });
             }
             $data = $data->paginate($perPage);
             if ($data->isNotEmpty()) {
@@ -51,54 +51,55 @@ class SubjekController extends Controller
         }
     }
 
+
     public function multiStore(Request $request)
     {
         try {
             $data = $request->json()->all();
             $validator = Validator::make($data, [
-            '*.nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
-            '*.indikator_id' => 'required|string',  // Validasi setiap 'indikator_id' di dalam array sebagai string
+                '*.nama' => 'required|string|max:255',  // Validasi setiap 'nama' di dalam array sebagai string
+                '*.indikator_id' => 'required|string',  // Validasi setiap 'indikator_id' di dalam array sebagai string
             ]);
 
             if ($validator->fails()) {
-            return $this->errorResponseWithData($validator->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
+                return $this->errorResponseWithData($validator->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
             }
 
             $req = $validator->validated();
             // Validasi data
             if (empty($data)) {
-            return $this->errorResponse('Data tidak boleh kosong', Response::HTTP_BAD_REQUEST);
+                return $this->errorResponse('Data tidak boleh kosong', Response::HTTP_BAD_REQUEST);
             }
 
             foreach ($req as $item) {
-            // Cek apakah subjek sudah ada berdasarkan nama
-            $subjek = Subjek::whereRaw('LOWER(nama) = ?', [strtolower($request->nama)])->first();
+                // Cek apakah subjek sudah ada berdasarkan nama
+                $subjek = Subjek::whereRaw('LOWER(nama) = ?', [strtolower($request->nama)])->first();
 
-            // Jika subjek belum ada, maka buat baru
-            if (!$subjek) {
-                $subjek = Subjek::create([
-                'nama' => $item['nama'],
-                ]);
-            }
-
-            // Pisahkan indikator_id berdasarkan koma dan hilangkan spasi
-            $indikatorIds = array_filter(array_map('trim', explode(',', $item['indikator_id'])), function($value) {
-                return $value !== '';
-            });
-            foreach ($indikatorIds as $indikatorId) {
-                if (!empty($indikatorId)) {
-                // Buat data pada pivot jika belum ada
-                PivotIndikatorSubjek::firstOrCreate([
-                    'indikator_id' => $indikatorId,
-                    'subjek_id' => $subjek->id,
-                ]);
+                // Jika subjek belum ada, maka buat baru
+                if (!$subjek) {
+                    $subjek = Subjek::create([
+                        'nama' => $item['nama'],
+                    ]);
                 }
-            }
+
+                // Pisahkan indikator_id berdasarkan koma dan hilangkan spasi
+                $indikatorIds = array_filter(array_map('trim', explode(',', $item['indikator_id'])), function ($value) {
+                    return $value !== '';
+                });
+                foreach ($indikatorIds as $indikatorId) {
+                    if (!empty($indikatorId)) {
+                        // Buat data pada pivot jika belum ada
+                        PivotIndikatorSubjek::firstOrCreate([
+                            'indikator_id' => $indikatorId,
+                            'subjek_id' => $subjek->id,
+                        ]);
+                    }
+                }
             }
 
             return $this->successResponse(
-            'Data subjek berhasil dibuat',
-            Response::HTTP_CREATED
+                'Data subjek berhasil dibuat',
+                Response::HTTP_CREATED
             );
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
@@ -142,8 +143,8 @@ class SubjekController extends Controller
             PivotIndikatorSubjek::create($req);
 
             return $this->successResponse(
-            'Data pivot berhasil dibuat',
-            Response::HTTP_CREATED
+                'Data pivot berhasil dibuat',
+                Response::HTTP_CREATED
             );
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
@@ -222,6 +223,7 @@ class SubjekController extends Controller
         }
     }
 
+
     public function destroyPivot($id)
     {
         try {
@@ -231,6 +233,28 @@ class SubjekController extends Controller
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function multiDestroyPivot()
+    {
+        try {
+            $id = request('id');
+            $ids = explode(",", $id);
+
+            $subjek = PivotIndikatorSubjek::whereIn('id', $ids)->pluck('id')->toArray();
+
+            $notFoundIds = array_diff($ids, $subjek);
+
+            if (!empty($notFoundIds)) {
+                return $this->errorResponse('Data dengan ID berikut tidak ditemukan: ' . implode(', ', $notFoundIds), Response::HTTP_NOT_FOUND);
+            }
+
+            PivotIndikatorSubjek::whereIn('id', $subjek)->delete();
+
+            return $this->successResponse('Data subjek berhasil dihapus', Response::HTTP_OK);
         } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }

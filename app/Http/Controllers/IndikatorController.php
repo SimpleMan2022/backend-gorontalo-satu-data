@@ -10,6 +10,7 @@ use App\Exports\RekapHasilExport;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\{Indikator, RekapHasil};
 use App\Http\Resources\IndikatorResource;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
@@ -66,8 +67,8 @@ class IndikatorController extends Controller
         try {
             $random = Str::random(10);
 
-            $rekap_hasil = RekapHasil::with(['indikator','indikator.variabel','hasil_data'])->where('indikator_id', $id)->get();
-            return Excel::download(new RekapHasilExport($rekap_hasil), 'Data Indikator'. $rekap_hasil[0]->indikator->nama .'.xlsx');  
+            $rekap_hasil = RekapHasil::with(['indikator', 'indikator.variabel', 'hasil_data'])->where('indikator_id', $id)->get();
+            return Excel::download(new RekapHasilExport($rekap_hasil), 'Data Indikator' . $rekap_hasil[0]->indikator->nama . '.xlsx');
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         }
@@ -164,10 +165,11 @@ class IndikatorController extends Controller
     public function multiUpdate(Request $request)
     {
         try {
-            $validated = $request->validate([
-                '*.id' => 'required|integer|exists:indikator,id',
+            $data = $request->json()->all();
+            $validated = Validator::make($data, [
+                '*.id' => 'required|exists:indikators,id',
                 '*.status' => 'required|in:public,private,pending',
-            ]);
+            ])->validate();
 
             $ids = collect($validated)->pluck('id');
             $indikator = Indikator::whereIn('id', $ids)->get();
