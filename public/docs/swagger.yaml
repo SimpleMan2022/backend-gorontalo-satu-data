@@ -1088,7 +1088,100 @@ paths:
           content:
             application/json:
               schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"            
+  /indikator/export-data/{id}:
+    get:
+      tags:
+        - Indikator
+      summary: Mendapatkan daftar indikator berbentuk excel
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
+
+        - name: sektor_id
+          in: query
+          description: Filter berdasarkan ID sektor
+          required: false
+          schema:
+            type: integer
+            example: 9
+        - name: opd_provinsi_id
+          in: query
+          description: Filter berdasarkan ID OPD Provinsi
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: antar_waktu_id
+          in: query
+          description: Filter berdasarkan ID Antar Waktu
+          required: false
+          schema:
+            type: integer
+            example: 6
+      responses:
+        200:
+          description: Data Riwayat Enumerator berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data Riwayat Enumerator berhasil diambil"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        nama_sektor:
+                          type: string
+                          example: "Infrastruktur"
+                        indikator_id:
+                          type: integer
+                          example: 77
+                        status:
+                          type: string
+                          example: "submit"
+                        nama_indikator:
+                          type: string
+                          example: "Sebaran Jumlah Kantor Desa berkondisi buruk"
+                        nama_opd:
+                          type: string
+                          example: "Dinas Desa"
+                        logo_opd:
+                          type: string
+                          example: "logo/vi7LIC1F2Nz6yXu25JLoUBKvQGSaqOvVFd0ptkOz.webp"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T16:02:20.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
                 $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"                                                  
   /indikator/{id}:
     get:
       tags:
@@ -8472,9 +8565,6 @@ paths:
                   enumerator_id:
                     type: integer
                     example: 1
-                  variabel_id:
-                    type: integer
-                    example: 7
                   konten:
                     type: string
                     example: "Deskripsi singkat"     
@@ -8506,7 +8596,73 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/UnauthorizedResponse" 
+                $ref: "#/components/schemas/UnauthorizedResponse"
+  /hasil-data/edit/{rekap_hasil_id}:
+    patch:
+      tags:
+        - Mobile
+      summary: Memperbarui hasil data di mobile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enumerator_id:
+                  type: integer
+                  example: 6
+                variabel_id:
+                  type: integer
+                  example: 1
+                konten:
+                  type: string
+                  example: "Deskripsi singkat baru"
+                id:
+                  type: integer
+                  example: 1
+      responses:            
+        "200":
+          description: Respons berhasil dengan data enumerator.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    enumerator_id:
+                      type: integer
+                      example: 6
+                    variabel_id:
+                      type: integer
+                      example: 1
+                    konten:
+                      type: string
+                      example: "0.939933, 1.23311"
+                    id:
+                      type: integer
+                      example: 1      
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse" 
   /landing/sektor:
     get:
       tags:
@@ -8565,7 +8721,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmptyDataResponse"
+                $ref: "#/components/schemas/EmptyDataResponse"              
   /landing/antar-waktu:
     get:
       tags:
