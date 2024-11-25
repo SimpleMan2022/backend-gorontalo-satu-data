@@ -124,6 +124,7 @@ class RekapHasilController extends Controller
                     Response::HTTP_OK
                 );
             } else {
+                // dd('tes');
                 // Jika `indikator_id` ada tapi data tidak ditemukan, lakukan query tambahan untuk mendapatkan informasi indikator dan variabel
                 if ($indikatorId) {
                     $indikator = Indikator::with(['variabel', 'enumerators', 'opd_provinsi'])
@@ -142,7 +143,13 @@ class RekapHasilController extends Controller
                                 'jabatan' => $indikator->enumerators()->first()->jabatan,
                                 'enumerator_level' => $indikator->enumerators()->first()->enumerator_level,
                             ] : null,
-                            'periode' => $indikator->opd_provinsi()->first()->periode()->first()->nama ?? null,
+                            'periode' => [
+                                'id' => $indikator->opd_provinsi()->first()->periode()->first()->id ?? null,
+                                'nama' => $indikator->opd_provinsi()->first()->periode()->first()->nama ?? null,
+                                'tanggal_mulai' => $indikator->opd_provinsi()->first()->periode()->first()->tanggal_mulai ?? null,
+                                'tanggal_selesai' => $indikator->opd_provinsi()->first()->periode()->first()->tanggal_selesai ?? null,
+                            ],
+                            // 'periode' => $indikator->opd_provinsi()->first()->periode()->first()->nama ?? null,
                             'variabel' => $indikator->variabel->map(function ($variabel) {
                                 return [
                                     'id' => $variabel->id,
@@ -150,7 +157,7 @@ class RekapHasilController extends Controller
                                     'tipe' => $variabel->tipe,
                                 ];
                             }),
-                            'hasil_data' => [],
+                            'rekap_hasil' => [],
                             'status' => 'pending',
                             'created_at' => null,
                             'updated_at' => null,
