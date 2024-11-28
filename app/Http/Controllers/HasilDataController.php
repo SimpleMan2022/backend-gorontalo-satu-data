@@ -4,13 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\{
-    HasilData, 
-    Variabel, 
-    RekapHasil, 
-    Periode, 
-    Enumerator, 
-    OpdProvinsi, 
-    OpdKabupaten, 
+    HasilData,
+    Variabel,
+    RekapHasil,
+    Periode,
+    Enumerator,
+    OpdProvinsi,
+    OpdKabupaten,
     PivotEnumeratorIndikator,
     Indikator
 };
@@ -18,10 +18,11 @@ use App\Http\Resources\HasilDataResource;
 use App\Http\Traits\ApiResponse;
 use Illuminate\Support\Facades\Validator;
 use Exception;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Support\Facades\Storage;
-use Str;
+use Illuminate\Support\Str;
 
 class HasilDataController extends Controller
 {
@@ -64,75 +65,74 @@ class HasilDataController extends Controller
             $data = $request->json()->all();
             // dd($request->user());
             $enumeratorId = $request->user();
-            
-            $variabel_id = collect($data)->pluck('variabel_id')->first();
-            $variabel =Variabel::where('id', $variabel_id)->first();
-            $indikator = Indikator::where('id', $variabel->indikator_id)->first();
-            
 
-            if($enumeratorId) {
+            $variabel_id = collect($data)->pluck('variabel_id')->first();
+            $variabel = Variabel::where('id', $variabel_id)->first();
+            $indikator = Indikator::where('id', $variabel->indikator_id)->first();
+
+            if ($enumeratorId) {
                 $enumerator = Enumerator::where('user_id', $enumeratorId->id)
                     ->with('enumerator_kabupaten')
                     ->with('enumerator_provinsi')
                     ->first();
-                // dd($enumeratorId);
-                if(!$enumerator) {
-                    return $this->errorResponse('Enumerator tidak valid', Response::HTTP_NOT_FOUND);                    return $this->errorResponse('Enumerator masih kosong', Response::HTTP_NOT_FOUND);
+                if (!$enumerator) {
+                    return $this->errorResponse('Enumerator tidak valid', Response::HTTP_NOT_FOUND);
+                    return $this->errorResponse('Enumerator masih kosong', Response::HTTP_NOT_FOUND);
                 }
-            }else {
+            } else {
                 return $this->errorResponse('Enumerator masih kosong', Response::HTTP_NOT_FOUND);
             }
-        
+
             try {
                 if ($enumerator['enumerator_level'] == 'provinsi') {
                     if (isset($enumerator['enumerator_provinsi'][0]['id'])) {
                         $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['opd_provinsi_id'])->first();
-                        if(!$opd) {
+                        if (!$opd) {
                             return $this->errorResponse($enumerator, Response::HTTP_NOT_FOUND);
                         }
-                        
+
                         $now = date('Y-m-d');
-                        
+
                         $periode = Periode::where('tanggal_mulai', '<=', $now)
-                        ->where('tanggal_selesai', '>=', $now)
-                        ->where('opd_provinsi_id', $opd->id)
-                        ->first();
-        
-                        if($periode) {
+                            ->where('tanggal_selesai', '>=', $now)
+                            ->where('opd_provinsi_id', $opd->id)
+                            ->first();
+
+                        if ($periode) {
                             $nama_rekap = $enumerator->nama . ' - ' . $opd->nama . ' (Provinsi) ' . ' - ' . $periode->nama;
-                        }else {
+                        } else {
                             return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
                         }
-                    }else {
+                    } else {
                         return $this->errorResponse('Enumerator provinsi tidak valid', Response::HTTP_NOT_FOUND);
                     }
                 } else {
-                    if(isset($enumerator['enumerator_kabupaten'][0]['id'])) {
+                    if (isset($enumerator['enumerator_kabupaten'][0]['id'])) {
                         $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['opd_kabupaten_id'])->first();
 
-                        if(!$opd) {
+                        if (!$opd) {
                             return $this->errorResponse('OPD Kabupaten masih kosong', Response::HTTP_NOT_FOUND);
                         }
-        
+
                         $opd_provinsi = OpdProvinsi::where('id', $opd->opd_provinsi_id)->first();
-        
+
                         $now = date('Y-m-d');
                         $periode = Periode::where('tanggal_mulai', '<=', $now)
                             ->where('tanggal_selesai', '>=', $now)
                             ->where('opd_provinsi_id', $opd_provinsi->id)
                             ->first();
-                            
-                        if($periode) {
+
+                        if ($periode) {
                             $nama_rekap = $enumerator->nama . ' - ' . $opd->nama .  ' - ' . $periode->nama;
-                        }else {
+                        } else {
                             return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
                         }
-                    }else {
+                    } else {
                         return $this->errorResponse('Enumerator kabupaten tidak valid', Response::HTTP_NOT_FOUND);
                     }
                 }
-                
-                if($periode) {
+
+                if ($periode) {
                     $rekap_hasil = RekapHasil::create([
                         'nama' => $nama_rekap,
                         'enumerator_id' => $enumerator->id ?? $enumeratorId,
@@ -140,10 +140,10 @@ class HasilDataController extends Controller
                         'indikator_id' => $indikator->id ?? $variabel->indikator_id,
                         'status' => $enumerator['enumerator_level'] == 'provinsi' ? 'v3' : 'v2',
                     ]);
-                }else {
+                } else {
                     return $this->errorResponse('Periode masih kosong', Response::HTTP_NOT_FOUND);
                 }
-    
+
                 try {
                     $val = $request->json()->all();
                     $validator = Validator::make($val, [
@@ -154,74 +154,33 @@ class HasilDataController extends Controller
                     if ($validator->fails()) {
                         return $this->errorResponseWithData($validator->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
                     }
-        
+
                     $req = $validator->validated();
-        
+
                     foreach ($req as $item) {
-        
+
                         // Buat data pada pivot jika belum ada
                         $variabel = Variabel::find($item['variabel_id']);
-        
-                        if ($variabel->tipe == 'gambar') {
-        
-                            $file = $item['konten'];
-        
-        
-                            $randomString = rand(10000, 99999);
-                            $enumerator_nama = strtolower(str_replace(' ', '_', $enumerator->nama));
-        
-                            $opd_nama = strtolower(str_replace(' ', '_', $opd->nama));
-        
-                            $file_name = $randomString . '_' . $enumerator_nama . '_' . $opd_nama . '.' . $file->getClientOriginalExtension();
-                            $extension = $file->getClientOriginalExtension();
-        
-                            if (in_array($extension, ['jpg', 'png', 'jpeg'])) {
-                                if ($file->getSize() <= 2048000) {
-                                    Storage::putFileAs('hasil_gambar', $file, $file_name);
-        
-                                    $hasil_data = HasilData::create([
-                                        'rekap_hasil_id' => $rekap_hasil->id,
-                                        'variabel_id' => $item['variabel_id'],
-                                        'konten' => $file_name,
-                                    ]);
-                                } else {
-                                    return $this->errorResponse('Ukuran file maksimal 2mb', Response::HTTP_BAD_REQUEST);
-                                }
-                            } else {
-                                return $this->errorResponse('Ekstensi file harus berupa .jpg, .png atau .jpeg', Response::HTTP_BAD_REQUEST);
-                            }
+
+                        if ($variabel->tipe == 'gambar' && isset($item['konten']) && strpos($item['konten'], 'data:image') === 0) {
+                            preg_match('/^data:image\/(\w+);base64,/', $item['konten'], $type);
+                            $extension = $type[1];
+                            $base64String = substr($item['konten'], strpos($item['konten'], ',') + 1);
+
+                            // Decode base64
+                            $fileData = base64_decode($base64String);
+
+                            // Simpan file
+                            $fileName = uniqid() . '.' . $extension;
+
+                            $path = Storage::put("hasil-data/{$fileName}", $fileData);
+                            $hasil_data = HasilData::create([
+                                'rekap_hasil_id' => $rekap_hasil->id,
+                                'variabel_id' => $item['variabel_id'],
+                                'konten' => $path,
+                            ]);
                         }
-        
-                        if ($variabel->tipe == 'file') {
-        
-                            $file = $item['konten'];
-        
-                            $randomString = rand(10000, 99999);
-                            $enumerator_nama = strtolower(str_replace(' ', '_', $enumerator->nama));
-                            $opd_nama = strtolower(str_replace(' ', '_', $opd->nama));
-        
-                            $file_name = $randomString . '_' . $enumerator_nama . '_' . $opd_nama . '.' . $file->getClientOriginalExtension();
-                            $extension = $file->getClientOriginalExtension();
-        
-                            $extension = $file->getClientOriginalExtension();
-        
-        
-                            if (in_array($extension, ['pdf'])) {
-                                if ($file->getSize() <= 2048000) {
-                                    Storage::putFileAs('hasil_file', $file, $file_name);
-        
-                                    $hasil_data = HasilData::create([
-                                        'rekap_hasil_id' => $rekap_hasil->id,
-                                        'variabel_id' => $item['variabel_id'],
-                                        'konten' => $file_name,
-                                    ]);
-                                } else {
-                                    return $this->errorResponse('Ukuran file maksimal 2mb', Response::HTTP_BAD_REQUEST);
-                                }
-                            } else {
-                                return $this->errorResponse('Ekstensi file harus berupa pdf', Response::HTTP_BAD_REQUEST);
-                            }
-                        }
+
                         if ($variabel->tipe != 'file' && $variabel->tipe != 'gambar') {
                             $hasil_data = HasilData::create([
                                 'rekap_hasil_id' => $rekap_hasil->id,
@@ -229,33 +188,28 @@ class HasilDataController extends Controller
                                 'konten' => $item['konten'],
                             ]);
                         }
-        
+
                         // update pivot enumerator indikator
                         $pivotEnumeratorIndikator = PivotEnumeratorIndikator::where('enumerator_id', $enumerator->id)->where('indikator_id', $variabel->indikator_id)->first();
                         if ($pivotEnumeratorIndikator) {
                             $pivotEnumeratorIndikator->update([
                                 'status' => 'submit'
                             ]);
-                        }else {
+                        } else {
                             return $this->errorResponse('Enumerator Indikator belum dikaitkan', Response::HTTP_INTERNAL_SERVER_ERROR);
-
                         }
-                        
                     }
-                }catch(ValidationException $e){
+                } catch (ValidationException $e) {
                     $rekap_hasil->delete();
                     return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-                }catch(Exception $e) {
+                } catch (Exception $e) {
                     return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
-                
-
-            }catch(Exception $e) {
+            } catch (Exception $e) {
                 return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
-            
+
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
-            
         } catch (ValidationException $e) {
             return $this->errorResponseWithData($e->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
         } catch (Exception $e) {
@@ -294,72 +248,73 @@ class HasilDataController extends Controller
             // $enumeratorId = collect($data)->pluck('enumerator_id')->first();
 
             $variabel_id = collect($data)->pluck('variabel_id')->first();
-            $variabel =Variabel::where('id', $variabel_id)->first();
+            $variabel = Variabel::where('id', $variabel_id)->first();
             $indikator = Indikator::where('id', $variabel->indikator_id)->first();
 
-            if($enumeratorId) {
+            if ($enumeratorId) {
                 $enumerator = Enumerator::where('user_id', $enumeratorId->id)
-                ->with('enumerator_kabupaten')
-                ->with('enumerator_provinsi')
-                ->first();
-                if(!$enumerator) {
-                    return $this->errorResponse('Enumerator tidak valid', Response::HTTP_NOT_FOUND);                    return $this->errorResponse('Enumerator masih kosong', Response::HTTP_NOT_FOUND);
+                    ->with('enumerator_kabupaten')
+                    ->with('enumerator_provinsi')
+                    ->first();
+                if (!$enumerator) {
+                    return $this->errorResponse('Enumerator tidak valid', Response::HTTP_NOT_FOUND);
+                    return $this->errorResponse('Enumerator masih kosong', Response::HTTP_NOT_FOUND);
                 }
-            }else {
+            } else {
                 return $this->errorResponse('Enumerator masih kosong', Response::HTTP_NOT_FOUND);
             }
             try {
-                if($enumerator['enumerator_level'] == 'provinsi') {
+                if ($enumerator['enumerator_level'] == 'provinsi') {
                     if (isset($enumerator['enumerator_provinsi'][0]['id'])) {
                         $opd = OpdProvinsi::where('id', $enumerator['enumerator_provinsi'][0]['opd_provinsi_id'])->first();
-                        if(!$opd) {
+                        if (!$opd) {
                             return $this->errorResponse($enumerator, Response::HTTP_NOT_FOUND);
                         }
-                        
+
                         $now = date('Y-m-d');
-                        
+
                         $periode = Periode::where('tanggal_mulai', '<=', $now)
-                        ->where('tanggal_selesai', '>=', $now)
-                        ->where('opd_provinsi_id', $opd->id)
-                        ->first();
-        
-                        if($periode) {
+                            ->where('tanggal_selesai', '>=', $now)
+                            ->where('opd_provinsi_id', $opd->id)
+                            ->first();
+
+                        if ($periode) {
                             $nama_rekap = $enumerator->nama . ' - ' . $opd->nama . ' (Provinsi) ' . ' - ' . $periode->nama;
-                        }else {
+                        } else {
                             return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
                         }
-                    }else {
+                    } else {
                         return $this->errorResponse('Enumerator provinsi tidak valid', Response::HTTP_NOT_FOUND);
                     }
-                }else {
-                    if(isset($enumerator['enumerator_kabupaten'][0]['id'])) {
+                } else {
+                    if (isset($enumerator['enumerator_kabupaten'][0]['id'])) {
                         $opd = OpdKabupaten::where('id', $enumerator['enumerator_kabupaten'][0]['opd_kabupaten_id'])->first();
 
-                        if(!$opd) {
+                        if (!$opd) {
                             return $this->errorResponse('OPD Kabupaten masih kosong', Response::HTTP_NOT_FOUND);
                         }
-        
+
                         $opd_provinsi = OpdProvinsi::where('id', $opd->opd_provinsi_id)->first();
-        
+
                         $now = date('Y-m-d');
                         $periode = Periode::where('tanggal_mulai', '<=', $now)
                             ->where('tanggal_selesai', '>=', $now)
                             ->where('opd_provinsi_id', $opd_provinsi->id)
                             ->first();
-                            
-                        if($periode) {
+
+                        if ($periode) {
                             $nama_rekap = $enumerator->nama . ' - ' . $opd->nama .  ' - ' . $periode->nama;
-                        }else {
+                        } else {
                             return $this->errorResponse('Periode tidak tersedia', Response::HTTP_NOT_FOUND);
                         }
-                    }else {
+                    } else {
                         return $this->errorResponse('Enumerator kabupaten tidak valid', Response::HTTP_NOT_FOUND);
                     }
                 }
-                
-                if($periode) {
+
+                if ($periode) {
                     $rekap_hasil = RekapHasil::find($rekap_hasil_id);
-        
+
                     $rekap_hasil->update([
                         'nama' => $nama_rekap,
                         'enumerator_id' => $enumerator->id ?? $rekap_hasil->enumerator_id,
@@ -367,45 +322,45 @@ class HasilDataController extends Controller
                         'indikator_id' => $indikator->id ?? $variabel->indikator_id,
                         'status' => $enumerator['enumerator_level'] == 'provinsi' ? 'v3' : 'v2',
                     ]);
-                }else {
+                } else {
                     return $this->errorResponse('Periode masih kosong', Response::HTTP_NOT_FOUND);
                 }
-    
+
                 try {
-                    
+
                     $val = $request->json()->all();
                     $validator = Validator::make($val, [
                         '*.variabel_id' => 'required|integer|exists:variabel,id',  // Validasi setiap 'variabel_id' di dalam array sebagai integer dan harus ada di tabel 'variabel'
                         '*.konten' => 'required',  // Validasi setiap 'konten' di dalam array sebagai string
                         '*.id' => 'required',  // Validasi setiap 'konten' di dalam array sebagai string
                     ]);
-        
+
                     if ($validator->fails()) {
                         return $this->errorResponseWithData($validator->errors(), 'Data gagal dibuat', Response::HTTP_BAD_REQUEST);
                     }
-        
+
                     $req = $validator->validated();
-        
+
                     foreach ($req as $item) {
-        
+
                         // Buat data pada pivot jika belum ada
                         $variabel = Variabel::find($item['variabel_id']);
-        
+
                         if ($variabel->tipe == 'gambar') {
-        
+
                             $file = $item['konten'];
-        
-        
+
+
                             $randomString = rand(10000, 99999);
                             $enumerator_nama = strtolower(str_replace(' ', '_', $enumerator->nama));
-        
+
                             $file_name = $randomString . '_' . $enumerator_nama . '_' . $opd->nama . '_' . $randomString . '.' . $file->getClientOriginalExtension();
                             $extension = $file->getClientOriginalExtension();
-        
+
                             if (in_array($extension, ['jpg', 'png', 'jpeg'])) {
                                 if ($file->getSize() <= 2048000) {
                                     Storage::putFileAs('hasil_gambar', $file, $file_name);
-        
+
                                     HasilData::find($item['id'])->update([
                                         'rekap_hasil_id' => $rekap_hasil->id,
                                         'variabel_id' => $item['variabel_id'],
@@ -418,24 +373,24 @@ class HasilDataController extends Controller
                                 return $this->errorResponse('Ekstensi file harus berupa .jpg, .png atau .jpeg', Response::HTTP_BAD_REQUEST);
                             }
                         }
-        
+
                         if ($variabel->tipe == 'file') {
-        
+
                             $file = $item['konten'];
-        
+
                             $randomString = rand(10000, 99999);
                             $enumerator_nama = strtolower(str_replace(' ', '_', $enumerator->nama));
-        
-        
+
+
                             $file_name = $randomString . '_' . $enumerator_nama . '_' . $opd->nama . '_' . $randomString . '.' . $file->getClientOriginalExtension();
-        
+
                             $extension = $file->getClientOriginalExtension();
-        
-        
+
+
                             if (in_array($extension, ['pdf'])) {
                                 if ($file->getSize() <= 2048000) {
                                     Storage::putFileAs('hasil_file', $file, $file_name);
-        
+
                                     HasilData::find($item['id'])->update([
                                         'rekap_hasil_id' => $rekap_hasil->id,
                                         'variabel_id' => $item['variabel_id'],
@@ -448,7 +403,7 @@ class HasilDataController extends Controller
                                 return $this->errorResponse('Ekstensi file harus berupa pdf', Response::HTTP_BAD_REQUEST);
                             }
                         }
-        
+
                         if ($variabel->tipe != 'file' && $variabel->tipe != 'gambar') {
                             HasilData::find($item['id'])->update([
                                 'rekap_hasil_id' => $rekap_hasil->id,
@@ -456,7 +411,7 @@ class HasilDataController extends Controller
                                 'konten' => $item['konten'],
                             ]);
                         }
-        
+
                         // update pivot enumerator indikator
                         $pivotEnumeratorIndikator = PivotEnumeratorIndikator::where('enumerator_id', $enumerator->id)->where('indikator_id', $variabel->indikator_id)->first();
                         if ($pivotEnumeratorIndikator) {
@@ -465,14 +420,13 @@ class HasilDataController extends Controller
                             ]);
                         }
                     }
-                }catch(ValidationException $e){
+                } catch (ValidationException $e) {
                     $rekap_hasil->delete();
                     return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
-                }catch(Exception $e) {
+                } catch (Exception $e) {
                     return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
                 }
-
-            }catch(Exception $e) {
+            } catch (Exception $e) {
                 return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
             }
 
