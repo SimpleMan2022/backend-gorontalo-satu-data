@@ -40,7 +40,6 @@ class RekapHasilController extends Controller
             }
 
             $data = $hasilQuery->first();
-
             if ($data) {
                 // Jika data ditemukan, format hasil seperti biasa
 
@@ -52,7 +51,9 @@ class RekapHasilController extends Controller
                         if ($periodeId = $request->query('periode_id')) {
                             $query->where('periode_id', $periodeId);
                         }
+                        $query->where('indikator_id', $request->query('indikator_id'));
                     })
+
                     ->orderBy('created_at', 'desc')
                     ->get();
 
