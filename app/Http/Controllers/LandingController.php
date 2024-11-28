@@ -9,6 +9,7 @@ use App\Http\Resources\SektorSpasialResource;
 use App\Models\Sektor;
 use App\Http\Traits\ApiResponse;
 use App\Models\AntarWaktu;
+use App\Models\HasilData;
 use App\Models\Indikator;
 use App\Models\OpdProvinsi;
 use App\Models\SektorSpasial;
@@ -114,11 +115,11 @@ class LandingController extends Controller
         }
     }
 
-    public function getIndikator(Request $request, $id) 
+    public function getIndikator(Request $request, $id)
     {
         try {
             // Mencari data sektor dengan id
-            $data = Indikator::with('rekap_hasil.hasil_data')->where('id', $id)->first();
+            $data = Indikator::with(['rekap_hasil.hasil_data', 'sektor', 'antar_waktu', 'opd_provinsi', 'subjek'])->where('id', $id)->first();
 
             if ($data) {
                 // Proses per Kabupaten
@@ -137,18 +138,53 @@ class LandingController extends Controller
                         return $group->count();
                     });
 
+                // Ambil semua HasilData terkait dengan rekap_hasil
+                $allHasilData = HasilData::with(['variabel', 'rekap_hasil'])
+                    ->whereHas('rekap_hasil', function ($query) use ($id) {
+                        $query->where('indikator_id', $id);
+                    })
+                    ->orderBy('created_at', 'desc')
+                    ->get();
+
+                // Group hasil_data into pairs
+                $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
+                    return [
+                        'id' => $items[0]->rekap_hasil->id,
+                        'nama' => $items[0]->rekap_hasil->nama,
+                        'status' => $items[0]->rekap_hasil->status,
+                        'hasil_data' => $items->map(function ($hasil) {
+                            return [
+                                'hasil_data_id' => $hasil->id,
+                                'nama' => $hasil->variabel->nama,
+                                'tipe' => $hasil->variabel->tipe,
+                                'konten' => $hasil->konten,
+                            ];
+                        })->values()
+                    ];
+                })->values();
+
                 // Transformasi data
                 $transformedData = [
                     'id' => $data->id,
                     'nama_indikator' => $data->nama,
                     'nama_sektor' => $data->sektor->nama,
-                    'antar_waktu' => $data->antar_waktu->nama,
-                    'opd_provinsi' => $data->opd_provinsi->nama,
+                    'nama_opd' => $data->opd_provinsi->nama,
                     'logo_opd' => $data->opd_provinsi->logo,
-                    'rekap_hasil' => $data->rekap_hasil,
+                    'antar_waktu' => $data->antar_waktu->only('tahun', 'nama'),
+                    'subjek' => $data->subjek->map(function ($subjek) {
+                        return $subjek->only('nama');
+                    }),
+                    'variabel' => $data->variabel->map(function ($variabel) {
+                        return [
+                            'id' => $variabel->id,
+                            'nama' => $variabel->nama,
+                            'tipe' => $variabel->tipe,
+                        ];
+                    }),
+                    'rekap_hasil' => $groupedHasilData,
+                    'perkabupaten' => $perKabupaten,
                     'updated_at' => $data->updated_at,
                     'created_at' => $data->created_at,
-                    'perkabupaten' => $perKabupaten,
                 ];
 
                 return $this->successResponseWithData(
@@ -162,7 +198,7 @@ class LandingController extends Controller
                     Response::HTTP_NOT_FOUND
                 );
             }
-        }catch (Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }

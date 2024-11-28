@@ -8951,6 +8951,160 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"
+  /landing/indikator/{id}:
+    get:
+      tags:
+        - Landing
+      summary: Mendapatkan detail indikator
+      description: API untuk mendapatkan detail indikator berdasarkan ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Detail indikator berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data indikator berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 1
+                      nama_indikator:
+                        type: string
+                        example: "Sebaran Jumlah Fasilitas"
+                      nama_sektor:
+                        type: string
+                        example: "Pendidikan"
+                      antar_waktu:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          tahun:
+                            type: string
+                            example: "2024"
+                          nama:
+                            type: string
+                            example: "Triwulan 1"
+                      nama_opd:
+                        type: string
+                        example: "Dinas Kesehatan"
+                      logo_opd:
+                        type: string
+                        example: "logo/1.webp"
+                      subjek: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            nama:
+                              type: string
+                              example: Sekolah Menengah Kejuruan
+                      variabel: 
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Nama Sekolah"
+                            tipe:
+                              type: string
+                              example: "string"
+                      rekap_hasil:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Enum Pekerjaan 1"
+                            status: 
+                              type: string
+                            hasil_data:
+                              type: array
+                              items:
+                                type: object
+                                properties:
+                                  hasil_data_id:
+                                    type: integer
+                                    example: 1
+                                  nama:
+                                    type: string
+                                    example: Nama Sekolah
+                                  tipe:
+                                    type: string
+                                    example: teks
+                                  konten:
+                                    type: string
+                                    example: SMK Negeri 1
+                            # perkabupaten:
+                            #   type: array
+                            #   items:
+                            #     type: object
+                            #     properties:
+                            #       id:
+                            #         type: integer
+                            #         example: 1
+                            #       nama:
+                            #         type: string
+                            #         example: "Gorontalo"
+                            #       jumlah:
+                            #         type: integer
+                            #         example: 1
+                            #       created_at:
+                            #         type: string
+                            #         format: date-time
+                            #         example: "2024-11-05T16:02:20.000000Z"
+                            #       updated_at:
+                            #         type: string
+                            #         format: date-time
+                            #         example: "2024-11-05T08:19:07.000000Z"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-11-05T16:02:20.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
 components:
   schemas:
     Pagination:

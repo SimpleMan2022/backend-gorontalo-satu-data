@@ -230,7 +230,7 @@ class MobileController extends Controller
                         ];
                     });
                     break;
-                // Add more cases if needed
+                    // Add more cases if needed
             }
 
             // $data = $query->get()->map(function ($rekap) {
@@ -246,7 +246,7 @@ class MobileController extends Controller
             //     ];
             // });
 
-            
+
             // Get the search query parameter
             // $search = $request->query('search');
 
