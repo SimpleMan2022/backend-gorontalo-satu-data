@@ -43,8 +43,8 @@ class RekapHasilController extends Controller
 
             if ($data) {
                 // Jika data ditemukan, format hasil seperti biasa
-                
-                    $allHasilData = HasilData::with(['variabel', 'rekap_hasil'])
+
+                $allHasilData = HasilData::with(['variabel', 'rekap_hasil'])
                     ->whereHas('rekap_hasil', function ($query) use ($request) {
                         if ($enumeratorId = $request->query('enumerator_id')) {
                             $query->where('enumerator_id', $enumeratorId);
@@ -54,10 +54,10 @@ class RekapHasilController extends Controller
                         }
                     })
                     ->orderBy('created_at', 'desc')
-                    ->get();                
+                    ->get();
 
                 // Group hasil_data into pairs
-                
+
                 $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
                     return [
                         'id' => $items[0]->rekap_hasil->id,
@@ -87,7 +87,7 @@ class RekapHasilController extends Controller
                 // })->values();
 
                 // return $groupedHasilData;
-                
+
 
                 $formattedData = [
                     'id' => (int) $indikatorId,
@@ -181,7 +181,7 @@ class RekapHasilController extends Controller
 
     // public function byIndikator(Request $request) {
     //     try {
-            
+
     //     }
     // }
 
