@@ -45,6 +45,10 @@ class IndikatorController extends Controller
                 $indikatorQuery->where('antar_waktu_id', $antarWaktuId);
             }
 
+            if($user->hasRole('opd_kabupaten')){
+                $indikatorQuery->where('tingkatan','!=', 'provinsi');
+            }
+
             $data = $indikatorQuery->paginate($perPage);
 
             if ($data->isNotEmpty()) {
@@ -82,6 +86,7 @@ class IndikatorController extends Controller
                 'sektor_id' => 'required',
                 'antar_waktu_id' => 'required',
                 'opd_provinsi_id' => 'required',
+                'tingkatan' => 'required',
                 'status' => 'required',
             ]);
 
@@ -127,6 +132,7 @@ class IndikatorController extends Controller
                 'sektor_id' => 'required',
                 'antar_waktu_id' => 'required',
                 'opd_provinsi_id' => 'required',
+                'tingkatan' => 'required',
                 'status' => 'required',
             ]);
 
