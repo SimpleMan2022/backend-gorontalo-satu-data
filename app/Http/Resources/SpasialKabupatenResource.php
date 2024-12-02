@@ -17,7 +17,7 @@ class SpasialKabupatenResource extends JsonResource
         return [
             'id' => $this->id,
             'olahan_spasial' => $this->olahan_spasial->only('id', 'judul', 'konten', 'status', 'opd_provinsi_id', 'sektor_spasial_id'),
-            'kabupaten' => $this->kabupaten,
+            'kabupaten' => $this->kabupaten->only('id', 'name'),
             'tahun' => $this->tahun,
             'konten' => $this->konten,
             'created_at' => $this->created_at,

@@ -65,7 +65,6 @@ class HasilDataController extends Controller
             $data = $request->json()->all();
             // dd($request->user());
             $enumeratorId = $request->user();
-
             $variabel_id = collect($data)->pluck('variabel_id')->first();
             $variabel = Variabel::where('id', $variabel_id)->first();
             $indikator = Indikator::where('id', $variabel->indikator_id)->first();
@@ -162,26 +161,32 @@ class HasilDataController extends Controller
                         // Buat data pada pivot jika belum ada
                         $variabel = Variabel::find($item['variabel_id']);
 
-                        if ($variabel->tipe == 'gambar' && isset($item['konten']) && strpos($item['konten'], 'data:image') === 0) {
-                            preg_match('/^data:image\/(\w+);base64,/', $item['konten'], $type);
-                            $extension = $type[1];
-                            $base64String = substr($item['konten'], strpos($item['konten'], ',') + 1);
+                        if ($variabel->tipe == 'gambar' || $variabel->tipe == 'file') {
+                            if (isset($item['konten']) && strpos($item['konten'], 'data:') === 0) {
+                                // Validasi tipe file
+                                preg_match('/^data:(\w+\/\w+);base64,/', $item['konten'], $type);
+                                $mimeType = $type[1]; // contoh: image/png atau application/pdf
+                                $base64String = substr($item['konten'], strpos($item['konten'], ',') + 1);
 
-                            // Decode base64
-                            $fileData = base64_decode($base64String);
+                                // Hanya izinkan gambar atau PDF
+                                if (in_array($mimeType, ['image/jpeg', 'image/png', 'application/pdf'])) {
+                                    $extension = explode('/', $mimeType)[1];
+                                    $fileData = base64_decode($base64String);
 
-                            // Simpan file
-                            $fileName = uniqid() . '.' . $extension;
+                                    // Simpan file
+                                    $fileName = uniqid() . '.' . $extension;
+                                    Storage::put("hasil-data/{$fileName}", $fileData);
 
-                            $path = Storage::put("hasil-data/{$fileName}", $fileData);
-                            $hasil_data = HasilData::create([
-                                'rekap_hasil_id' => $rekap_hasil->id,
-                                'variabel_id' => $item['variabel_id'],
-                                'konten' => $path,
-                            ]);
-                        }
-
-                        if ($variabel->tipe != 'file' && $variabel->tipe != 'gambar') {
+                                    $hasil_data = HasilData::create([
+                                        'rekap_hasil_id' => $rekap_hasil->id,
+                                        'variabel_id' => $item['variabel_id'],
+                                        'konten' => "hasil-data/{$fileName}",
+                                    ]);
+                                } else {
+                                    return $this->errorResponse("Format file tidak didukung.", Response::HTTP_BAD_REQUEST);
+                                }
+                            }
+                        } elseif ($variabel->tipe != 'file' && $variabel->tipe != 'gambar') {
                             $hasil_data = HasilData::create([
                                 'rekap_hasil_id' => $rekap_hasil->id,
                                 'variabel_id' => $item['variabel_id'],
