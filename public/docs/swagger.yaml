@@ -8562,7 +8562,7 @@ paths:
               items:
                 type: object
                 properties:
-                  enumerator_id:
+                  variabel_id:
                     type: integer
                     example: 1
                   konten:
