@@ -61,11 +61,12 @@ class SpasialKabupatenController extends Controller
     {
         try {
             $req = $request->validate([
-                'olahan_spasial_id' => 'required|numeric',
                 'kabupaten_id' => 'required|numeric',
                 'tahun' => 'required',
                 'konten' => 'required',
             ]);
+
+            $req['olahan_spasial_id'] = $request->query('olahan_spasial_id');
 
             $data = SpasialKabupaten::create($req);
 
@@ -110,7 +111,6 @@ class SpasialKabupatenController extends Controller
     {
         try {
             $req = $request->validate([
-                'olahan_spasial_id' => 'required|numeric',
                 'kabupaten_id' => 'required|numeric',
                 'tahun' => 'required',
                 'konten' => 'required',
@@ -141,7 +141,7 @@ class SpasialKabupatenController extends Controller
     public function destroy($id)
     {
         try {
-            SpasialKabupaten::findOrFail($id)->delete;
+            SpasialKabupaten::findOrFail($id)->delete();
             return $this->successResponse('Data berhasil dihapus', Response::HTTP_OK);
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
