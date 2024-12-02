@@ -45,6 +45,10 @@ class IndikatorController extends Controller
                 $indikatorQuery->where('antar_waktu_id', $antarWaktuId);
             }
 
+            if($user->hasRole('opd_kabupaten')){
+                $indikatorQuery->where('tingkatan','!=', 'provinsi');
+            }
+
             $data = $indikatorQuery->paginate($perPage);
 
             if ($data->isNotEmpty()) {
@@ -65,10 +69,12 @@ class IndikatorController extends Controller
     public function exportData(Request $request, $id)
     {
         try {
-            $random = Str::random(10);
-
             $rekap_hasil = RekapHasil::with(['indikator', 'indikator.variabel', 'hasil_data'])->where('indikator_id', $id)->get();
-            return Excel::download(new RekapHasilExport($rekap_hasil), 'Data Indikator' . $rekap_hasil[0]->indikator->nama . '.xlsx');
+            if($rekap_hasil){
+                return Excel::download(new RekapHasilExport($rekap_hasil), 'Data Indikator' . $rekap_hasil[0]->indikator->nama . '.xlsx');
+            }else {
+                return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+            }
         } catch (ModelNotFoundException $e) {
             return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
         }
@@ -82,6 +88,7 @@ class IndikatorController extends Controller
                 'sektor_id' => 'required',
                 'antar_waktu_id' => 'required',
                 'opd_provinsi_id' => 'required',
+                'tingkatan' => 'required',
                 'status' => 'required',
             ]);
 
@@ -127,6 +134,7 @@ class IndikatorController extends Controller
                 'sektor_id' => 'required',
                 'antar_waktu_id' => 'required',
                 'opd_provinsi_id' => 'required',
+                'tingkatan' => 'required',
                 'status' => 'required',
             ]);
 

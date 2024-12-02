@@ -39,6 +39,7 @@ class RekapHasilController extends Controller
                 });
             }
 
+            
             $data = $hasilQuery->first();
             if ($data) {
                 // Jika data ditemukan, format hasil seperti biasa
@@ -56,6 +57,8 @@ class RekapHasilController extends Controller
 
                     ->orderBy('created_at', 'desc')
                     ->get();
+
+                    
 
                 // Group hasil_data into pairs
 
