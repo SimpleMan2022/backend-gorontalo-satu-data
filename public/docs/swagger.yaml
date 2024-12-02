@@ -7208,6 +7208,406 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/MultiDataNotFoundResponse"
+  /spasial-kabupaten:
+    get:
+      tags:
+        - Spasial Kabupaten
+      summary: Mendapatkan semua data spasial kabupaten
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: olahan_spasial_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Berhasil mendapatkan data spasial kabupaten
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data spasial kabupaten berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 2
+                        olahan_spasial:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            judul: 
+                              type: string
+                              example: Sebaran Sekolah
+                            konten:
+                              type: string
+                              example: Daftar sekolah yang ada di kabupaten
+                            status: 
+                              type: string  
+                              example: public
+                            opd_provinsi_id: 
+                              type: integer
+                              example: 1
+                            sektor_spasial_id: 
+                              type: integer
+                              example: 1
+                        kabupaten:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            name:
+                              type: string
+                              example: "Kabupaten Gorontalo"
+                        tahun:
+                          type: string
+                          example: 2024
+                        konten: 
+                          type: string
+                          example: 200
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+    post:
+      tags:
+        - Spasial Kabupaten
+      summary: Menambahkan spasial kabupaten baru
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: olahan_spasial_id
+          in: query
+          required: true
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kabupaten_id:
+                  type: integer
+                  example: 1
+                tahun:
+                  type: string
+                  example: 2024
+                konten:
+                  type: string
+                  example: 200
+      responses:
+        "200":
+          description: spasial kabupaten berhasil ditambahkan
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil dibuat
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+  /spasial-kabupaten/{id}:
+    get:
+      tags:
+        - Spasial Kabupaten
+      summary: Mendapatkan detail spasial kabupaten
+      description: API untuk mendapatkan detail spasial kabupaten berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Detail spasial kabupaten berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data spasial kabupaten berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      olahan_spasial:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          judul: 
+                            type: string
+                            example: Sebaran Sekolah
+                          konten:
+                            type: string
+                            example: Daftar sekolah yang ada di kabupaten
+                          status: 
+                            type: string  
+                            example: public
+                          opd_provinsi_id: 
+                            type: integer
+                            example: 1
+                          sektor_spasial_id: 
+                            type: integer
+                            example: 1
+                      kabupaten:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: "Kabupaten Gorontalo"
+                      tahun:
+                        type: string
+                        example: 2024
+                      konten: 
+                        type: string
+                        example: 200
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /spasial-kabupaten/edit/{id}:
+    patch:
+      tags:
+        - Spasial Kabupaten
+      summary: Memperbarui spasial kabupaten yang ada
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                kabupaten_id:
+                  type: integer
+                  example: 1
+                tahun:
+                  type: string
+                  example: 2024
+                konten:
+                  type: string
+                  example: 200
+      responses:
+        "201":
+          description: spasial kabupaten berhasil diperbarui
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data berhasil diubah
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /spasial-kabupaten/delete/{id}:
+    delete:
+      tags:
+        - Spasial Kabupaten
+      summary: Menghapus spasial kabupaten berdasarkan id
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: path
+          name: id
+          required: true
+          schema:
+            type: integer
+          description: ID dari spasial kabupaten yang akan dihapus
+      responses:
+        "200":
+          description: spasial kabupaten berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /spasial-kabupaten/multi-delete:
+    delete:
+      tags:
+        - Spasial Kabupaten
+      summary: Menghapus banyak spasial kabupaten
+      description: API untuk menghapus banyak spasial kabupaten berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: spasial kabupaten berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data spasial kabupaten berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data spasial kabupaten tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /data/kabupaten:
     get:
       tags:

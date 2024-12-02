@@ -230,7 +230,7 @@ class EnumeratorController extends Controller
             $enumerator = Enumerator::find($id);
             $enumerator->delete();
 
-            User::where('id', $enumerator->user_id)->delete();  
+            User::where('id', $enumerator->user_id)->delete();
 
             // Check for rekap hasil with status 'v3' and delete them
 
@@ -259,7 +259,7 @@ class EnumeratorController extends Controller
 
             $enumeratorId = Enumerator::whereIn('id', $ids)->pluck('id')->toArray();
 
-            $enumerator = Enumerator::whereIn('id',$ids)->get();
+            $enumerator = Enumerator::whereIn('id', $ids)->get();
 
             $notFoundIds = array_diff($ids, $enumeratorId);
 
