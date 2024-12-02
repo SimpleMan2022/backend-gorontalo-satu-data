@@ -65,8 +65,6 @@ class IndikatorController extends Controller
     public function exportData(Request $request, $id)
     {
         try {
-            $random = Str::random(10);
-
             $rekap_hasil = RekapHasil::with(['indikator', 'indikator.variabel', 'hasil_data'])->where('indikator_id', $id)->get();
             return Excel::download(new RekapHasilExport($rekap_hasil), 'Data Indikator' . $rekap_hasil[0]->indikator->nama . '.xlsx');
         } catch (ModelNotFoundException $e) {
