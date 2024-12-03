@@ -3227,6 +3227,9 @@ paths:
                             id:
                               type: integer
                               example: 2
+                            opd_provinsi_id:
+                              type: integer
+                              example: 1
                             nama:
                               type: string
                               example: "Dinas Kesehatan"
@@ -3289,9 +3292,6 @@ paths:
                 nama:
                   type: string
                   example: "Persetujuan data OPD Kesehatan triwulan 3 tahun 2024"
-                opd_kabupaten_id:
-                  type: integer
-                  example: 2
                 indikator_id:
                   type: integer
                   example: 4
@@ -3377,6 +3377,9 @@ paths:
                           id:
                             type: integer
                             example: 2
+                          opd_provinsi_id:
+                            type: integer
+                            example: 1
                           nama:
                             type: string
                             example: "Dinas Kesehatan"
@@ -3445,9 +3448,6 @@ paths:
                 nama:
                   type: string
                   example: "Penerimaan data dinas kesehatan triwulan 2 tahun 2025"
-                opd_kabupaten_id:
-                  type: integer
-                  example: 1
                 file:
                   type: string
                   format: binary
