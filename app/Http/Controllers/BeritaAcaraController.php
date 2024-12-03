@@ -18,8 +18,21 @@ class BeritaAcaraController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
             $BeritaAcaraQuery = BeritaAcara::orderBy('created_at', 'desc');
+            if ($user->hasRole('opd_provinsi')) {
+                $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
+                $BeritaAcaraQuery->whereHas('opd_kabupaten', function ($query) use ($opdProvinsiId) {
+                    $query->where('opd_provinsi_id', $opdProvinsiId);
+                });
+            } elseif ($user->hasRole('opd_kabupaten')) {
+                $opdProvinsiId = $user->user_opd_kabupaten()->first()->opd_kabupaten()->first()->opd_provinsi_id;
+                $BeritaAcaraQuery->whereHas('opd_kabupaten', function ($query) use ($opdProvinsiId) {
+                    $query->where('opd_provinsi_id', $opdProvinsiId);
+                });
+            }
+
             if ($search = $request->query('search')) {
                 $BeritaAcaraQuery->where('nama', 'like', '%' . $search . '%');
             }
@@ -53,12 +66,16 @@ class BeritaAcaraController extends Controller
             // Validate request
             $validated = $request->validate([
                 'nama' => 'required|string',
-                'opd_kabupaten_id' => 'required|integer|exists:opd_kabupaten,id',
                 'file' => 'required|file|mimes:pdf|max:20480', // Restrict file to only PDF
                 'indikator_id' => 'required|integer|exists:indikator,id',
                 'status' => 'required'
             ]);
+            $user = $request->user();
 
+            if (!$user->hasRole('opd_kabupaten')) {
+                return $this->errorResponse('Anda tidak memiliki akses untuk membuat berita acara', Response::HTTP_FORBIDDEN);
+            }
+            $validated['opd_kabupaten_id'] = $user->user_opd_kabupaten()->first()->opd_kabupaten_id;
             // Handle file upload (PDF only)
             if ($request->hasFile('file')) {
                 $timestamp = now()->format('Ymd_His');
@@ -85,7 +102,6 @@ class BeritaAcaraController extends Controller
     {
         try {
             $data = BeritaAcara::find($id);
-
             if ($data) {
                 return $this->successResponseWithData(
                     BeritaAcaraResource::make($data),
@@ -105,11 +121,17 @@ class BeritaAcaraController extends Controller
         try {
             $validated = $request->validate([
                 'nama' => 'required',
-                'opd_kabupaten_id' => 'required|integer|exists:opd_kabupaten,id',
                 'file' => 'nullable|file|mimes:pdf|max:20480',
                 'indikator_id' => 'required|integer|exists:indikator,id',
                 'status' => 'required'
             ]);
+
+            $user = $request->user();
+
+            if (!$user->hasRole('opd_kabupaten')) {
+                return $this->errorResponse('Anda tidak memiliki akses untuk membuat berita acara', Response::HTTP_FORBIDDEN);
+            }
+            $validated['opd_kabupaten_id'] = $user->user_opd_kabupaten()->first()->opd_kabupaten_id;
 
             $berita_acara = BeritaAcara::find($id);
 
@@ -137,6 +159,10 @@ class BeritaAcaraController extends Controller
     public function destroy(string $id)
     {
         try {
+            $user = request()->user();
+            if (!$user->hasRole('opd_kabupaten')) {
+                return $this->errorResponse('Anda tidak memiliki akses untuk membuat berita acara', Response::HTTP_FORBIDDEN);
+            }
             // Menghapus data sektor sesuai request $sektor
             $berita_acara = BeritaAcara::findOrFail($id);
             if ($berita_acara->file) {
@@ -154,6 +180,10 @@ class BeritaAcaraController extends Controller
     public function multiDestroy()
     {
         try {
+            $user = request()->user();
+            if (!$user->hasRole('opd_kabupaten')) {
+                return $this->errorResponse('Anda tidak memiliki akses untuk membuat berita acara', Response::HTTP_FORBIDDEN);
+            }
             $id = request('id');
             $ids = explode(",", $id);
 
