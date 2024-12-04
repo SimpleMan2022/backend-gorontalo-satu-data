@@ -26,6 +26,7 @@ class IndikatorResource extends JsonResource
             'subjek' => $this->subjek->map(function ($subjek) {
                 return $subjek->only('id', 'nama');
             }),
+            'tingkatan' => $this->tingkatan,
             'status' => $this->status,
             'created_at' => $this->created_at,
             'updated_at' => $this->created_at,
