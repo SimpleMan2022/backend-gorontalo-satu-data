@@ -13,6 +13,7 @@ use App\Models\EnumeratorKabupaten;
 use App\Models\EnumeratorProvinsi;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
+use ModelNotFoundException;
 
 class EnumeratorController extends Controller
 {
@@ -228,6 +229,9 @@ class EnumeratorController extends Controller
         try {
             // Menghapus data sektor sesuai request $sektor
             $enumerator = Enumerator::find($id);
+            if (!$enumerator) {
+                return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+            }
             $enumerator->delete();
 
             User::where('id', $enumerator->user_id)->delete();
