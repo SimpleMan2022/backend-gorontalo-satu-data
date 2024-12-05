@@ -229,7 +229,7 @@ class EnumeratorController extends Controller
         try {
             // Menghapus data sektor sesuai request $sektor
             $enumerator = Enumerator::find($id);
-            if(!$enumerator) {
+            if (!$enumerator) {
                 return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
             }
             $enumerator->delete();
