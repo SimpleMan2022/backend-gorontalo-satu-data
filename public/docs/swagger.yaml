@@ -9270,6 +9270,65 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"
+  /landing/sektor-spasial:
+    get:
+      tags:
+        - Landing
+      summary: Mendapatkan semua data sektor spasial
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+      responses:
+        "200":
+          description: Berhasil mendapatkan data sektor spasial
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data sektor spasial berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        nama:
+                          type: string
+                          example: "Kemiskinan"
+                        logo:
+                          type: string
+                          example: "logo/1.webp"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T16:02:20.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
   /landing/indikator:
     get:
       tags:
@@ -9520,6 +9579,202 @@ paths:
                         type: string
                         format: date-time
                         example: "2024-11-05T08:19:07.000000Z"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
+  /landing/hasil-spasial:
+    get:
+      tags:
+        - Landing
+      summary: Mendapatkan semua data hasil spasial
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - $ref: "#/components/parameters/SearchParam"
+        - name: sektor_spasial_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+        - name: opd_provinsi_id
+          in: query
+          required: false
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Berhasil mendapatkan data hasil spasial
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: Data hasil spasial berhasil diambil
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 1
+                        judul:
+                          type: string
+                          example: "Sebaran Jumlah Fasilitas"
+                        file:
+                          type: string
+                          example: "geojson/example.geojson"
+                        konten:
+                          type: string
+                          example: "deskripsi singkat"
+                        status:
+                          type: string
+                          example: "public"
+                        sektor_spasial:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Kemiskinan"
+                        opd_provinsi:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Dinas Kesehatan"
+                            lokasi:
+                              type: string
+                              lokasi: Gorontalo Barat
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T00:33:23.000000Z"
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /landing/hasil-spasial/{id}:
+    get:
+      tags:
+        - Landing
+      summary: Mendapatkan detail hasil spasial
+      description: API untuk mendapatkan detail hasil spasial berdasarkan ID
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            example: 1
+      responses:
+        "200":
+          description: Detail hasil spasial berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data hasil spasial berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 2
+                      judul:
+                        type: string
+                        example: "Sebaran Jumlah Fasilitas"
+                      deskripsi:
+                        type: string
+                        example: "deskripsi singkat"
+                      file:
+                        type: string
+                        example: "geojson/example.geojson"
+                      sektor:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          nama:
+                            type: string
+                            example: "Pendidikan"
+                      sektor_spasial:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Kemiskinan"
+                      opd_provinsi:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 2
+                          nama:
+                            type: string
+                            example: "Dinas Pertanian"
+                      status:
+                        type: string
+                        example: "public"
+                      created_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
+                      updated_at:
+                        type: string
+                        format: date-time
+                        example: "2024-10-13T00:33:23.000000Z"
         "401":
           description: Tidak diotorisasi
           content:
