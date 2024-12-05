@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Resources\HasilSpasialResource;
 use App\Http\Resources\IndikatorLandingResource;
 use App\Http\Resources\IndikatorResource;
 use App\Http\Resources\SektorResource;
@@ -10,6 +11,7 @@ use App\Models\Sektor;
 use App\Http\Traits\ApiResponse;
 use App\Models\AntarWaktu;
 use App\Models\HasilData;
+use App\Models\HasilSpasial;
 use App\Models\Indikator;
 use App\Models\OpdProvinsi;
 use App\Models\SektorSpasial;
@@ -73,6 +75,34 @@ class LandingController extends Controller
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
+
+    public function getSektorSpasial(Request $request)
+    {
+        try {
+            $perPage = $request->per_page ?? 10;
+            $data = SektorSpasial::orderBy('created_at', 'desc');
+
+            if ($perPage === 'all') {
+                $data = $data->get();
+            } else {
+                $data = $data->paginate($perPage);
+            }
+
+            if ($data->isNotEmpty()) {
+                return $this->successResponseWithDataIndex(
+                    $data,
+                    $perPage === 'all' ? $data : $data->items(),
+                    'Data Sektor Spasial berhasil diambil',
+                    Response::HTTP_OK
+                );
+            } else {
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
 
     public function getIndikatorAndDataSearch(Request $request)
     {
@@ -190,6 +220,87 @@ class LandingController extends Controller
                 return $this->successResponseWithData(
                     $transformedData,
                     'Data indikator berhasil diambil',
+                    Response::HTTP_OK
+                );
+            } else {
+                return $this->errorResponse(
+                    'Data tidak ditemukan',
+                    Response::HTTP_NOT_FOUND
+                );
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getHasilSpasialandSearch(Request $request)
+    {
+        try {
+            $perPage = $request->per_page ?? 10;
+            $data = HasilSpasial::orderBy('created_at', 'desc');
+
+            if ($request->query('sektor_spasial_id')) {
+                $data = $data->where('sektor_spasial_id', $request->sektor_spasial_id);
+            }
+
+            if ($request->query('opd_provinsi_id')) {
+                $data = $data->where('opd_provinsi_id', $request->opd_provinsi_id);
+            }
+            if ($request->query('search')) {
+                $data = $data->where('judul', 'like', '%' . $request->search . '%');
+            }
+
+            if ($request->query('antar_waktu')) {
+                $data = $data->where('antar_waktu_id', $request->antar_waktu_id);
+            }
+
+            if ($request->query('status')) {
+                $data = $data->where('status', $request->status);
+            }
+
+            if ($perPage === 'all') {
+                $data = $data->get();
+            } else {
+                $data = $data->paginate($perPage);
+            }
+
+            if ($data->isNotEmpty()) {
+                return $this->successResponseWithDataIndex(
+                    $data,
+                    $perPage === 'all' ? HasilSpasialResource::collection($data) : HasilSpasialResource::collection($data->items()),
+                    'Data Hasil Spasial berhasil diambil',
+                    Response::HTTP_OK
+                );
+            } else {
+                return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
+            }
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    public function getHasilSpasial(Request $request, $id)
+    {
+        try {
+            // Mencari data sektor dengan id
+            $data = HasilSpasial::with(['sektor_spasial', 'opd_provinsi'])->where('id', $id)->first();
+
+            if ($data) {
+                $group = [
+                    'id' => $data->id,
+                    'judul' => $data->judul,
+                    'deskripsi' => $data->konten,
+                    'file' => $data->file,
+                    'sektor' => $data->sektor_spasial->sektor->only('id', 'nama'),
+                    'sektor_spasial' => $data->sektor_spasial->only('id', 'nama'),
+                    'opd_provinsi' => $data->opd_provinsi->only('id', 'nama'),
+                    'status' => $data->status,
+                    'created_at' => $data->created_at,
+                    'updated_at' => $data->updated_at
+                ];
+                return $this->successResponseWithData(
+                    $group,
+                    'Data hasil spasial berhasil diambil',
                     Response::HTTP_OK
                 );
             } else {
