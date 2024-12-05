@@ -1057,9 +1057,9 @@ paths:
                 opd_provinsi_id:
                   type: integer
                   example: 2
-                status:
+                tingkatan:
                   type: string
-                  example: "public"
+                  example: "Kabupaten"
       responses:
         "201":
           description: Indikator berhasil ditambahkan
@@ -1245,9 +1245,9 @@ paths:
                 opd_provinsi_id:
                   type: integer
                   example: 2
-                status:
+                tingkatan:
                   type: string
-                  example: "public"
+                  example: "Kabupaten"
       responses:
         "200":
           description: Indikator berhasil diperbarui

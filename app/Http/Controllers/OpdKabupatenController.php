@@ -20,7 +20,6 @@ class OpdKabupatenController extends Controller
     {
         try {
             $perPage = $request->per_page ?? 10;
-
             $opdQuery = OpdKabupaten::orderBy('created_at', 'desc');
             if ($search = $request->query('search')) {
                 $opdQuery->where('nama', 'like', '%' . $search . '%');
@@ -85,30 +84,31 @@ class OpdKabupatenController extends Controller
         }
     }
 
-    public function setPermission(Request $request) {
+    public function setPermission(Request $request)
+    {
         try {
-            if($request->status == 'aktif') {
+            if ($request->status == 'aktif') {
                 $operator = UserOpdKabupaten::where('opd_kabupaten_id', $request->id)->get();
-    
+
                 $permissions_kabupaten = [
                     'kelola_user_opd_kabupaten',
                     'kelola_opd_kabupaten',
                 ];
-                foreach($operator as $item) {
+                foreach ($operator as $item) {
                     $user = $item->user;
-                    $user->givePermissionTo($permissions_kabupaten);                
+                    $user->givePermissionTo($permissions_kabupaten);
                 }
                 return $this->successResponse('OPD Kabupaten berhasil diizinkan', Response::HTTP_OK);
-            }else {
+            } else {
                 $operator = UserOpdKabupaten::where('opd_kabupaten_id', $request->id)->get();
-    
+
                 $permissions_kabupaten = [
                     'kelola_user_opd_kabupaten',
                     'kelola_opd_kabupaten',
                 ];
-                foreach($operator as $item) {
+                foreach ($operator as $item) {
                     $user = $item->user;
-                    $user->revokePermissionTo($permissions_kabupaten);                
+                    $user->revokePermissionTo($permissions_kabupaten);
                 }
                 return $this->successResponse('Perizinan OPD Kabupaten berhasil diubah', Response::HTTP_OK);
             }
