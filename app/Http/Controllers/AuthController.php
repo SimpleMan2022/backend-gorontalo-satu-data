@@ -99,14 +99,17 @@ class AuthController extends Controller
 
     if ($roleName === 'opd_provinsi') {
       $opd = $request->user()->user_opd_provinsi->opd_provinsi;
+      $jabatan = $request->user()->user_opd_provinsi->jabatan;
     } elseif ($roleName === 'opd_kabupaten') {
       $opd = $request->user()->user_opd_kabupaten->opd_kabupaten;
+      $jabatan = $request->user()->user_opd_kabupaten->jabatan;
     }
 
     $responseData = [
       'id' => $request->user()->id,
       'username' => $request->user()->username,
       'email' => $request->user()->email,
+      'jabatan' => $jabatan ?? 'admin',
       'role' => [
         'id' => $request->user()->roles->first()->id,
         'name' => $request->user()->roles->first()->name,
@@ -120,6 +123,8 @@ class AuthController extends Controller
         'id' => $opd->id,
         'tingkat' => $roleName,
         'nama' => $opd->nama,
+        'logo' => $opd->logo,
+        'lokasi' => $opd->lokasi,
       ];
     }
 
@@ -166,12 +171,12 @@ class AuthController extends Controller
   {
     try {
       $request->user()->tokens()->delete();
-  
+
       return $this->successResponse(
         'Logout berhasil',
         Response::HTTP_OK
       );
-    }catch(Exception $e){
+    } catch (Exception $e) {
       return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
     }
   }
@@ -195,5 +200,52 @@ class AuthController extends Controller
     Mail::to($request->email)->send(new SendCodeResetPassword($codeData->token));
 
     return response(['message' => trans('passwords.sent')], 200);
+  }
+
+  public function changeProfile(Request $request)
+  {
+    $data = $request->validate([
+      'username' => 'required',
+    ]);
+
+    $user = $request->user();
+    $user->username = $data['username'];
+    $user->save();
+
+    return response($this->successResponse('Profil berhasil diubah'), 200);
+  }
+
+  public function changePassword(Request $request)
+  {
+    try {
+      $data = $request->validate([
+        'old_password' => 'required',
+        'new_password' => 'required|min:8',
+        'confirm_password' => 'required|same:new_password',
+      ]);
+
+      $user = $request->user();
+
+      if (!Hash::check($data['old_password'], $user->password)) {
+        return $this->errorResponse('Password lama tidak sesuai', Response::HTTP_UNPROCESSABLE_ENTITY);
+      }
+
+      if (Hash::check($data['new_password'], $user->password)) {
+        return $this->errorResponse('Password baru tidak boleh sama dengan password lama', Response::HTTP_UNPROCESSABLE_ENTITY);
+      }
+
+      if ($data['new_password'] !== $data['confirm_password']) {
+        return $this->errorResponse('Password baru tidak sama dengan konfirmasi password', Response::HTTP_UNPROCESSABLE_ENTITY);
+      }
+
+      $user->password = Hash::make($data['new_password']);
+      $user->save();
+
+      return $this->successResponse('Password berhasil diubah', Response::HTTP_OK);
+    } catch (ValidationException $e) {
+      return $this->errorResponseWithData($e->errors(), 'Gagal mengubah password', Response::HTTP_BAD_REQUEST);
+    } catch (Exception $e) {
+      return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
   }
 }
