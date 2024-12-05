@@ -20,6 +20,8 @@ class OpdKabupatenController extends Controller
     {
         try {
             $perPage = $request->per_page ?? 10;
+            $user = $request->user();
+            
             $opdQuery = OpdKabupaten::orderBy('created_at', 'desc');
             if ($search = $request->query('search')) {
                 $opdQuery->where('nama', 'like', '%' . $search . '%');
@@ -32,7 +34,12 @@ class OpdKabupatenController extends Controller
                 $opdQuery->where('opd_provinsi_id', $opdProvId);
             }
 
+            if($user->hasRole('opd_provinsi')) {
+                $opdQuery->where('opd_provinsi_id', $user->user_opd_provinsi()->first()->opd_provinsi_id);
+            };
+
             $data = $opdQuery->paginate($perPage);
+
             if ($data->isNotEmpty()) {
                 return $this->successResponseWithDataIndex(
                     $data,
