@@ -22,6 +22,9 @@ class RekapHasilController extends Controller
     public function index(Request $request)
     {
         try {
+            if (!$request->query('indikator_id')) {
+                return $this->errorResponse('Parameter `indikator_id` tidak ditemukan', Response::HTTP_BAD_REQUEST);
+            }
             $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi'])
                 ->orderBy('created_at', 'desc');
 
