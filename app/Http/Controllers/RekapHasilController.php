@@ -148,7 +148,7 @@ class RekapHasilController extends Controller
                             'id' => (int) $indikatorId,
                             'nama' => $indikator->nama,
                             'nama_opd' => $indikator->opd_provinsi->nama,
-                            'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
+                            'subjek' => $indikator->subjek ? $indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
