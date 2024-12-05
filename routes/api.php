@@ -42,9 +42,12 @@ Route::prefix("auth")->controller(AuthController::class)->group(function () {
 Route::prefix("landing")->controller(LandingController::class)->group(function () {
     Route::get("sektor", "getSektor");
     Route::get("antar-waktu", "getAntarWaktu");
+    Route::get("sektor-spasial", "getSektorSpasial");
     Route::get("indikator", "getIndikatorandDataSearch");
     Route::get("indikator/{id}", "getIndikator");
     Route::get("opd-provinsi", "getOpdProvinsi");
+    Route::get("hasil-spasial", "getHasilSpasialandSearch");
+    Route::get("hasil-spasial/{id}", "getHasilSpasial");
 });
 
 Route::prefix("data")->controller(DataController::class)->group(function () {
