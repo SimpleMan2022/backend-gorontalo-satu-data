@@ -61,8 +61,6 @@ class RekapHasilController extends Controller
                     ->orderBy('created_at', 'desc')
                     ->get();
 
-
-
                 // Group hasil_data into pairs
 
                 $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
@@ -100,12 +98,12 @@ class RekapHasilController extends Controller
                     'id' => (int) $indikatorId,
                     'nama' => $data->hasil_data->first()->variabel->indikator->nama,
                     'nama_opd' => $data->periode->opd_provinsi->nama,
-                    'subjek' => $data->subjek->map(function ($subjek) {
+                    'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
                         return [
                             'id' => $subjek->id,
                             'nama' => $subjek->nama,
                         ];
-                    }),
+                    }) : [],
                     'enumerator' => [
                         'id' => $data->enumerator->id,
                         'nama' => $data->enumerator->nama,
@@ -150,12 +148,12 @@ class RekapHasilController extends Controller
                             'id' => (int) $indikatorId,
                             'nama' => $indikator->nama,
                             'nama_opd' => $indikator->opd_provinsi->nama,
-                            'subjek' => $indikator->subjek->map(function ($subjek) {
+                            'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
                                 ];
-                            }),
+                            }) : [],
                             'enumerator' => $indikator->enumerators()->first() ? [
                                 'id' => $indikator->enumerators()->first()->id,
                                 'nama' => $indikator->enumerators()->first()->nama,
