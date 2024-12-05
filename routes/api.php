@@ -60,6 +60,8 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::controller(AuthController::class)->group(function () {
         Route::get("auth/me", "getUser");
         Route::post("auth/logout", "logout");
+        Route::post('auth/change-password', [AuthController::class, 'changePassword']);
+        Route::put('auth/change-profile', [AuthController::class, 'changeProfile']);
     });
 
     // Sektor Route

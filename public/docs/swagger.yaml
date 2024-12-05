@@ -105,6 +105,46 @@ paths:
                       email:
                         type: string
                         example: "admin@example.com"
+                      jabatan:
+                        type: string
+                        example: "admin"
+                      role:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          name:
+                            type: string
+                            example: "admin"
+                          permissions:
+                            type: array
+                            items:
+                              type: string
+                            example: ["create-sektor", "update-sektor"]
+                      permissions:
+                        type: array
+                        items:
+                          type: string
+                        example: ["create-sektor", "update-sektor"]
+                      opd:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                            example: 1
+                          tingkat:
+                            type: string
+                            example: "opd_provinsi"
+                          nama:
+                            type: string
+                            example: "Dinas Pendidikan"
+                          logo: 
+                            type: string
+                            example: "logo/dinas_pendidikan.png"
+                          lokasi:
+                            type: string
+                            example: "Jl. Pendidikan No. 1"
         "401":
           description: Unauthorized
           content:
@@ -287,6 +327,59 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/BadRequestResponse"
+  /auth/change-password:
+    post:
+      tags:
+        - Authentication
+      summary: Mengganti password
+      description: API untuk mengganti password
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                old_password:
+                  type: string
+                  example: "12345678"
+                new_password:
+                  type: string
+                  example: "12345678"
+                confirm_password:
+                  type: string
+                  example: "12345678"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Password berhasil diubah"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
   /sektor:
     get:
       tags:
