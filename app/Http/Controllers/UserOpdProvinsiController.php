@@ -115,7 +115,7 @@ class UserOpdProvinsiController extends Controller
                     'kelola_opd_provinsi',
                 ];
 
-                $user->revokePermissionTo($permission_operator_provinsi);
+                $user->givePermissionTo($permission_operator_provinsi);
             }
             $user->assignRole('opd_provinsi');
             if ($user) {
