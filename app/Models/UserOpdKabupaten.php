@@ -21,6 +21,25 @@ class UserOpdKabupaten extends Model
         return $this->belongsTo(User::class);
     }
 
+    public function wilayah()
+    {
+        return $this->morphTo(null, 'tipe_wilayah', 'wilayah_id');
+    }
+
+    // public function kecamatan()
+    // {
+    //     if ($this->tipe_wilayah === Desa::class) {
+    //         return $this->wilayah->kecamatan; // Ambil kabupaten dari kecamatan
+    //     }
+
+    //     if ($this->tipe_wilayah === Kecamatan::class) {
+    //         return $this->wilayah; // Sudah langsung kabupaten
+    //     }
+
+    //     return null; // Jika tipe lainnya
+    // }
+    
+
     public function opd_provinsi()
     {
         return $this->belongsTo(OpdProvinsi::class);

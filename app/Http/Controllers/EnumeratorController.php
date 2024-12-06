@@ -24,7 +24,21 @@ class EnumeratorController extends Controller
         try {
             $user = $request->user();
             $perPage = $request->per_page ?? 10;
-            $enumeratorQuery = Enumerator::orderBy('created_at', 'desc');
+            $enumeratorQuery = Enumerator::orderBy('created_at', 'desc')->with([
+                'wilayah' => function ($query) {
+                    $query->when(
+                        $query->getModel() instanceof \App\Models\Desa,
+                        function ($query) {
+                            $query->with(['kecamatan.kabupaten']);
+                        }
+                    )->when(
+                        $query->getModel() instanceof \App\Models\Kecamatan,
+                        function ($query) {
+                            $query->with(['kabupaten']);
+                        }
+                    );
+                }
+            ]);
 
             if ($user->hasRole('opd_provinsi')) {
                 $opdProvinsiId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
@@ -101,12 +115,28 @@ class EnumeratorController extends Controller
                 'email' => 'required|email|unique:users',
                 'nama' => 'required',
                 'jabatan' => 'required',
+                'tipe_wilayah' => 'required',
+                'wilayah_id' => 'required'
             ]);
 
             if ($user->hasRole('opd_provinsi')) {
                 $validated['opd_provinsi_id'] = $user->user_opd_provinsi()->first()->opd_provinsi_id;
             } elseif ($user->hasRole('opd_kabupaten')) {
                 $validated['opd_kabupaten_id'] = $user->user_opd_kabupaten()->first()->opd_kabupaten_id;
+            }
+
+            switch ($request->tipe_wilayah) {
+                case 'desa':
+                    $validated['tipe_wilayah'] = 'App\Models\Desa';
+                    break;
+                case 'kecamatan':
+                    $validated['tipe_wilayah'] = 'App\Models\Kecamatan';
+                    break;
+                case 'kabupaten':
+                    $validated['tipe_wilayah'] = 'App\Models\Kabupaten';
+                    break;
+                default:
+                    return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
             }
 
             // Mengubah menjadi huruf kecil
@@ -122,6 +152,8 @@ class EnumeratorController extends Controller
                     'nama' => $request->nama,
                     'user_id' => $newUser->id,
                     'jabatan' => $request->jabatan,
+                    'tipe_wilayah' => $validated['tipe_wilayah'],
+                    'wilayah_id' => $request->wilayah_id,
                 ]);
                 $newUser->assignRole('enumerator');
                 // Check for opd_kabupaten_id and create in EnumeratorKabupaten
@@ -197,6 +229,20 @@ class EnumeratorController extends Controller
                 'jabatan' => 'required',
             ]);
 
+            switch ($request->tipe_wilayah) {
+                case 'desa':
+                    $validated['tipe_wilayah'] = 'App\Models\Desa';
+                    break;
+                case 'kecamatan':
+                    $validated['tipe_wilayah'] = 'App\Models\Kecamatan';
+                    break;
+                case 'kabupaten':
+                    $validated['tipe_wilayah'] = 'App\Models\Kabupaten';
+                    break;
+                default:
+                    return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
+            }
+
             if ($loginUser->hasRole('opd_provinsi')) {
                 $validated['opd_provinsi_id'] = $loginUser->user_opd_provinsi()->first()->opd_provinsi_id;
             } elseif ($loginUser->hasRole('opd_kabupaten')) {
@@ -213,6 +259,8 @@ class EnumeratorController extends Controller
             $enumerator->update([
                 'nama' => $request->nama,
                 'jabatan' => $request->jabatan,
+                'tipe_wilayah' => $validated['tipe_wilayah'],
+                'wilayah_id' => $request->wilayah_id,
             ]);
 
             return $this->successResponse('Data enumerator berhasil diubah', Response::HTTP_OK);

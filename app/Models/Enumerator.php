@@ -55,6 +55,10 @@ class Enumerator extends Model
     {
         return $this->hasMany(PivotEnumeratorIndikator::class);
     }
+    public function wilayah()
+    {
+        return $this->morphTo(null, 'tipe_wilayah', 'wilayah_id');
+    }
 
     public function enumerator_indikator_status_pending()
     {
