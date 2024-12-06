@@ -48,6 +48,8 @@ Route::prefix("landing")->controller(LandingController::class)->group(function (
     Route::get("opd-provinsi", "getOpdProvinsi");
     Route::get("hasil-spasial", "getHasilSpasialandSearch");
     Route::get("hasil-spasial/{id}", "getHasilSpasial");
+    Route::get("olahan-spasial", "getOlahanSpasialandSearch");
+    Route::get("olahan-spasial/{id}", "getOlahanSpasial");
 });
 
 Route::prefix("data")->controller(DataController::class)->group(function () {
