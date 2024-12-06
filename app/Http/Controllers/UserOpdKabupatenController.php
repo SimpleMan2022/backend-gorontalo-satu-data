@@ -98,6 +98,16 @@ class UserOpdKabupatenController extends Controller
             }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
             $user = User::create($validated);
+
+            if($request->jabatan == 'Admin') {
+                $permission_operator_kabupaten = [
+                    'kelola_user_opd_kabupaten',
+                    'kelola_opd_kabupaten',
+                ];
+
+                $user->revokePermissionTo($permission_operator_kabupaten);
+            }
+
             $user->assignRole('opd_kabupaten');
             if ($user) {
 
@@ -162,6 +172,23 @@ class UserOpdKabupatenController extends Controller
             if (!$user) {
                 return $this->errorResponse('Data user tidak ditemukan', Response::HTTP_NOT_FOUND);
             }
+
+            if($request->jabatan != 'Admin') {
+                $permission_operator_kabupaten = [
+                    'kelola_user_opd_kabupaten',
+                    'kelola_opd_kabupaten',
+                ];
+
+                $user->revokePermissionTo($permission_operator_kabupaten);
+            }else {
+                $permission_operator_kabupaten = [
+                    'kelola_user_opd_kabupaten',
+                    'kelola_opd_kabupaten',
+                ];
+
+                $user->givePermissionTo($permission_operator_kabupaten);
+            }
+
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
