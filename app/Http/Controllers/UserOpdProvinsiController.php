@@ -109,6 +109,14 @@ class UserOpdProvinsiController extends Controller
                 'username' => $validated['username'],
                 'password' => $validated['password'],
             ]);
+            if($request->jabatan == 'Admin') {
+                $permission_operator_provinsi = [
+                    'kelola_user_opd_provinsi',
+                    'kelola_opd_provinsi',
+                ];
+
+                $user->revokePermissionTo($permission_operator_provinsi);
+            }
             $user->assignRole('opd_provinsi');
             if ($user) {
                 UserOpdProvinsi::create([
@@ -168,6 +176,23 @@ class UserOpdProvinsiController extends Controller
                 'email' => $request->email,
                 'username' => $validated['username'],
             ]);
+
+            if($request->jabatan != 'Admin') {
+                $permission_operator_provinsi = [
+                    'kelola_user_opd_provinsi',
+                    'kelola_opd_provinsi',
+                ];
+
+                $user->revokePermissionTo($permission_operator_provinsi);
+            }else {
+                $permission_operator_provinsi = [
+                    'kelola_user_opd_provinsi',
+                    'kelola_opd_provinsi',
+                ];
+
+                $user->givePermissionTo($permission_operator_provinsi);
+            }
+
             if ($user) {
                 $user_opd_provinsi->update([
                     'nama' => $request->nama,

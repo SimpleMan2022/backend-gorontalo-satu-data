@@ -115,7 +115,7 @@ class OpdKabupatenController extends Controller
                 ];
                 foreach ($operator as $item) {
                     $user = $item->user;
-                    $user->revokePermissionTo($permissions_kabupaten);
+                    $user->givePermissionTo($permissions_kabupaten);
                 }
                 return $this->successResponse('Perizinan OPD Kabupaten berhasil diubah', Response::HTTP_OK);
             }
