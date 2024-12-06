@@ -137,16 +137,71 @@ class AuthController extends Controller
 
   public function getEnumeratorMobile(Request $request)
   {
-    $enumerator = Enumerator::where('user_id', $request->user()->id)->first();
+    $enumerator = Enumerator::where('user_id', $request->user()->id)->with(['wilayah' => function ($query) {
+      $query->when(
+          $query->getModel() instanceof \App\Models\Desa,
+          function ($query) {
+              // Muat relasi kecamatan dan kabupaten untuk Desa
+              $query->with(['kecamatan.kabupaten']);
+          }
+      )->when(
+          $query->getModel() instanceof \App\Models\Kecamatan,
+          function ($query) {
+              // Muat relasi kabupaten untuk Kecamatan
+              $query->with(['kabupaten']);
+          }
+      );
+    }])->first();
     if ($enumerator === null) {
       return $this->errorResponse('Data enumerator tidak ditemukan', Response::HTTP_NOT_FOUND);
     }
+
+    switch ($enumerator->tipe_wilayah) {
+      case 'App\Models\Desa':
+          $tipeWilayahName = 'Desa';
+          break;
+      case 'App\Models\Kecamatan':
+          $tipeWilayahName = 'Kecamatan';
+          break;
+      case 'App\Models\Kabupaten':
+          $tipeWilayahName = 'Kabupaten';
+          break;
+      default:
+          $tipeWilayahName = 'Unknown';
+  }
 
     $enumeratorData = [
       'id' => $enumerator->id,
       'nama' => $enumerator->nama,
       'jabatan' => $enumerator->jabatan,
       'enumerator_level' => $enumerator->enumerator_level,
+      'wilayah' => [
+        'desa' => $enumerator->tipe_wilayah === \App\Models\Desa::class
+          ? [
+            'id' => $enumerator->wilayah->id,
+            'name' => $enumerator->wilayah->name,            
+          ]
+          : null,
+        'kecamatan' => $enumerator->tipe_wilayah !== \App\Models\Kabupaten::class
+          ? [
+            'id' => $enumerator->wilayah->kecamatan->id ?? $enumerator->wilayah->id,
+            'name' => $enumerator->wilayah->kecamatan->name ?? $enumerator->wilayah->name,
+          ]
+          : null,
+        'kabupaten' => [
+            'id' => $enumerator->tipe_wilayah === \App\Models\Desa::class
+              ? $enumerator->wilayah->kecamatan->kabupaten->id
+              : ($enumerator->tipe_wilayah === \App\Models\Kecamatan::class
+                ? $enumerator->wilayah->kabupaten->id
+                : $enumerator->wilayah->id),
+            'name' => $enumerator->tipe_wilayah === \App\Models\Desa::class
+            ? $enumerator->wilayah->kecamatan->kabupaten->name
+            : ($enumerator->tipe_wilayah === \App\Models\Kecamatan::class
+              ? $enumerator->wilayah->kabupaten->name
+              : $enumerator->wilayah->name),            
+          ],
+      ],
+      'tipe_wilayah' => $tipeWilayahName
     ];
 
     if ($enumerator->enumerator_level === 'kabupaten') {
