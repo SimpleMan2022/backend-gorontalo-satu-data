@@ -22,7 +22,21 @@ class UserOpdKabupatenController extends Controller
     {
         try {
             $perPage = $request->per_page ?? 10;
-            $UserOpdKabupatenQuery = UserOpdKabupaten::orderBy('created_at', 'desc');
+            $UserOpdKabupatenQuery = UserOpdKabupaten::orderBy('created_at', 'desc')->with([
+                'wilayah' => function ($query) {
+                    $query->when(
+                        $query->getModel() instanceof \App\Models\Desa,
+                        function ($query) {
+                            $query->with(['kecamatan.kabupaten']);
+                        }
+                    )->when(
+                        $query->getModel() instanceof \App\Models\Kecamatan,
+                        function ($query) {
+                            $query->with(['kabupaten']);
+                        }
+                    );
+                }
+            ]);
 
             $search = $request->query('search');
             if ($search) {
@@ -79,6 +93,8 @@ class UserOpdKabupatenController extends Controller
                 'nama' => 'required',
                 'opd_kabupaten_id' => 'required',
                 'jabatan' => 'required',
+                'tipe_wilayah' => 'required',
+                'wilayah_id' => 'required'
             ]);
 
             if (User::where('email', $validated['email'])->exists()) {
@@ -87,6 +103,20 @@ class UserOpdKabupatenController extends Controller
 
             if (!OpdKabupaten::where('id', $validated['opd_kabupaten_id'])->exists()) {
                 return $this->errorResponse('OPD tidak ditemukan', Response::HTTP_BAD_REQUEST);
+            }
+
+            switch ($request->tipe_wilayah) {
+                case 'desa':
+                    $validated['tipe_wilayah'] = 'App\Models\Desa';
+                    break;
+                case 'kecamatan':
+                    $validated['tipe_wilayah'] = 'App\Models\Kecamatan';
+                    break;
+                case 'kabupaten':
+                    $validated['tipe_wilayah'] = 'App\Models\Kabupaten';
+                    break;
+                default:
+                    return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
             }
 
             // Mengubah menjadi huruf kecil
@@ -116,6 +146,8 @@ class UserOpdKabupatenController extends Controller
                     'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
                     'user_id' => $user->id,
                     'jabatan' => $request->jabatan,
+                    'tipe_wilayah' => $validated['tipe_wilayah'],
+                    'wilayah_id' => $request->wilayah_id,
                 ]);
             }
             return $this->successResponse('Data berhasil dibuat', Response::HTTP_CREATED);
@@ -156,7 +188,22 @@ class UserOpdKabupatenController extends Controller
                 'nama' => 'required',
                 'opd_kabupaten_id' => 'required',
                 'jabatan' => 'required',
+                'wilayah_id' => 'required'
             ]);
+
+            switch ($request->tipe_wilayah) {
+                case 'desa':
+                    $validated['tipe_wilayah'] = 'App\Models\Desa';
+                    break;
+                case 'kecamatan':
+                    $validated['tipe_wilayah'] = 'App\Models\Kecamatan';
+                    break;
+                case 'kabupaten':
+                    $validated['tipe_wilayah'] = 'App\Models\Kabupaten';
+                    break;
+                default:
+                    return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
+            }
 
             $user_opd_kabupaten = UserOpdKabupaten::find($id);
             if (!$user_opd_kabupaten) {
@@ -166,6 +213,8 @@ class UserOpdKabupatenController extends Controller
                 'nama' => $request->nama,
                 'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
                 'jabatan' => $request->jabatan,
+                'tipe_wilayah' => $validated['tipe_wilayah'],
+                'wilayah_id' => $request->wilayah_id,
             ]);
 
             $user = User::find($user_opd_kabupaten->user_id);

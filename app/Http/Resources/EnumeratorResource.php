@@ -14,6 +14,20 @@ class EnumeratorResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        switch ($this->tipe_wilayah) {
+            case 'App\Models\Desa':
+                $tipeWilayahName = 'Desa';
+                break;
+            case 'App\Models\Kecamatan':
+                $tipeWilayahName = 'Kecamatan';
+                break;
+            case 'App\Models\Kabupaten':
+                $tipeWilayahName = 'Kabupaten';
+                break;
+            default:
+                $tipeWilayahName = 'Unknown';
+        }
+        
         return [
             'id' => $this->id,
             'email' => $this->user->email,
@@ -49,6 +63,16 @@ class EnumeratorResource extends JsonResource
                 ];
             }
             ),
+            'wilayah' => $this->whenLoaded('wilayah', function () {
+                if ($this->tipe_wilayah === \App\Models\Desa::class) {
+                    return $this->wilayah->load(['kecamatan.kabupaten']);
+                } elseif ($this->tipe_wilayah === \App\Models\Kecamatan::class) {
+                    return $this->wilayah->load(['kabupaten']);
+                }
+
+                return $this->wilayah; // Default jika tidak perlu relasi lebih lanjut
+            }),
+            'tipe_wilayah' => $tipeWilayahName,
             'created_at' => $this->created_at,
             'updated_at' => $this->created_at
         ];
