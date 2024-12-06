@@ -105,7 +105,7 @@ class UserOpdKabupatenController extends Controller
                     'kelola_opd_kabupaten',
                 ];
 
-                $user->revokePermissionTo($permission_operator_kabupaten);
+                $user->givePermissionTo($permission_operator_kabupaten);
             }
 
             $user->assignRole('opd_kabupaten');
