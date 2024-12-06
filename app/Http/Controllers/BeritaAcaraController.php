@@ -28,9 +28,7 @@ class BeritaAcaraController extends Controller
                 });
             } elseif ($user->hasRole('opd_kabupaten')) {
                 $opdProvinsiId = $user->user_opd_kabupaten()->first()->opd_kabupaten()->first()->opd_provinsi_id;
-                $BeritaAcaraQuery->whereHas('opd_kabupaten', function ($query) use ($opdProvinsiId) {
-                    $query->where('opd_provinsi_id', $opdProvinsiId);
-                });
+                $BeritaAcaraQuery->where('opd_kabupaten_id', $user->user_opd_kabupaten()->first()->opd_kabupaten_id);
             }
 
             if ($search = $request->query('search')) {
@@ -68,13 +66,13 @@ class BeritaAcaraController extends Controller
                 'nama' => 'required|string',
                 'file' => 'required|file|mimes:pdf|max:20480', // Restrict file to only PDF
                 'indikator_id' => 'required|integer|exists:indikator,id',
-                'status' => 'required'
             ]);
             $user = $request->user();
 
             if (!$user->hasRole('opd_kabupaten')) {
                 return $this->errorResponse('Anda tidak memiliki akses untuk membuat berita acara', Response::HTTP_FORBIDDEN);
             }
+            $validated['status'] = 'private';
             $validated['opd_kabupaten_id'] = $user->user_opd_kabupaten()->first()->opd_kabupaten_id;
             // Handle file upload (PDF only)
             if ($request->hasFile('file')) {
@@ -123,11 +121,11 @@ class BeritaAcaraController extends Controller
                 'nama' => 'required',
                 'file' => 'nullable|file|mimes:pdf|max:20480',
                 'indikator_id' => 'required|integer|exists:indikator,id',
-                'status' => 'required'
             ]);
 
             $user = $request->user();
-
+            $validated['status'] = 'private';
+            
             if (!$user->hasRole('opd_kabupaten')) {
                 return $this->errorResponse('Anda tidak memiliki akses untuk membuat berita acara', Response::HTTP_FORBIDDEN);
             }
