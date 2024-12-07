@@ -102,6 +102,9 @@ paths:
                       username:
                         type: string
                         example: "admin"
+                      nama_lengkap:
+                        type: string
+                        example: "-"
                       email:
                         type: string
                         example: "admin@example.com"
@@ -380,6 +383,56 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/UnauthorizedResponse"
+  /auth/change-profile:
+    put:
+      tags:
+        - Authentication
+      summary: Mengganti profile
+      description: API untuk mengganti profile
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                username:
+                  type: string
+                  example: "farel"
+                nama_lengkap:
+                  type: string
+                  example: "Farel"
+      responses:
+        "200":
+          description: Success
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Profile berhasil diubah"
+        "400":
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BadRequestResponse"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse" 
   /sektor:
     get:
       tags:

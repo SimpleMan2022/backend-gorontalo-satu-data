@@ -105,9 +105,17 @@ class AuthController extends Controller
       $jabatan = $request->user()->user_opd_kabupaten->jabatan;
     }
 
+    if ($roleName == 'opd_provinsi') {
+      $nama_lengkap = $request->user()->user_opd_provinsi->nama;
+    }
+    if ($roleName == 'opd_kabupaten') {
+      $nama_lengkap = $request->user()->user_opd_kabupaten->nama;
+    }
+
     $responseData = [
       'id' => $request->user()->id,
       'username' => $request->user()->username,
+      'nama_lengkap' => $nama_lengkap ?? "-",
       'email' => $request->user()->email,
       'jabatan' => $jabatan ?? 'admin',
       'role' => [
@@ -117,6 +125,7 @@ class AuthController extends Controller
       ],
       'permissions' => $request->user()->permissions->pluck('name') ?? '-'
     ];
+
 
     if ($roleName !== 'admin') {
       $responseData['opd'] = [
@@ -139,17 +148,17 @@ class AuthController extends Controller
   {
     $enumerator = Enumerator::where('user_id', $request->user()->id)->with(['wilayah' => function ($query) {
       $query->when(
-          $query->getModel() instanceof \App\Models\Desa,
-          function ($query) {
-              // Muat relasi kecamatan dan kabupaten untuk Desa
-              $query->with(['kecamatan.kabupaten']);
-          }
+        $query->getModel() instanceof \App\Models\Desa,
+        function ($query) {
+          // Muat relasi kecamatan dan kabupaten untuk Desa
+          $query->with(['kecamatan.kabupaten']);
+        }
       )->when(
-          $query->getModel() instanceof \App\Models\Kecamatan,
-          function ($query) {
-              // Muat relasi kabupaten untuk Kecamatan
-              $query->with(['kabupaten']);
-          }
+        $query->getModel() instanceof \App\Models\Kecamatan,
+        function ($query) {
+          // Muat relasi kabupaten untuk Kecamatan
+          $query->with(['kabupaten']);
+        }
       );
     }])->first();
     if ($enumerator === null) {
@@ -158,17 +167,17 @@ class AuthController extends Controller
 
     switch ($enumerator->tipe_wilayah) {
       case 'App\Models\Desa':
-          $tipeWilayahName = 'Desa';
-          break;
+        $tipeWilayahName = 'Desa';
+        break;
       case 'App\Models\Kecamatan':
-          $tipeWilayahName = 'Kecamatan';
-          break;
+        $tipeWilayahName = 'Kecamatan';
+        break;
       case 'App\Models\Kabupaten':
-          $tipeWilayahName = 'Kabupaten';
-          break;
+        $tipeWilayahName = 'Kabupaten';
+        break;
       default:
-          $tipeWilayahName = 'Unknown';
-  }
+        $tipeWilayahName = 'Unknown';
+    }
 
     $enumeratorData = [
       'id' => $enumerator->id,
@@ -179,7 +188,7 @@ class AuthController extends Controller
         'desa' => $enumerator->tipe_wilayah === \App\Models\Desa::class
           ? [
             'id' => $enumerator->wilayah->id,
-            'name' => $enumerator->wilayah->name,            
+            'name' => $enumerator->wilayah->name,
           ]
           : null,
         'kecamatan' => $enumerator->tipe_wilayah !== \App\Models\Kabupaten::class
@@ -189,17 +198,17 @@ class AuthController extends Controller
           ]
           : null,
         'kabupaten' => [
-            'id' => $enumerator->tipe_wilayah === \App\Models\Desa::class
-              ? $enumerator->wilayah->kecamatan->kabupaten->id
-              : ($enumerator->tipe_wilayah === \App\Models\Kecamatan::class
-                ? $enumerator->wilayah->kabupaten->id
-                : $enumerator->wilayah->id),
-            'name' => $enumerator->tipe_wilayah === \App\Models\Desa::class
+          'id' => $enumerator->tipe_wilayah === \App\Models\Desa::class
+            ? $enumerator->wilayah->kecamatan->kabupaten->id
+            : ($enumerator->tipe_wilayah === \App\Models\Kecamatan::class
+              ? $enumerator->wilayah->kabupaten->id
+              : $enumerator->wilayah->id),
+          'name' => $enumerator->tipe_wilayah === \App\Models\Desa::class
             ? $enumerator->wilayah->kecamatan->kabupaten->name
             : ($enumerator->tipe_wilayah === \App\Models\Kecamatan::class
               ? $enumerator->wilayah->kabupaten->name
-              : $enumerator->wilayah->name),            
-          ],
+              : $enumerator->wilayah->name),
+        ],
       ],
       'tipe_wilayah' => $tipeWilayahName
     ];
@@ -259,15 +268,34 @@ class AuthController extends Controller
 
   public function changeProfile(Request $request)
   {
-    $data = $request->validate([
-      'username' => 'required',
-    ]);
+    try {
+      $data = $request->validate([
+        'username' => 'required',
+      ]);
 
-    $user = $request->user();
-    $user->username = $data['username'];
-    $user->save();
+      $user = $request->user();
+      if ($user->username !== $data['username']) {
+        $request->validate([
+          'username' => 'unique:users',
+        ]);
+      }
+      $user->username = $data['username'];
+      $user->save();
 
-    return response($this->successResponse('Profil berhasil diubah'), 200);
+      if ($user->hasRole('opd_provinsi')) {
+        $user->user_opd_provinsi->nama = $request->nama_lengkap;
+        $user->user_opd_provinsi->save();
+      } elseif ($user->hasRole('opd_kabupaten')) {
+        $user->user_opd_kabupaten->nama = $request->nama_lengkap;
+        $user->user_opd_kabupaten->save();
+      }
+
+      return $this->successResponse('Profil berhasil diubah', Response::HTTP_OK);
+    } catch (ValidationException $e) {
+      return $this->errorResponseWithData($e->errors(), 'Gagal mengubah profil', Response::HTTP_BAD_REQUEST);
+    } catch (Exception $e) {
+      return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
   }
 
   public function changePassword(Request $request)
