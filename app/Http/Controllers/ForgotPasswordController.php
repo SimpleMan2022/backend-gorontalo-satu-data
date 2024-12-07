@@ -26,7 +26,7 @@ class ForgotPasswordController extends Controller
     {
         try {
             $request->validate([
-                'email' => 'required|email|exists:users,email',
+                'email' => 'required|email',
             ]);
 
             // Buat token plain text

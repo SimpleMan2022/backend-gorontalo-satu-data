@@ -235,7 +235,8 @@ class LandingController extends Controller
         }
     }
 
-    public function getOlahanSpasialandSearch(Request $request) {
+    public function getOlahanSpasialandSearch(Request $request)
+    {
         try {
             $perPage = $request->per_page ?? 10;
             $data = OlahanSpasial::orderBy('created_at', 'desc');
@@ -271,8 +272,8 @@ class LandingController extends Controller
             } else {
                 return $this->errorResponse('Data masih kosong', Response::HTTP_NOT_FOUND);
             }
-        }catch(Exception $e) {
-            return $this->errorRespones($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        } catch (Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -322,7 +323,7 @@ class LandingController extends Controller
     {
         try {
             // Mencari data sektor dengan id
-            $data = OlahanSpasial::with(['sektor_spasial', 'opd_provinsi','spasial_kabupaten'])->where('id', $id)->first();
+            $data = OlahanSpasial::with(['sektor_spasial', 'opd_provinsi', 'spasial_kabupaten'])->where('id', $id)->first();
 
             if ($data) {
                 $group = [
