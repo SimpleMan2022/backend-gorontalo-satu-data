@@ -159,7 +159,7 @@ class LandingController extends Controller
                     ->flatMap(function ($rekap) {
                         return collect($rekap->hasil_data)
                             ->filter(function ($hasil) {
-                                return str_contains($hasil->konten, 'Kabupaten') || str_contains($hasil->konten, 'Kota');
+                                return str_contains($hasil->variabel->tipe, 'kabupaten');
                             })
                             ->pluck('konten');
                     })
