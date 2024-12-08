@@ -32,7 +32,7 @@ class DataController extends Controller
             }
             $data = $kecamatanQuery->get();
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex($data, $data->items(), 'Data kecamatan berhasil diambil');
+                return $this->successResponseWithData($data, 'Data kecamatan berhasil diambil');
             } else {
                 return $this->errorResponse('Data tidak ditemukan', 404);
             }
@@ -51,7 +51,7 @@ class DataController extends Controller
             }
             $data = $desaQuery->get();
             if ($data->isNotEmpty()) {
-                return $this->successResponseWithDataIndex($data, $data, 'Data desa berhasil diambil');
+                return $this->successResponseWithData($data, 'Data desa berhasil diambil');
             } else {
                 return $this->errorResponse('Data tidak ditemukan', 404);
             }

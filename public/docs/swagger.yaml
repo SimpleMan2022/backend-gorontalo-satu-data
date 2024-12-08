@@ -8168,9 +8168,6 @@ paths:
       summary: Mendapatkan semua data kabupaten
       security:
         - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
       responses:
         "200":
           description: Berhasil mendapatkan data kabupaten
@@ -8219,8 +8216,6 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
         - name: kabupaten_id
           in: query
           required: false
@@ -8280,8 +8275,6 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
         - name: kecamatan_id
           in: query
           required: false
