@@ -2170,7 +2170,7 @@ paths:
         - $ref: "#/components/parameters/SearchParam"
       responses:
         "200":
-          description: Berhasil mendapatkan daftar user opd kabupaten
+          description: Data user OPD Kabupaten berhasil diambil
           content:
             application/json:
               schema:
@@ -2184,7 +2184,7 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data user OPD Kabupaten berhasil diambil
+                    example: "Data user OPD Kabupaten berhasil diambil"
                   data:
                     type: array
                     items:
@@ -2192,71 +2192,98 @@ paths:
                       properties:
                         id:
                           type: integer
-                          example: 1
+                          example: 18
                         nama:
                           type: string
-                          example: "Agus Kurniawan"
+                          example: "ical"
                         opd_kabupaten:
                           type: object
                           properties:
                             id:
                               type: integer
-                              example: 1
+                              example: 3
                             nama:
                               type: string
-                              example: "Dinas Pendidikan"
+                              example: "Dinas Perhubungan Kabupaten Bone Bolango"
                             lokasi:
                               type: string
-                              example: "Jl. Pendidikan No. 1"
+                              example: "Jl. Perhubungan No. 12"
                             kabupaten:
                               type: object
                               properties:
                                 id:
                                   type: integer
-                                  example: 1
+                                  example: 7504
+                                name:
+                                  type: string
+                                  example: "KABUPATEN BONE BOLANGO"
+                            opd_provinsi:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 3
                                 nama:
                                   type: string
-                                  example: "Kabupaten Gorontalo"
-                        opd_provinsi:
+                                  example: "Dinas Perhubungan"
+                        jabatan:
+                          type: string
+                          example: "Admin"
+                        wilayah:
                           type: object
                           properties:
                             id:
                               type: integer
-                              example: 1
-                            nama:
+                              example: 7502020
+                            regency_id:
                               type: string
-                              example: "Dinas Pendidikan"
-                        jabatan:
+                              example: "7502"
+                            name:
+                              type: string
+                              example: "BATUDAA"
+                            kabupaten:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                  example: 7502
+                                province_id:
+                                  type: string
+                                  example: "75"
+                                name:
+                                  type: string
+                                  example: "KABUPATEN GORONTALO"
+                        tipe_wilayah:
                           type: string
-                          example: "Admin OPD"
+                          example: "Kecamatan"
                         user:
                           type: object
                           properties:
                             id:
                               type: integer
-                              example: 1
+                              example: 72
                             username:
                               type: string
-                              example: aguskurniawan
+                              example: "ical"
                             email:
                               type: string
-                              example: "aguskurniawan@gmail.com"
+                              example: "ical@gmail.com"
                             created_at:
                               type: string
                               format: date-time
-                              example: "2024-10-07T02:28:11.000000Z"
+                              example: "2024-12-06T07:07:41.000000Z"
                             updated_at:
                               type: string
                               format: date-time
-                              example: "2024-10-07T02:28:11.000000Z"
+                              example: "2024-12-06T07:07:41.000000Z"
                         created_at:
                           type: string
                           format: date-time
-                          example: "2024-10-07T02:28:11.000000Z"
+                          example: "2024-12-06T07:07:41.000000Z"
                         updated_at:
                           type: string
                           format: date-time
-                          example: "2024-10-07T02:28:11.000000Z"
+                          example: "2024-12-06T07:07:41.000000Z"
                   pagination:
                     $ref: "#/components/schemas/Pagination"
         "401":
@@ -2271,6 +2298,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"
+
     post:
       tags:
         - User OPD Kabupaten
@@ -8140,9 +8168,6 @@ paths:
       summary: Mendapatkan semua data kabupaten
       security:
         - BearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
       responses:
         "200":
           description: Berhasil mendapatkan data kabupaten
@@ -8191,8 +8216,6 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
         - name: kabupaten_id
           in: query
           required: false
@@ -8252,8 +8275,6 @@ paths:
       security:
         - BearerAuth: []
       parameters:
-        - $ref: "#/components/parameters/PageParam"
-        - $ref: "#/components/parameters/PerPageParam"
         - name: kecamatan_id
           in: query
           required: false
@@ -9260,6 +9281,27 @@ paths:
                           enumerator_level:
                             type: string
                             example: "Provinsi"
+                          wilayah: 
+                            type: object
+                            properties:
+                              desa:
+                                type: "string"
+                                example: "andalas"
+                              kecamatan:
+                                type: "string"
+                                exampla: "tapa"
+                              kabupaten: 
+                                type: object
+                                properties:
+                                  id:
+                                    type: integer
+                                    example: 1
+                                  nama:
+                                    type: string
+                                    example: "Kabupaten Gorontalo"
+                          tipe_wilayah:
+                            type: string
+                            example: "Kabupaten"
                           nama_opd:
                             type: string
                             example: "Dinas Kesehatan"
@@ -9402,7 +9444,71 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/EmptyDataResponse"     
+                $ref: "#/components/schemas/EmptyDataResponse"
+  /mobile/dashboard/variabel/{id}:
+    get:
+      tags:
+        - Mobile
+      summary: Mendapatkan data variabel berdasarkan ID
+      description: API untuk mendapatkan data variabel berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID variabel yang ingin diambil
+          schema:
+            type: integer
+            example: 216
+      responses:
+        "200":
+          description: Data Variabel berhasil diambil
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data Variabel berhasil diambil"
+                  data:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                        example: 216
+                      indikator_id:
+                        type: integer
+                        example: 77
+                      nama:
+                        type: string
+                        example: "Titik koordinat"
+                      order:
+                        type: integer
+                        example: 0
+                      tipe:
+                        type: string
+                        example: "titik_koordinat"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
+                
   /mobile/dashboard/enumerator/riwayat:
     get:
       tags:
@@ -9418,7 +9524,7 @@ paths:
             type: string
             example: "v3"
       responses:
-        200:
+        "200":
           description: Data Riwayat Enumerator berhasil diambil
           content:
             application/json:
