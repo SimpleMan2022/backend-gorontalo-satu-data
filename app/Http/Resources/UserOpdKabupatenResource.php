@@ -16,16 +16,16 @@ class UserOpdKabupatenResource extends JsonResource
     {
         switch ($this->tipe_wilayah) {
             case 'App\Models\Desa':
-                $tipeWilayahName = 'Desa';
+                $tipeWilayahName = 'desa';
                 break;
             case 'App\Models\Kecamatan':
-                $tipeWilayahName = 'Kecamatan';
+                $tipeWilayahName = 'kecamatan';
                 break;
             case 'App\Models\Kabupaten':
-                $tipeWilayahName = 'Kabupaten';
+                $tipeWilayahName = 'kabupaten';
                 break;
             default:
-                $tipeWilayahName = 'Unknown';
+                $tipeWilayahName = 'error';
         }
 
         return [
