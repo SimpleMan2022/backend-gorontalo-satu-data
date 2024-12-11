@@ -102,13 +102,13 @@ class UserSeeder extends Seeder
         $user_opd_provinsi = User::create([
             'username' => 'dinaskesehatan',
             'email' => 'dinaskesehatan@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('gsdmakro321'),
         ]);
 
         $user_enumerator_provinsi = User::create([
             'username' => 'enumeratordinkes',
             'email' => 'enumeratordinkes@example.com',
-            'password' => Hash::make('password'),
+            'password' => Hash::make('gsdmakro321'),
         ]);
 
         $enumerator_provinsi = Enumerator::create([
@@ -190,7 +190,7 @@ class UserSeeder extends Seeder
                 'user' => [
                     'username' => 'dinaskesehatan_bonebolango',
                     'email' => 'dinaskesehatan_bonebolango@example.com',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('gsdmakro321'),
                 ],
                 'opd' => [
                     'nama' => 'Dinas Kesehatan Kabupaten Bone Bolango',
@@ -203,7 +203,7 @@ class UserSeeder extends Seeder
                 'enumerator_user' => [
                     'username' => 'enumeratordinkes_bonebolango',
                     'email' => 'enumeratordinkes_bonebolango@example.com',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('gsdmakro321'),
                 ],
                 'enumerator' => [
                     'nama' => 'Enumerator Rizki',
@@ -214,7 +214,7 @@ class UserSeeder extends Seeder
                 'user' => [
                     'username' => 'dinaskesehatan_kotagorontalo',
                     'email' => 'dinaskesehatan_kotagorontalo@example.com',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('gsdmakro321'),
                 ],
                 'opd' => [
                     'nama' => 'Dinas Kesehatan Kota Gorontalo',
@@ -227,7 +227,7 @@ class UserSeeder extends Seeder
                 'enumerator_user' => [
                     'username' => 'enumeratordinkes_kotagorontalo',
                     'email' => 'enumeratordinkes_kotagorontalo@example.com',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('gsdmakro321'),
                 ],
                 'enumerator' => [
                     'nama' => 'Enumerator Ikbal',
@@ -238,7 +238,7 @@ class UserSeeder extends Seeder
                 'user' => [
                     'username' => 'dinaskesehatan_boalemo',
                     'email' => 'dinaskesehatan_boalemo@example.com',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('gsdmakro321'),
                 ],
                 'opd' => [
                     'nama' => 'Dinas Kesehatan Kabupaten Boalemo',
@@ -252,7 +252,7 @@ class UserSeeder extends Seeder
                 'enumerator_user' => [
                     'username' => 'enumeratordinkes_boalemo',
                     'email' => 'enumeratordinkes_boalemo@example.com',
-                    'password' => Hash::make('password'),
+                    'password' => Hash::make('gsdmakro321'),
                 ],
                 'enumerator' => [
                     'nama' => 'Enumerator Aldi',
