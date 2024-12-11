@@ -3304,6 +3304,50 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
+  /opd-kabupaten/set-permission/{id}:
+    get:
+      tags:
+        - OPD Kabupaten
+      summary: Mengubah perizinan OPD Kabupaten
+      description: Endpoint untuk mengubah status perizinan OPD Kabupaten berdasarkan ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID OPD Kabupaten
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Respons berhasil dengan status perizinan.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    oneOf:
+                      - example: "OPD Kabupaten berhasil diizinkan"
+                      - example: "Perizinan OPD Kabupaten berhasil diubah"
+        "401":
+          description: Tidak diotorisasi
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/DataNotFoundResponse"
   /opd-kabupaten/edit/{id}:
     patch:
       tags:
