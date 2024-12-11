@@ -59,20 +59,21 @@ class UserOpdProvinsiController extends Controller
         }
     }
 
-    public function getUser(Request $request) {
+    public function getUser(Request $request)
+    {
         try {
             $data = UserOpdProvinsi::where('user_id', $request->user_id)->first();
 
-            if($data){
+            if ($data) {
                 return $this->successResponseWithData(
                     UserOpdProvinsiResource::make($data),
                     'Data user OPD Provinsi berhasil diambil',
                     Response::HTTP_OK
                 );
-            }else {
+            } else {
                 return $this->errorResponse('Data user OPD Provinsi tidak ditemukan', Response::HTTP_NOT_FOUND);
             }
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -99,8 +100,11 @@ class UserOpdProvinsiController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-            if (User::where('username', $validated['username'])->exists()) {
-                return $this->errorResponse('Username sudah tersedia', Response::HTTP_BAD_REQUEST);
+            $baseUsername = $validated['username'];
+            $counter = 1;
+            while (User::where('username', $validated['username'])->exists()) {
+                $validated['username'] = $baseUsername . $counter;
+                $counter++;
             }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
             // dd($validated);
@@ -109,7 +113,7 @@ class UserOpdProvinsiController extends Controller
                 'username' => $validated['username'],
                 'password' => $validated['password'],
             ]);
-            if($request->jabatan == 'Admin') {
+            if ($request->jabatan == 'Admin') {
                 $permission_operator_provinsi = [
                     'kelola_user_opd_provinsi',
                     'kelola_opd_provinsi',
@@ -158,7 +162,6 @@ class UserOpdProvinsiController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                // 'password' => 'required',,
                 'opd_provinsi_id' => 'required',
                 'jabatan' => 'required',
             ]);
@@ -169,7 +172,12 @@ class UserOpdProvinsiController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-
+            $baseUsername = $validated['username'];
+            $counter = 1;
+            while (User::where('username', $validated['username'])->exists()) {
+                $validated['username'] = $baseUsername . $counter;
+                $counter++;
+            }
             // $validated['password'] = Hash::make($request->password);
             $user = User::find($user_opd_provinsi->user_id);
             $user->update([
@@ -177,14 +185,14 @@ class UserOpdProvinsiController extends Controller
                 'username' => $validated['username'],
             ]);
 
-            if($request->jabatan != 'Admin') {
+            if ($request->jabatan != 'Admin') {
                 $permission_operator_provinsi = [
                     'kelola_user_opd_provinsi',
                     'kelola_opd_provinsi',
                 ];
 
                 $user->revokePermissionTo($permission_operator_provinsi);
-            }else {
+            } else {
                 $permission_operator_provinsi = [
                     'kelola_user_opd_provinsi',
                     'kelola_opd_provinsi',
