@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Models\{HasilData, Variabel, RekapHasil, Periode, Enumerator, Indikator, OpdProvinsi, OpdKabupaten, PivotEnumeratorIndikator};
+use App\Models\{HasilData, Variabel, RekapHasil, Periode, Enumerator, Indikator, OpdProvinsi, OpdKabupaten, PivotEnumeratorIndikator, Kabupaten};
 use App\Http\Resources\RekapHasilResource;
 use App\Http\Traits\ApiResponse;
 use Exception;
@@ -200,10 +200,115 @@ class RekapHasilController extends Controller
     public function rekapKeseluruhan(Request $request) {
         try {
 
-            $rekap_hasil = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi'])
-            ->orderBy('created_at', 'desc')->get();
+            $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi']);
 
-            return $rekap_hasil;
+            if ($indikatorId = $request->query('indikator_id')) {
+                $hasilQuery->whereHas('indikator', function ($query) use ($indikatorId) {
+                    $query->where('id', $indikatorId);
+                });
+            }
+
+            if($wilayahId = $request->query('wilayah_id')) {
+                if($wilayahId = 75) {     
+
+                    // $rekapHasilQuery = RekapHasil::join('hasil_data', 'rekap_hasil.id', '=', 'hasil_data.rekap_hasil_id')
+                    //     ->join('variabel', 'hasil_data.variabel_id', '=', 'variabel.id')
+                    //     ->join('regencies', DB::raw('LEFT(rekap_hasil.wilayah_id, 4)'), '=', 'regencies.id')
+                    //     ->selectRaw("
+                    //         regencies.id as kode_kabupaten,
+                    //         regencies.name as nama_kabupaten,
+                    //         variabel.nama,
+                    //         SUM(hasil_data.konten) as total_nilai
+                    //     ")
+                    //     ->where('variabel.tipe', 'angka') // Hanya variabel bertipe angka
+                    //     ->groupBy('kode_kabupaten', 'nama_kabupaten', 'variabel.nama')
+                    //     ->get();
+                    
+                    // // Format hasil data menjadi bentuk array yang terstruktur
+                    // $formattedData = $rekapHasilQuery->groupBy('kode_kabupaten')->map(function ($items, $kode_kabupaten) {
+                    //     $result = [
+                    //         'kode_wilayah' => $kode_kabupaten,
+                    //         'nama_wilayah' => $items->first()->nama_kabupaten, // Ambil nama kabupaten
+                    //     ];
+                    //     foreach ($items as $item) {
+                    //         $result['total_' . $item->nama] = $item->total_nilai;
+                    //     }
+                    //     return $result;
+                    // })->values()->toArray();
+
+                    $rekapHasilQuery = DB::table('regencies as kabupaten')
+                        ->leftJoin(DB::raw('(
+                            SELECT 
+                                LEFT(rekap_hasil.wilayah_id, 4) as kode_kabupaten,
+                                variabel.nama,
+                                SUM(hasil_data.konten) as total_nilai
+                            FROM rekap_hasil
+                            INNER JOIN hasil_data ON rekap_hasil.id = hasil_data.rekap_hasil_id
+                            INNER JOIN variabel ON hasil_data.variabel_id = variabel.id
+                            WHERE variabel.tipe = "angka"
+                            GROUP BY kode_kabupaten, variabel.nama
+                        ) as hasil_rekap'), 'kabupaten.id', '=', 'kode_kabupaten')
+                        ->select('kabupaten.id as kode_kabupaten', 'kabupaten.name as nama_kabupaten','hasil_rekap.*',  DB::raw('IFNULL(hasil_rekap.total_nilai, 0) as total_nilai'))
+                        ->get();
+
+                        // dd($rekapHasilQuery);
+
+                    // Format data menjadi struktur array yang diinginkan
+                    $formattedData = $rekapHasilQuery->groupBy('kode_kabupaten')->map(function ($items, $kode_kabupaten) {
+                        $result = [
+                            'kode_kabupaten' => $kode_kabupaten,
+                            'nama_kabupaten' => $items->first()->nama_kabupaten,
+                        ];
+                        foreach ($items as $item) {
+                            $result['total_' . $item->nama] = $item->total_nilai;
+                        }
+                        return $result;
+                    })->values()->toArray();
+                            
+                    return $formattedData;
+                }
+
+                
+            }
+            
+            return $data;
+
+            $formattedData = [
+                'id' => (int) $indikatorId,
+                'nama' => $data->hasil_data->first()->variabel->indikator->nama,
+                'nama_opd' => $data->periode->opd_provinsi->nama,
+                'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
+                    return [
+                        'id' => $subjek->id,
+                        'nama' => $subjek->nama,
+                    ];
+                }) : [],                
+                'periode' => [
+                    'id' => $data->periode->id,
+                    'nama' => $data->periode->nama,
+                    'tanggal_mulai' => $data->periode->tanggal_mulai,
+                    'tanggal_selesai' => $data->periode->tanggal_selesai,
+                ],
+                'variabel' => $data->hasil_data->map(function ($hasil) {
+                    return [
+                        'id' => $hasil->variabel->id,
+                        'nama' => $hasil->variabel->nama,
+                        'tipe' => $hasil->variabel->tipe,
+                    ];
+                }),
+                'rekap_hasil' => $groupedHasilData,
+                'status' => $data->status,
+                'created_at' => $data->created_at,
+                'updated_at' => $data->updated_at,
+            ];
+
+            // return $formattedData;
+
+            // return $this->successResponseWithData(
+            //     $formattedData,
+            //     'Rekap hasil berhasil diambil',
+            //     Response::HTTP_OK
+            // );
         }catch(Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
