@@ -125,7 +125,7 @@ class BeritaAcaraController extends Controller
 
             $user = $request->user();
             $validated['status'] = 'private';
-            
+
             if (!$user->hasRole('opd_kabupaten')) {
                 return $this->errorResponse('Anda tidak memiliki akses untuk membuat berita acara', Response::HTTP_FORBIDDEN);
             }
