@@ -26,4 +26,9 @@ class RekapHasil extends Model
     public function indikator() {
         return $this->belongsTo(Indikator::class);
     }
+
+    public function wilayah()
+    {
+        return $this->morphTo(null, 'tipe_wilayah', 'wilayah_id');
+    }
 }

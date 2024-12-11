@@ -132,13 +132,34 @@ class HasilDataController extends Controller
                 }
 
                 if ($periode) {
+
+                    // switch ($enumerator->tipe_wilayah) {
+                    //     case 'desa':
+                    //         $validated['tipe_wilayah'] = 'App\Models\Desa';
+                    //         break;
+                    //     case 'kecamatan':
+                    //         $validated['tipe_wilayah'] = 'App\Models\Kecamatan';
+                    //         break;
+                    //     case 'kabupaten':
+                    //         $validated['tipe_wilayah'] = 'App\Models\Kabupaten';
+                    //         break;
+                    //     default:
+                    //         return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
+                    // }
+
+                    // dd($enumerator);
+
                     $rekap_hasil = RekapHasil::create([
                         'nama' => $nama_rekap,
                         'enumerator_id' => $enumerator->id ?? $enumeratorId,
                         'periode_id' => $periode->id,
                         'indikator_id' => $indikator->id ?? $variabel->indikator_id,
                         'status' => $enumerator['enumerator_level'] == 'provinsi' ? 'v3' : 'v2',
+                        'wilayah_id' => $enumerator->wilayah_id,
+                        'tipe_wilayah' => $enumerator->tipe_wilayah
                     ]);
+
+                    // dd($rekap_hasil);
                 } else {
                     return $this->errorResponse('Periode masih kosong', Response::HTTP_NOT_FOUND);
                 }

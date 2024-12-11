@@ -18,7 +18,6 @@ class RekapHasilController extends Controller
 {
     use ApiResponse;
 
-
     public function index(Request $request)
     {
         try {
@@ -68,7 +67,9 @@ class RekapHasilController extends Controller
                         'id' => $items[0]->rekap_hasil->id,
                         'nama' => $items[0]->rekap_hasil->nama,
                         'status' => $items[0]->rekap_hasil->status,
-                        // 'Status' => $items->rekap_hasil->status,
+                        'enumerator' => $items[0]->rekap_hasil->enumerator->only('id','nama','user_id'),
+                        'wilayah_id' => $items[0]->rekap_hasil->wilayah_id,
+                        'tipe_wilayah' => $items[0]->rekap_hasil->tipe_wilayah,
                         'hasil_data' => $items->map(function ($hasil) {
                             return [
                                 'hasil_data_id' => $hasil->id,
@@ -104,12 +105,12 @@ class RekapHasilController extends Controller
                             'nama' => $subjek->nama,
                         ];
                     }) : [],
-                    'enumerator' => [
-                        'id' => $data->enumerator->id,
-                        'nama' => $data->enumerator->nama,
-                        'jabatan' => $data->enumerator->jabatan,
-                        'enumerator_level' => $data->enumerator->enumerator_level,
-                    ],
+                    // 'enumerator' => [
+                    //     'id' => $data->enumerator->id,
+                    //     'nama' => $data->enumerator->nama,
+                    //     'jabatan' => $data->enumerator->jabatan,
+                    //     'enumerator_level' => $data->enumerator->enumerator_level,
+                    // ],
                     'periode' => [
                         'id' => $data->periode->id,
                         'nama' => $data->periode->nama,
@@ -196,11 +197,17 @@ class RekapHasilController extends Controller
         }
     }
 
-    // public function byIndikator(Request $request) {
-    //     try {
+    public function rekapKeseluruhan(Request $request) {
+        try {
 
-    //     }
-    // }
+            $rekap_hasil = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi'])
+            ->orderBy('created_at', 'desc')->get();
+
+            return $rekap_hasil;
+        }catch(Exception $e) {
+            return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
+    }
 
     public function show(string $id)
     {
