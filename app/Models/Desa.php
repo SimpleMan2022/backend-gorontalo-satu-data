@@ -25,4 +25,9 @@ class Desa extends Model
     {
         return $this->morphMany(UserOpdKabupaten::class, 'wilayah_id');
     }
+
+    public function wilayah_rekap_hasil()
+    {
+        return $this->morphMany(RekapHasil::class, 'wilayah_id');
+    }
 }

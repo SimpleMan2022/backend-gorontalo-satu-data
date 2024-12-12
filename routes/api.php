@@ -259,7 +259,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::prefix('rekap-hasil')->controller(RekapHasilController::class)->group(function () {
         Route::get("", "index");
-        // Route::post("", "store");
+        Route::get("/rekap-keseluruhan", "rekapKeseluruhan");
         Route::get("/{id}", "show");
         Route::put("/multiVerifikasi", "multiUpdate");
         Route::put("/verifikasi/{rekap_hasil_id}", "update");
