@@ -1299,7 +1299,7 @@ paths:
           description: ID dari indikator yang akan ditampilkan
       responses:
         "200":
-          description: Berhasil mendapatkan detail indikator
+          description: Berhasil mendapatkan daftar indikator
           content:
             application/json:
               schema:
@@ -1313,60 +1313,87 @@ paths:
                     example: true
                   message:
                     type: string
-                    example: Data indikator berhasil diambil
+                    example: "Data indikator berhasil diambil"
                   data:
-                    type: object
-                    properties:
-                      id:
-                        type: integer
-                        example: 7
-                      nama:
-                        type: string
-                        example: "Sebaran Jumlah Rumah Sakit dengan kondisi bangunan sedang"
-                      sektor:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 9
-                          nama:
-                            type: string
-                            example: "kesehatan"
-                      antar_waktu:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 6
-                          tahun:
-                            type: string
-                            example: "2022"
-                          nama:
-                            type: string
-                            example: "Triwulan 5"
-                      opd_provinsi:
-                        type: object
-                        properties:
-                          id:
-                            type: integer
-                            example: 1
-                          nama:
-                            type: string
-                            example: "Dinas Pendidikan"
-                          lokasi:
-                            type: string
-                            example: "Jl. Pendidikan No. 1"
-                      status:
-                        type: string
-                        example: "pending"
-                      created_at:
-                        type: string
-                        format: date-time
-                        example: "2024-10-13T12:30:11.000000Z"
-                      updated_at:
-                        type: string
-                        format: date-time
-                        example: "2024-10-13T12:30:11.000000Z"
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                          example: 7
+                        nama:
+                          type: string
+                          example: "Sebaran Jumlah Rumah Sakit dengan kondisi bangunan sedang"
+                        sektor:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 9
+                            nama:
+                              type: string
+                              example: "kesehatan"
+                        antar_waktu:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 6
+                            tahun:
+                              type: string
+                              example: "2022"
+                            nama:
+                              type: string
+                              example: "Triwulan 5"
+                        opd_provinsi:
+                          type: object
+                          properties:
+                            id:
+                              type: integer
+                              example: 1
+                            nama:
+                              type: string
+                              example: "Dinas Pendidikan"
+                            lokasi:
+                              type: string
+                              example: "Jl. Pendidikan No. 1"
+                        variabel:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              nama:
+                                type: string
+                                example: "Nama Sekolah"
+                        subjek:
+                          type: array
+                          items:
+                            type: object
+                            properties:
+                              id:
+                                type: integer
+                                example: 1
+                              nama:
+                                type: string
+                                example: "Kabupaten"
+                        tingkatan:
+                          type: string
+                          example: "desa"
+                        status:
+                          type: string
+                          example: "pending"
+                        created_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T12:30:11.000000Z"
+                        updated_at:
+                          type: string
+                          format: date-time
+                          example: "2024-10-13T12:30:11.000000Z"
         "401":
           description: Unauthorized
           content:
@@ -6761,6 +6788,73 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/EmptyDataResponse"
+  /rekap-hasil/rekap-keseluruhan:
+    get:
+      tags:
+        - Rekap Hasil
+      summary: Mendapatkan semua data rekap hasil
+      security:
+        - BearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/PageParam"
+        - $ref: "#/components/parameters/PerPageParam"
+        - name: indikator_id
+          in: query
+          required: false
+          schema:
+            type: integer
+          description: ID dari indikator yang akan diambil
+      responses:
+        '200':
+          description: Rekap hasil berhasil diambil.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: integer
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Rekap hasil berhasil diambil"
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        kode_wilayah:
+                          type: integer
+                          example: 7505040020
+                        nama_wilayah:
+                          type: string
+                          example: "TUMBA"
+                        kode_kecamatan:
+                          type: string
+                          example: "7505040"
+                        Jumlah Alat Tersedia:
+                          type: integer
+                          example: 176
+                        Jumlah Tenaga Kesehatan:
+                          type: integer
+                          example: 90
+                  pagination:
+                    $ref: "#/components/schemas/Pagination"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data masih kosong
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/EmptyDataResponse"
   /rekap-hasil/verifikasi/{id}:
     patch:
       tags:
@@ -7082,6 +7176,54 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/DataNotFoundResponse"
+  /rekap-hasil/multi-delete:
+    delete:
+      tags:
+        - Rekap Hasil
+      summary: Menghapus banyak hasil data
+      description: API untuk menghapus banyak hasil data sekaligus
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: query
+          required: true
+          schema:
+            type: array
+            items:
+              type: integer
+            example: [1, 2]
+          style: form
+          explode: false
+      responses:
+        "200":
+          description: hasil data berhasil dihapus
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  code:
+                    type: number
+                    example: 200
+                  status:
+                    type: boolean
+                    example: true
+                  message:
+                    type: string
+                    example: "Data berhasil dihapus"
+        "401":
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/UnauthorizedResponse"
+        "404":
+          description: Data tidak ditemukan
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MultiDataNotFoundResponse"
   /sektor-spasial:
     get:
       tags:
