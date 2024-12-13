@@ -143,7 +143,12 @@ class EnumeratorController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-
+            $baseUsername = $validated['username'];
+            $counter = 1;
+            while (User::where('username', $validated['username'])->exists()) {
+                $validated['username'] = $baseUsername . $counter;
+                $counter++;
+            }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
             $newUser = User::create($validated);
             if ($newUser) {
@@ -243,6 +248,16 @@ class EnumeratorController extends Controller
                     return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
             }
 
+            $lowercaseString = strtolower($request->nama);
+            // Menghapus spasi
+            $validated['username'] = str_replace(' ', '', $lowercaseString);
+            $baseUsername = $validated['username'];
+            $counter = 1;
+            while (User::where('username', $validated['username'])->exists()) {
+                $validated['username'] = $baseUsername . $counter;
+                $counter++;
+            }
+
             if ($loginUser->hasRole('opd_provinsi')) {
                 $validated['opd_provinsi_id'] = $loginUser->user_opd_provinsi()->first()->opd_provinsi_id;
             } elseif ($loginUser->hasRole('opd_kabupaten')) {
@@ -252,7 +267,7 @@ class EnumeratorController extends Controller
             // Update data user
             $user->update([
                 'email' => $validated['email'],
-                'username' => $request->nama,
+                'username' => $validated['username'],
             ]);
 
             // Update data enumerator
