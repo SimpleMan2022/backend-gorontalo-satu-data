@@ -67,20 +67,21 @@ class UserOpdKabupatenController extends Controller
         }
     }
 
-    public function getUser(Request $request) {
+    public function getUser(Request $request)
+    {
         try {
             $data = UserOpdKabupaten::where('user_id', $request->user_id)->first();
 
-            if($data){
+            if ($data) {
                 return $this->successResponseWithData(
                     UserOpdKabupatenResource::make($data),
                     'Data user OPD Provinsi berhasil diambil',
                     Response::HTTP_OK
                 );
-            }else {
+            } else {
                 return $this->errorResponse('Data user OPD Provinsi tidak ditemukan', Response::HTTP_NOT_FOUND);
             }
-        }catch(Exception $e) {
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -123,13 +124,16 @@ class UserOpdKabupatenController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-            if (User::where('username', $validated['username'])->exists()) {
-                return $this->errorResponse('Username telah terdaftar', Response::HTTP_BAD_REQUEST);
+            $baseUsername = $validated['username'];
+            $counter = 1;
+            while (User::where('username', $validated['username'])->exists()) {
+                $validated['username'] = $baseUsername . $counter;
+                $counter++;
             }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
             $user = User::create($validated);
 
-            if($request->jabatan == 'Admin') {
+            if ($request->jabatan == 'Admin') {
                 $permission_operator_kabupaten = [
                     'kelola_user_opd_kabupaten',
                     'kelola_opd_kabupaten',
@@ -222,14 +226,14 @@ class UserOpdKabupatenController extends Controller
                 return $this->errorResponse('Data user tidak ditemukan', Response::HTTP_NOT_FOUND);
             }
 
-            if($request->jabatan != 'Admin') {
+            if ($request->jabatan != 'Admin') {
                 $permission_operator_kabupaten = [
                     'kelola_user_opd_kabupaten',
                     'kelola_opd_kabupaten',
                 ];
 
                 $user->revokePermissionTo($permission_operator_kabupaten);
-            }else {
+            } else {
                 $permission_operator_kabupaten = [
                     'kelola_user_opd_kabupaten',
                     'kelola_opd_kabupaten',
@@ -241,6 +245,12 @@ class UserOpdKabupatenController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
+            $baseUsername = $validated['username'];
+            $counter = 1;
+            while (User::where('username', $validated['username'])->exists()) {
+                $validated['username'] = $baseUsername . $counter;
+                $counter++;
+            }
             $user->update([
                 'email' => $request->email,
                 'username' => $validated['username'],
