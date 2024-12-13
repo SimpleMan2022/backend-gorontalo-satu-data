@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Storage;
 use Str;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class RekapHasilController extends Controller
 {
@@ -67,7 +68,7 @@ class RekapHasilController extends Controller
                         'id' => $items[0]->rekap_hasil->id,
                         'nama' => $items[0]->rekap_hasil->nama,
                         'status' => $items[0]->rekap_hasil->status,
-                        'enumerator' => $items[0]->rekap_hasil->enumerator->only('id','nama','user_id'),
+                        'enumerator' => $items[0]->rekap_hasil->enumerator->only('id', 'nama', 'user_id'),
                         'wilayah_id' => $items[0]->rekap_hasil->wilayah_id,
                         'tipe_wilayah' => $items[0]->rekap_hasil->tipe_wilayah,
                         'hasil_data' => $items->map(function ($hasil) {
@@ -197,14 +198,15 @@ class RekapHasilController extends Controller
         }
     }
 
-    public function rekapKeseluruhan(Request $request) {
+    public function rekapKeseluruhan(Request $request)
+    {
         try {
 
             $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi']);
 
 
-            if($wilayahId = $request->query('wilayah_id')) {
-                if($wilayahId == 75) { 
+            if ($wilayahId = $request->query('wilayah_id')) {
+                if ($wilayahId == 75) {
                     // Kode Untuk Provinsi 
 
                     $rekapHasilQuery = DB::table('regencies as kabupaten')
@@ -224,24 +226,25 @@ class RekapHasilController extends Controller
                         ->select('kabupaten.id as kode_kabupaten', 'kabupaten.name as nama_kabupaten', 'hasil_rekap.nama', DB::raw('IFNULL(hasil_rekap.total_nilai, 0) as total_nilai'))
                         ->orderBy('kabupaten.id');
 
-                    $rekapHasilQuery = $rekapHasilQuery->addBinding($request->query('indikator_id'), 'select')->get();    
+                    $rekapHasilQuery = $rekapHasilQuery->addBinding($request->query('indikator_id'), 'select')->get();
 
                     // dd($rekapHasilQuery);   
-                                            
+
                     $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe', 'angka')->pluck('nama');
 
-                    function addMissingVariables(&$result, $variabels) {
+                    function addMissingVariables(&$result, $variabels)
+                    {
                         // Menambahkan variabel yang hilang dengan nilai 0
                         foreach ($variabels as $variableName) {
                             if (!isset($result[$variableName])) {
                                 $result[$variableName] = 0;
                             }
                         }
-                    }                    
+                    }
 
                     // Format data menjadi struktur array yang diinginkan
                     $formattedData = $rekapHasilQuery->groupBy('kode_kabupaten')->map(function ($items, $kode_kabupaten) use ($variabels) {
-                        
+
                         $result = [
                             'kode_wilayah' => $kode_kabupaten,
                             'nama_wilayah' => $items->first()->nama_kabupaten,
@@ -257,7 +260,7 @@ class RekapHasilController extends Controller
 
                         return $result;
                     })->values()->toArray();
-                            
+
                     // return $formattedData;
 
                     return $this->successResponseWithData(
@@ -265,10 +268,9 @@ class RekapHasilController extends Controller
                         'Rekap hasil berhasil diambil',
                         Response::HTTP_OK
                     );
-
                 } else if (strlen($wilayahId) == 4) {
                     // Kode Untuk yang Kabupaten
-                    
+
                     $rekapHasilQuery = DB::table('districts')
                         ->leftJoin(DB::raw('(
                             SELECT 
@@ -284,7 +286,7 @@ class RekapHasilController extends Controller
                             AND SUBSTR(rekap_hasil.wilayah_id, 1, 4) = ?
                             GROUP BY rekap_hasil.wilayah_id, variabel.nama
                         ) as hasil_rekap'), 'districts.id', '=', 'hasil_rekap.kode_kecamatan')
-                        ->select('districts.id as kode_kecamatan', 'districts.name as nama_kecamatan','districts.regency_id as kode_kabupaten', 'hasil_rekap.nama', DB::raw('IFNULL(hasil_rekap.total_nilai, 0) as total_nilai'))
+                        ->select('districts.id as kode_kecamatan', 'districts.name as nama_kecamatan', 'districts.regency_id as kode_kabupaten', 'hasil_rekap.nama', DB::raw('IFNULL(hasil_rekap.total_nilai, 0) as total_nilai'))
                         ->whereRaw('SUBSTR(districts.id, 1, 4) = ?', [substr($request->query('wilayah_id'), 0, 4)])
                         ->orderBy('districts.id');
 
@@ -294,17 +296,18 @@ class RekapHasilController extends Controller
                         ->addBinding(substr($request->query('wilayah_id'), 0, 4), 'select')
                         ->get();
 
-                        // dd($rekapHasilQuery);
-                   
                     // dd($rekapHasilQuery);
-                    
+
+                    // dd($rekapHasilQuery);
+
                     // Fetch variabel names for the specific indikator_id
                     $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                         ->where('tipe', 'angka')
                         ->pluck('nama');
 
                     // Function to add missing variables with 0 total_nilai
-                    function addMissingVariables(&$result, $variabels) {
+                    function addMissingVariables(&$result, $variabels)
+                    {
                         foreach ($variabels as $variabel) {
                             if (!array_key_exists($variabel, $result)) {
                                 $result[$variabel] = 0; // Default value
@@ -312,7 +315,7 @@ class RekapHasilController extends Controller
                         }
                     }
 
-                    
+
 
                     // Format data to the desired structure
                     $formattedData = $rekapHasilQuery->groupBy(function ($item) {
@@ -337,7 +340,6 @@ class RekapHasilController extends Controller
                         addMissingVariables($result, $variabels);
 
                         return $result;
-                        
                     })->values()->toArray();
 
                     return $this->successResponseWithData(
@@ -348,7 +350,7 @@ class RekapHasilController extends Controller
 
                     // return $formattedData;
 
-                }else if(strlen($wilayahId) == 7) {
+                } else if (strlen($wilayahId) == 7) {
                     // Kode untuk kecamatan
 
                     $rekapHasilQuery = DB::table('villages')
@@ -366,7 +368,7 @@ class RekapHasilController extends Controller
                             AND SUBSTR(rekap_hasil.wilayah_id, 1, 7) = ?
                             GROUP BY rekap_hasil.wilayah_id, variabel.nama
                         ) as hasil_rekap'), 'villages.id', '=', 'hasil_rekap.kode_desa')
-                        ->select('villages.id as kode_desa', 'villages.name as nama_desa','villages.district_id as kode_kecamatan', 'hasil_rekap.nama', DB::raw('IFNULL(hasil_rekap.total_nilai, 0) as total_nilai'))
+                        ->select('villages.id as kode_desa', 'villages.name as nama_desa', 'villages.district_id as kode_kecamatan', 'hasil_rekap.nama', DB::raw('IFNULL(hasil_rekap.total_nilai, 0) as total_nilai'))
                         ->whereRaw('SUBSTR(villages.id, 1, 7) = ?', [substr($request->query('wilayah_id'), 0, 7)])
                         ->orderBy('villages.id');
 
@@ -376,14 +378,15 @@ class RekapHasilController extends Controller
                         ->addBinding(substr($request->query('wilayah_id'), 0, 7), 'select')
                         ->get();
 
-                    
+
                     // Fetch variabel names for the specific indikator_id
                     $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                         ->where('tipe', 'angka')
                         ->pluck('nama');
 
                     // Function to add missing variables with 0 total_nilai
-                    function addMissingVariables(&$result, $variabels) {
+                    function addMissingVariables(&$result, $variabels)
+                    {
                         foreach ($variabels as $variabel) {
                             if (!array_key_exists($variabel, $result)) {
                                 $result[$variabel] = 0; // Default value
@@ -414,7 +417,6 @@ class RekapHasilController extends Controller
                         addMissingVariables($result, $variabels);
 
                         return $result;
-                        
                     })->values()->toArray();
 
                     return $this->successResponseWithData(
@@ -422,151 +424,149 @@ class RekapHasilController extends Controller
                         'Rekap hasil berhasil diambil',
                         Response::HTTP_OK
                     );
-
-                }else if(strlen($wilayahId) == 10) {
+                } else if (strlen($wilayahId) == 10) {
                     // Kode untuk Desa
 
                     $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi'])
                         ->orderBy('created_at', 'desc');
 
-                        if ($indikatorId = $request->query('indikator_id')) {
-                            $hasilQuery->whereHas('indikator', function ($query) use ($indikatorId) {
-                                $query->where('id', $indikatorId);
-                            });
-                        }
-            
-            
-                        $data = $hasilQuery->first();
-                        if ($data) {
-                            // Jika data ditemukan, format hasil seperti biasa
-            
-                            $allHasilData = HasilData::with(['variabel', 'rekap_hasil'])
-                                ->whereHas('rekap_hasil', function ($query) use ($request) {
-                                    if ($enumeratorId = $request->query('enumerator_id')) {
-                                        $query->where('enumerator_id', $enumeratorId);
-                                    }
-                                    if ($periodeId = $request->query('periode_id')) {
-                                        $query->where('periode_id', $periodeId);
-                                    }
-                                    $query->where('indikator_id', $request->query('indikator_id'));
-                                })
-            
-                                ->orderBy('created_at', 'desc')
-                                ->get();
-            
-                            // Group hasil_data into pairs
-            
-                            $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
-                                return [
-                                    'id' => $items[0]->rekap_hasil->id,
-                                    'nama' => $items[0]->rekap_hasil->nama,
-                                    'status' => $items[0]->rekap_hasil->status,
-                                    'enumerator' => $items[0]->rekap_hasil->enumerator->only('id','nama','user_id'),
-                                    'wilayah_id' => $items[0]->rekap_hasil->wilayah_id,
-                                    'tipe_wilayah' => $items[0]->rekap_hasil->tipe_wilayah,
-                                    'hasil_data' => $items->map(function ($hasil) {
-                                        return [
-                                            'hasil_data_id' => $hasil->id,
-                                            'nama' => $hasil->variabel->nama,
-                                            'tipe' => $hasil->variabel->tipe,
-                                            'konten' => $hasil->konten,
-                                        ];
-                                    })->values()
-                                ];
-                            })->values();            
-            
-                            $formattedData = [
-                                'id' => (int) $indikatorId,
-                                'nama' => $data->hasil_data->first()->variabel->indikator->nama,
-                                'nama_opd' => $data->periode->opd_provinsi->nama,
-                                'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
+                    if ($indikatorId = $request->query('indikator_id')) {
+                        $hasilQuery->whereHas('indikator', function ($query) use ($indikatorId) {
+                            $query->where('id', $indikatorId);
+                        });
+                    }
+
+
+                    $data = $hasilQuery->first();
+                    if ($data) {
+                        // Jika data ditemukan, format hasil seperti biasa
+
+                        $allHasilData = HasilData::with(['variabel', 'rekap_hasil'])
+                            ->whereHas('rekap_hasil', function ($query) use ($request) {
+                                if ($enumeratorId = $request->query('enumerator_id')) {
+                                    $query->where('enumerator_id', $enumeratorId);
+                                }
+                                if ($periodeId = $request->query('periode_id')) {
+                                    $query->where('periode_id', $periodeId);
+                                }
+                                $query->where('indikator_id', $request->query('indikator_id'));
+                            })
+
+                            ->orderBy('created_at', 'desc')
+                            ->get();
+
+                        // Group hasil_data into pairs
+
+                        $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
+                            return [
+                                'id' => $items[0]->rekap_hasil->id,
+                                'nama' => $items[0]->rekap_hasil->nama,
+                                'status' => $items[0]->rekap_hasil->status,
+                                'enumerator' => $items[0]->rekap_hasil->enumerator->only('id', 'nama', 'user_id'),
+                                'wilayah_id' => $items[0]->rekap_hasil->wilayah_id,
+                                'tipe_wilayah' => $items[0]->rekap_hasil->tipe_wilayah,
+                                'hasil_data' => $items->map(function ($hasil) {
                                     return [
-                                        'id' => $subjek->id,
-                                        'nama' => $subjek->nama,
-                                    ];
-                                }) : [],
-                                'periode' => [
-                                    'id' => $data->periode->id,
-                                    'nama' => $data->periode->nama,
-                                    'tanggal_mulai' => $data->periode->tanggal_mulai,
-                                    'tanggal_selesai' => $data->periode->tanggal_selesai,
-                                ],
-                                'variabel' => $data->hasil_data->map(function ($hasil) {
-                                    return [
-                                        'id' => $hasil->variabel->id,
+                                        'hasil_data_id' => $hasil->id,
                                         'nama' => $hasil->variabel->nama,
                                         'tipe' => $hasil->variabel->tipe,
+                                        'konten' => $hasil->konten,
                                     ];
-                                }),
-                                'rekap_hasil' => $groupedHasilData,
-                                'status' => $data->status,
-                                'created_at' => $data->created_at,
-                                'updated_at' => $data->updated_at,
+                                })->values()
                             ];
-            
-                            return $this->successResponseWithData(
-                                $formattedData,
-                                'Rekap hasil berhasil diambil',
-                                Response::HTTP_OK
-                            );
-                        } else {
-                            // dd('tes');
-                            // Jika `indikator_id` ada tapi data tidak ditemukan, lakukan query tambahan untuk mendapatkan informasi indikator dan variabel
-                            if ($indikatorId) {
-                                $indikator = Indikator::with(['variabel', 'enumerators', 'opd_provinsi'])
-                                    ->where('id', $indikatorId)
-                                    ->first();
-            
-                                if ($indikator) {
-                                    // Format data tanpa `hasil_data`
-                                    $formattedData = [
-                                        'id' => (int) $indikatorId,
-                                        'nama' => $indikator->nama,
-                                        'nama_opd' => $indikator->opd_provinsi->nama,
-                                        'subjek' => $indikator->subjek ? $indikator->subjek->map(function ($subjek) {
-                                            return [
-                                                'id' => $subjek->id,
-                                                'nama' => $subjek->nama,
-                                            ];
-                                        }) : [],
-                                        'enumerator' => $indikator->enumerators()->first() ? [
-                                            'id' => $indikator->enumerators()->first()->id,
-                                            'nama' => $indikator->enumerators()->first()->nama,
-                                            'jabatan' => $indikator->enumerators()->first()->jabatan,
-                                            'enumerator_level' => $indikator->enumerators()->first()->enumerator_level,
-                                        ] : null,
-                                        'periode' => [
-                                            'id' => $indikator->opd_provinsi()->first()->periode()->first()->id ?? null,
-                                            'nama' => $indikator->opd_provinsi()->first()->periode()->first()->nama ?? null,
-                                            'tanggal_mulai' => $indikator->opd_provinsi()->first()->periode()->first()->tanggal_mulai ?? null,
-                                            'tanggal_selesai' => $indikator->opd_provinsi()->first()->periode()->first()->tanggal_selesai ?? null,
-                                        ],
-                                        // 'periode' => $indikator->opd_provinsi()->first()->periode()->first()->nama ?? null,
-                                        'variabel' => $indikator->variabel->map(function ($variabel) {
-                                            return [
-                                                'id' => $variabel->id,
-                                                'nama' => $variabel->nama,
-                                                'tipe' => $variabel->tipe,
-                                            ];
-                                        }),
-                                        'rekap_hasil' => [],
-                                        'status' => 'pending',
-                                        'created_at' => null,
-                                        'updated_at' => null,
-                                    ];
-            
-                                    return $this->successResponseWithData(
-                                        $formattedData,
-                                        'Indikator ditemukan tanpa hasil data',
-                                        Response::HTTP_OK
-                                    );
-                                }
+                        })->values();
+
+                        $formattedData = [
+                            'id' => (int) $indikatorId,
+                            'nama' => $data->hasil_data->first()->variabel->indikator->nama,
+                            'nama_opd' => $data->periode->opd_provinsi->nama,
+                            'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
+                                return [
+                                    'id' => $subjek->id,
+                                    'nama' => $subjek->nama,
+                                ];
+                            }) : [],
+                            'periode' => [
+                                'id' => $data->periode->id,
+                                'nama' => $data->periode->nama,
+                                'tanggal_mulai' => $data->periode->tanggal_mulai,
+                                'tanggal_selesai' => $data->periode->tanggal_selesai,
+                            ],
+                            'variabel' => $data->hasil_data->map(function ($hasil) {
+                                return [
+                                    'id' => $hasil->variabel->id,
+                                    'nama' => $hasil->variabel->nama,
+                                    'tipe' => $hasil->variabel->tipe,
+                                ];
+                            }),
+                            'rekap_hasil' => $groupedHasilData,
+                            'status' => $data->status,
+                            'created_at' => $data->created_at,
+                            'updated_at' => $data->updated_at,
+                        ];
+
+                        return $this->successResponseWithData(
+                            $formattedData,
+                            'Rekap hasil berhasil diambil',
+                            Response::HTTP_OK
+                        );
+                    } else {
+                        // dd('tes');
+                        // Jika `indikator_id` ada tapi data tidak ditemukan, lakukan query tambahan untuk mendapatkan informasi indikator dan variabel
+                        if ($indikatorId) {
+                            $indikator = Indikator::with(['variabel', 'enumerators', 'opd_provinsi'])
+                                ->where('id', $indikatorId)
+                                ->first();
+
+                            if ($indikator) {
+                                // Format data tanpa `hasil_data`
+                                $formattedData = [
+                                    'id' => (int) $indikatorId,
+                                    'nama' => $indikator->nama,
+                                    'nama_opd' => $indikator->opd_provinsi->nama,
+                                    'subjek' => $indikator->subjek ? $indikator->subjek->map(function ($subjek) {
+                                        return [
+                                            'id' => $subjek->id,
+                                            'nama' => $subjek->nama,
+                                        ];
+                                    }) : [],
+                                    'enumerator' => $indikator->enumerators()->first() ? [
+                                        'id' => $indikator->enumerators()->first()->id,
+                                        'nama' => $indikator->enumerators()->first()->nama,
+                                        'jabatan' => $indikator->enumerators()->first()->jabatan,
+                                        'enumerator_level' => $indikator->enumerators()->first()->enumerator_level,
+                                    ] : null,
+                                    'periode' => [
+                                        'id' => $indikator->opd_provinsi()->first()->periode()->first()->id ?? null,
+                                        'nama' => $indikator->opd_provinsi()->first()->periode()->first()->nama ?? null,
+                                        'tanggal_mulai' => $indikator->opd_provinsi()->first()->periode()->first()->tanggal_mulai ?? null,
+                                        'tanggal_selesai' => $indikator->opd_provinsi()->first()->periode()->first()->tanggal_selesai ?? null,
+                                    ],
+                                    // 'periode' => $indikator->opd_provinsi()->first()->periode()->first()->nama ?? null,
+                                    'variabel' => $indikator->variabel->map(function ($variabel) {
+                                        return [
+                                            'id' => $variabel->id,
+                                            'nama' => $variabel->nama,
+                                            'tipe' => $variabel->tipe,
+                                        ];
+                                    }),
+                                    'rekap_hasil' => [],
+                                    'status' => 'pending',
+                                    'created_at' => null,
+                                    'updated_at' => null,
+                                ];
+
+                                return $this->successResponseWithData(
+                                    $formattedData,
+                                    'Indikator ditemukan tanpa hasil data',
+                                    Response::HTTP_OK
+                                );
                             }
                         }
+                    }
                 }
-                
-            }           
-        }catch(Exception $e) {
+            }
+        } catch (Exception $e) {
             return $this->errorResponse($e->getMessage(), Response::HTTP_INTERNAL_SERVER_ERROR);
         }
     }
@@ -636,10 +636,11 @@ class RekapHasilController extends Controller
     public function multiUpdate(Request $request)
     {
         try {
-            $validated = $request->validate([
+            $data = $request->json()->all();
+            $validated = Validator::make($data, [
                 '*.id' => 'required|integer|exists:rekap_hasil,id',
                 '*.status' => 'required|in:v2,v3,tolak,terima,revisi',
-            ]);
+            ])->validate();
 
             $ids = collect($validated)->pluck('id');
             $rekapHasil = RekapHasil::whereIn('id', $ids)->get();
