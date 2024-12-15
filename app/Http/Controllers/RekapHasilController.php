@@ -203,12 +203,42 @@ class RekapHasilController extends Controller
         try {
 
             $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi']);
-
-
             if ($wilayahId = $request->query('wilayah_id')) {
+                if ($wilayahId != 75) {
+                    if ($hasilQuery->where('wilayah_id', $wilayahId)->count() == 0) {
+                        return $this->errorResponse('Data tidak ditemukan', Response::HTTP_NOT_FOUND);
+                    }
+                    $wilayahData = [
+                        'desa' => $hasilQuery->first()->tipe_wilayah === \App\Models\Desa::class
+                            ? [
+                                'id' => $hasilQuery->first()->wilayah->id,
+                                'name' => $hasilQuery->first()->wilayah->name,
+                            ]
+                            : null,
+                        'kecamatan' => $hasilQuery->first()->tipe_wilayah !== \App\Models\Kabupaten::class
+                            ? [
+                                'id' => $hasilQuery->first()->wilayah->kecamatan->id ?? $hasilQuery->first()->wilayah->id,
+                                'name' => $hasilQuery->first()->wilayah->kecamatan->name ?? $hasilQuery->first()->wilayah->name,
+                            ]
+                            : null,
+                        'kabupaten' => [
+                            'id' => $hasilQuery->first()->tipe_wilayah === \App\Models\Desa::class
+                                ? $hasilQuery->first()->wilayah->kecamatan->kabupaten->id
+                                : ($hasilQuery->first()->tipe_wilayah === \App\Models\Kecamatan::class
+                                    ? $hasilQuery->first()->wilayah->kabupaten->id
+                                    : $hasilQuery->first()->wilayah->id),
+                            'name' => $hasilQuery->first()->tipe_wilayah === \App\Models\Desa::class
+                                ? $hasilQuery->first()->wilayah->kecamatan->kabupaten->name
+                                : ($hasilQuery->first()->tipe_wilayah === \App\Models\Kecamatan::class
+                                    ? $hasilQuery->first()->wilayah->kabupaten->name
+                                    : $hasilQuery->first()->wilayah->name),
+                        ],
+                    ];
+                } else {
+                    $wilayahData = null;
+                }
                 if ($wilayahId == 75) {
                     // Kode Untuk Provinsi 
-
                     $rekapHasilQuery = DB::table('regencies as kabupaten')
                         ->leftJoin(DB::raw('(
                             SELECT 
@@ -253,7 +283,6 @@ class RekapHasilController extends Controller
                             if (!empty($item->nama)) {
                                 $result[$item->nama] = $item->total_nilai;
                             }
-                            // $result['total_' . $item->nama] = $item->total_nilai;
                         }
 
                         addMissingVariables($result, $variabels);
@@ -263,8 +292,20 @@ class RekapHasilController extends Controller
 
                     // return $formattedData;
 
+                    $response = [
+                        "indikator" => $hasilQuery->first()->indikator->nama,
+                        "subjek" => $hasilQuery->first()->indikator->subjek->map(function ($subjek) {
+                            return [
+                                'id' => $subjek->id,
+                                'nama' => $subjek->nama,
+                            ];
+                        }),
+                        "wilayah" => $wilayahData,
+                        "rekap" => $formattedData,
+                    ];
+
                     return $this->successResponseWithData(
-                        $formattedData,
+                        $response,
                         'Rekap hasil berhasil diambil',
                         Response::HTTP_OK
                     );
@@ -341,9 +382,19 @@ class RekapHasilController extends Controller
 
                         return $result;
                     })->values()->toArray();
-
+                    $response = [
+                        "indikator" => $hasilQuery->first()->indikator->nama,
+                        "subjek" => $hasilQuery->first()->indikator->subjek->map(function ($subjek) {
+                            return [
+                                'id' => $subjek->id,
+                                'nama' => $subjek->nama,
+                            ];
+                        }),
+                        "wilayah" => $wilayahData,
+                        "rekap" => $formattedData,
+                    ];
                     return $this->successResponseWithData(
-                        $formattedData,
+                        $response,
                         'Rekap hasil berhasil diambil',
                         Response::HTTP_OK
                     );
@@ -418,9 +469,19 @@ class RekapHasilController extends Controller
 
                         return $result;
                     })->values()->toArray();
-
+                    $response = [
+                        "indikator" => $hasilQuery->first()->indikator->nama,
+                        "subjek" => $hasilQuery->first()->indikator->subjek->map(function ($subjek) {
+                            return [
+                                'id' => $subjek->id,
+                                'nama' => $subjek->nama,
+                            ];
+                        }),
+                        "wilayah" => $wilayahData,
+                        "rekap" => $formattedData,
+                    ];
                     return $this->successResponseWithData(
-                        $formattedData,
+                        $response,
                         'Rekap hasil berhasil diambil',
                         Response::HTTP_OK
                     );

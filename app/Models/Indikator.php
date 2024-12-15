@@ -30,7 +30,7 @@ class Indikator extends Model
     }
     public function variabel()
     {
-        return $this->hasMany(Variabel::class)->orderBy('order','ASC');
+        return $this->hasMany(Variabel::class)->orderBy('order', 'ASC');
     }
     public function pivot_enumerator_indikator()
     {
@@ -52,7 +52,8 @@ class Indikator extends Model
         return $this->belongsToMany(Subjek::class, 'pivot_indikator_subjek'); // Pivot table 'indikator_subjek'
     }
 
-    public function rekap_hasil() {
+    public function rekap_hasil()
+    {
         return $this->hasMany(RekapHasil::class);
     }
 }
