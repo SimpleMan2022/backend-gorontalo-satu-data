@@ -133,6 +133,7 @@ class IndikatorController extends Controller
                 'nama' => 'required',
                 'sektor_id' => 'required',
                 'antar_waktu_id' => 'required',
+                'tingkatan' => 'required',
             ]);
 
             $validated['opd_provinsi_id'] = $request->user()->user_opd_provinsi()->first()->opd_provinsi_id;
