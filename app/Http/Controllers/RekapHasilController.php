@@ -249,7 +249,8 @@ class RekapHasilController extends Controller
                             LEFT JOIN hasil_data ON rekap_hasil.id = hasil_data.rekap_hasil_id
                             LEFT JOIN indikator ON rekap_hasil.indikator_id = indikator.id
                             LEFT JOIN variabel ON hasil_data.variabel_id = variabel.id
-                            WHERE variabel.tipe = "angka" 
+                            WHERE variabel.tipe = "angka"
+                            AND rekap_hasil.status = "terima"
                             AND rekap_hasil.indikator_id = :indikator_id  -- Menambahkan filter untuk indikator_id
                             GROUP BY kode_kabupaten, variabel.nama
                         ) as hasil_rekap'), 'kabupaten.id', '=', 'hasil_rekap.kode_kabupaten')
@@ -324,6 +325,7 @@ class RekapHasilController extends Controller
                             LEFT JOIN variabel ON hasil_data.variabel_id = variabel.id
                             WHERE variabel.tipe = "angka" 
                             AND rekap_hasil.indikator_id = ?
+                            AND rekap_hasil.status = "terima"
                             AND SUBSTR(rekap_hasil.wilayah_id, 1, 4) = ?
                             GROUP BY rekap_hasil.wilayah_id, variabel.nama
                         ) as hasil_rekap'), 'districts.id', '=', 'hasil_rekap.kode_kecamatan')
@@ -416,6 +418,7 @@ class RekapHasilController extends Controller
                             LEFT JOIN variabel ON hasil_data.variabel_id = variabel.id
                             WHERE variabel.tipe = "angka" 
                             AND rekap_hasil.indikator_id = ?
+                            AND rekap_hasil.status = "terima"
                             AND SUBSTR(rekap_hasil.wilayah_id, 1, 7) = ?
                             GROUP BY rekap_hasil.wilayah_id, variabel.nama
                         ) as hasil_rekap'), 'villages.id', '=', 'hasil_rekap.kode_desa')
