@@ -21,6 +21,7 @@ class UserOpdKabupatenController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
             $UserOpdKabupatenQuery = UserOpdKabupaten::orderBy('created_at', 'desc')->with([
                 'wilayah' => function ($query) {
@@ -47,6 +48,11 @@ class UserOpdKabupatenController extends Controller
             }
 
             if ($opdKabupatenId = $request->query('opd_kabupaten_id')) {
+                $UserOpdKabupatenQuery->where('opd_kabupaten_id', $opdKabupatenId);
+            }
+
+            if($user->hasRole('opd_kabupaten')) {
+                $opdKabupatenId = $user->user_opd_kabupaten()->first()->opd_kabupaten_id;
                 $UserOpdKabupatenQuery->where('opd_kabupaten_id', $opdKabupatenId);
             }
 
@@ -136,7 +142,7 @@ class UserOpdKabupatenController extends Controller
             if ($request->jabatan == 'Admin') {
                 $permission_operator_kabupaten = [
                     'kelola_user_opd_kabupaten',
-                    'kelola_opd_kabupaten',
+                    // 'kelola_opd_kabupaten',
                 ];
 
                 $user->givePermissionTo($permission_operator_kabupaten);

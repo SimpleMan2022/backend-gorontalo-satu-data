@@ -115,7 +115,7 @@ class AuthController extends Controller
     $responseData = [
       'id' => $request->user()->id,
       'username' => $request->user()->username,
-      'nama_lengkap' => $nama_lengkap ?? "-",
+      'nama_lengkap' => $nama_lengkap ?? null,
       'email' => $request->user()->email,
       'jabatan' => $jabatan ?? 'admin',
       'role' => [
