@@ -22,6 +22,7 @@ class UserOpdProvinsiController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
             $UserOpdProvinsiQuery = UserOpdProvinsi::orderBy('created_at', 'desc');
 
@@ -39,6 +40,11 @@ class UserOpdProvinsiController extends Controller
 
             if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
                 $UserOpdProvinsiQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+
+            if($user->hasRole('opd_provinsi')) {
+                $opdKabupatenId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
+                $UserOpdProvinsiQuery->where('opd_provinsi_id', $opdKabupatenId);
             }
 
             $data = $UserOpdProvinsiQuery->paginate($perPage);
@@ -116,7 +122,7 @@ class UserOpdProvinsiController extends Controller
             if ($request->jabatan == 'Admin') {
                 $permission_operator_provinsi = [
                     'kelola_user_opd_provinsi',
-                    'kelola_opd_provinsi',
+                    // 'kelola_opd_provinsi',
                 ];
 
                 $user->givePermissionTo($permission_operator_provinsi);
