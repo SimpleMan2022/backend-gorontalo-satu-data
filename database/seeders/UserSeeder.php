@@ -37,6 +37,8 @@ class UserSeeder extends Seeder
             'kelola_antarwaktu',            
             'kelola_user_opd_provinsi',
             'kelola_user_opd_kabupaten',
+            'kelola_opd_kabupaten',
+            'kelola_opd_provinsi',
             'kelola_sektor_spasial',
             'view_sektor_spasial',
             'view_olahan_spasial',
@@ -68,13 +70,11 @@ class UserSeeder extends Seeder
             'kelola_subjek',
             'kelola_variabel',
             'kelola_periode',
-            'kelola_artikel',
             'view_sektor',
             'verifikasi_subjek_indikator',
             'verifikasi_enumerator_indikator',
             'verifikasi_indikator',
             'kelola_enumerator',
-            'verifikasi_provinsi',
             'kelola_user_opd_kabupaten',
             'kelola_enumerator_indikator',
             'view_opd_kabupaten',
@@ -144,7 +144,6 @@ class UserSeeder extends Seeder
             'kelola_berita_acara',
             'kelola_enumerator_indikator',
             'verifikasi_enumerator_indikator',
-            'verifikasi_kabupaten',
             'kelola_enumerator',
             'kelola_user_opd_kabupaten'            
         ];
@@ -167,7 +166,6 @@ class UserSeeder extends Seeder
             'view_sektor',
             'view_variabel',
             'kelola_hasil_data',
-            'kelola_rekap_data',
         ];
 
         // Create each permission
