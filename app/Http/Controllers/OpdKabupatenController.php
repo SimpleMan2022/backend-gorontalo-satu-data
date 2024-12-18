@@ -111,7 +111,7 @@ class OpdKabupatenController extends Controller
 
                 $permissions_kabupaten = [
                     'kelola_user_opd_kabupaten',
-                    'kelola_opd_kabupaten',
+                    // 'kelola_opd_kabupaten',
                 ];
                 foreach ($operator as $item) {
                     $user = $item->user;
