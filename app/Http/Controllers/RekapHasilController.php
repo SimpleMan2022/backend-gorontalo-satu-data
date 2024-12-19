@@ -91,11 +91,12 @@ class RekapHasilController extends Controller
                         default:
                             return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
                     }
-
+                // dd($groupedHasilData);
                 $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) use ($tipe_wilayah) {
                     return [
                         'id' => $items[0]->rekap_hasil->id,
                         'nama' => $items[0]->rekap_hasil->nama,
+                        'periode' => $items[0]->rekap_hasil->periode->only('id', 'nama', 'tanggal_mulai', 'tanggal_selesai'),
                         'status' => $items[0]->rekap_hasil->status,
                         'enumerator' => $items[0]->rekap_hasil->enumerator->only('id', 'nama', 'user_id','jabatan'),
                         'wilayah' => $items[0]->rekap_hasil->wilayah,
@@ -129,7 +130,7 @@ class RekapHasilController extends Controller
                     'id' => (int) $indikatorId,
                     'nama' => $data->hasil_data->first()->variabel->indikator->nama,
                     'nama_opd' => $data->periode->opd_provinsi->nama,
-                    'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
+                    'subjek' => $data->hasil_data->first()->variabel->indikator->subjek ? $data->hasil_data->first()->variabel->indikator->subjek->map(function ($subjek) {
                         return [
                             'id' => $subjek->id,
                             'nama' => $subjek->nama,
@@ -141,12 +142,12 @@ class RekapHasilController extends Controller
                     //     'jabatan' => $data->enumerator->jabatan,
                     //     'enumerator_level' => $data->enumerator->enumerator_level,
                     // ],
-                    'periode' => [
-                        'id' => $data->periode->id,
-                        'nama' => $data->periode->nama,
-                        'tanggal_mulai' => $data->periode->tanggal_mulai,
-                        'tanggal_selesai' => $data->periode->tanggal_selesai,
-                    ],
+                    // 'periode' => [
+                    //     'id' => $data->periode->id,
+                    //     'nama' => $data->periode->nama,
+                    //     'tanggal_mulai' => $data->periode->tanggal_mulai,
+                    //     'tanggal_selesai' => $data->periode->tanggal_selesai,
+                    // ],
                     'variabel' => $data->hasil_data->map(function ($hasil) {
                         return [
                             'id' => $hasil->variabel->id,
