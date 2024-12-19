@@ -195,7 +195,6 @@ class UserOpdKabupatenController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'opd_kabupaten_id' => 'required',
                 'jabatan' => 'required',
                 'wilayah_id' => 'required'
             ]);
