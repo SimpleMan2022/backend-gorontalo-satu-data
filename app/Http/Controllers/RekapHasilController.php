@@ -15,7 +15,7 @@ use App\Models\{
     PivotEnumeratorIndikator, 
     Kabupaten,
     Kecamatan,
-    Desa
+    Desa,
 };
 use App\Http\Resources\RekapHasilResource;
 use App\Http\Traits\ApiResponse;
@@ -231,8 +231,7 @@ class RekapHasilController extends Controller
     {
         try {
 
-            $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi']);
-
+            $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi']);            
             
             if ($wilayahId = $request->query('wilayah_id')) {
 
@@ -293,39 +292,7 @@ class RekapHasilController extends Controller
 
                 
 
-                if ($wilayahId != 75) {
-
-                    // if ($hasilQuery->where('wilayah_id', 'LIKE', "%{$wilayahId}%")->count() == 0) {
-                    //     // $wilayahId = substr($wilayahId, -4);
-                    //     return $this->errorResponse('Kode Wilayah tidak ditemukan', Response::HTTP_NOT_FOUND);
-                    // }
-
-                    // $wilayahData = [
-                    //     'desa' => $hasilQuery->first()->tipe_wilayah === \App\Models\Desa::class
-                    //         ? [
-                    //             'id' => $hasilQuery->first()->wilayah->id,
-                    //             'name' => $hasilQuery->first()->wilayah->name,
-                    //         ]
-                    //         : null,
-                    //     'kecamatan' => $hasilQuery->first()->tipe_wilayah !== \App\Models\Kabupaten::class
-                    //         ? [
-                    //             'id' => $hasilQuery->first()->wilayah->kecamatan->id ?? $hasilQuery->first()->wilayah->id,
-                    //             'name' => $hasilQuery->first()->wilayah->kecamatan->name ?? $hasilQuery->first()->wilayah->name,
-                    //         ]
-                    //         : null,
-                    //     'kabupaten' => [
-                    //         'id' => $hasilQuery->first()->tipe_wilayah === \App\Models\Desa::class
-                    //             ? $hasilQuery->first()->wilayah->kecamatan->kabupaten->id
-                    //             : ($hasilQuery->first()->tipe_wilayah === \App\Models\Kecamatan::class
-                    //                 ? $hasilQuery->first()->wilayah->kabupaten->id
-                    //                 : $hasilQuery->first()->wilayah->id),
-                    //         'name' => $hasilQuery->first()->tipe_wilayah === \App\Models\Desa::class
-                    //             ? $hasilQuery->first()->wilayah->kecamatan->kabupaten->name
-                    //             : ($hasilQuery->first()->tipe_wilayah === \App\Models\Kecamatan::class
-                    //                 ? $hasilQuery->first()->wilayah->kabupaten->name
-                    //                 : $hasilQuery->first()->wilayah->name),
-                    //     ],
-                    // ];                
+                if ($wilayahId != 75) {        
 
                     getWilayahData($wilayahData, $wilayahId);
                     
@@ -357,6 +324,9 @@ class RekapHasilController extends Controller
 
 
                         $data = $hasilQuery->first();
+
+ 
+                        
                         // dd($data);
                         if ($data) {
                             // Jika data ditemukan, format hasil seperti biasa
@@ -385,17 +355,13 @@ class RekapHasilController extends Controller
                                     ];
                                 });
                             
-                                return array_merge([
-                                    // 'id' => $rekapHasil->id,
+                                return array_merge([                                    
                                     'kode_wilayah' => $rekapHasil->wilayah_id,
-                                    'nama_wilayah' => $rekapHasil->wilayah->name,
-                                    // 'nama' => $rekapHasil->nama,
-                                    // 'status' => $rekapHasil->status,
-                                    // 'enumerator' => $rekapHasil->enumerator->only('id', 'nama', 'user_id'),
-                                    // 'wilayah_id' => $rekapHasil->wilayah_id,
-                                    // 'tipe_wilayah' => $rekapHasil->tipe_wilayah,
+                                    'nama_wilayah' => $rekapHasil->wilayah->name,                                    
                                 ], $additionalData->toArray()); // Gabungkan data utama dengan hasil_data
                             })->values();
+
+                            
 
                             $formattedData = [
                                 'id' => (int) $indikatorId,
@@ -404,21 +370,14 @@ class RekapHasilController extends Controller
                                     'nama' => $data->hasil_data->first()->variabel->indikator->nama,
                                     'tingkatan' => $data->hasil_data->first()->variabel->indikator->tingkatan,
                                 ],
-                                // 'indikator' => $data->hasil_data->first()->variabel->indikator->nama,
-                                // 'nama_opd' => $data->periode->opd_provinsi->nama,
+
                                 'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
                                     return [
                                         'id' => $subjek->id,
                                         'nama' => $subjek->nama,
                                     ];
                                 }) : [],
-                                'wilayah' => $wilayahData,
-                                // 'periode' => [
-                                //     'id' => $data->periode->id,
-                                //     'nama' => $data->periode->nama,
-                                //     'tanggal_mulai' => $data->periode->tanggal_mulai,
-                                //     'tanggal_selesai' => $data->periode->tanggal_selesai,
-                                // ],
+                                'wilayah' => $wilayahData,                               
                                 'variabel' => $data->hasil_data->map(function ($hasil) {
                                     return [
                                         'id' => $hasil->variabel->id,
@@ -484,7 +443,7 @@ class RekapHasilController extends Controller
                             }
                         }
                     }else {
-
+                        
                         // Kode Untuk Provinsi 
                         $rekapHasilQuery = DB::table('regencies as kabupaten')
                             ->leftJoin(DB::raw('(
@@ -543,14 +502,14 @@ class RekapHasilController extends Controller
                         })->values()->toArray();
 
                         // return $formattedData;
-
+                        // dd($variabels->first()->indikator->id);
                         $response = [
                             "indikator" => [
-                                "id" => $hasilQuery->first()->indikator->id, 
-                                "nama" => $hasilQuery->first()->indikator->nama,
-                                "tingkatan" => $hasilQuery->first()->indikator->tingkatan
+                                "id" => $variabels->first()->indikator->id, 
+                                "nama" => $variabels->first()->indikator->nama,
+                                "tingkatan" => $variabels->first()->indikator->tingkatan
                             ],
-                            "subjek" => $hasilQuery->first()->indikator->subjek->map(function ($subjek) {
+                            "subjek" => $variabels->first()->indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
@@ -790,11 +749,11 @@ class RekapHasilController extends Controller
                         })->values()->toArray();
                         $response = [
                             'indikator' => [
-                                'id' => $hasilQuery->first()->indikator->id, 
-                                'nama' => $hasilQuery->first()->indikator->nama,
-                                'tingkatan' => $hasilQuery->first()->indikator->tingkatan
+                                'id' => $variabels->first()->indikator->id, 
+                                'nama' => $variabels->first()->indikator->nama,
+                                'tingkatan' => $variabels->first()->indikator->tingkatan
                             ],
-                            "subjek" => $hasilQuery->first()->indikator->subjek->map(function ($subjek) {
+                            "subjek" => $variabels->first()->indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
@@ -1034,11 +993,11 @@ class RekapHasilController extends Controller
                         })->values()->toArray();
                         $response = [
                             "indikator" => [
-                                "id" => $hasilQuery->first()->indikator->id, 
-                                "nama" => $hasilQuery->first()->indikator->nama,
-                                "tingkatan" => $hasilQuery->first()->indikator->tingkatan
+                                "id" => $variabels->first()->indikator->id, 
+                                "nama" => $variabels->first()->indikator->nama,
+                                "tingkatan" => $variabels->first()->indikator->tingkatan
                             ],
-                            "subjek" => $hasilQuery->first()->indikator->subjek->map(function ($subjek) {
+                            "subjek" => $variabels->first()->indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
