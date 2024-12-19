@@ -219,7 +219,6 @@ class UserOpdKabupatenController extends Controller
             }
             $user_opd_kabupaten->update([
                 'nama' => $request->nama,
-                'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
                 'jabatan' => $request->jabatan,
                 'tipe_wilayah' => $validated['tipe_wilayah'],
                 'wilayah_id' => $request->wilayah_id,
