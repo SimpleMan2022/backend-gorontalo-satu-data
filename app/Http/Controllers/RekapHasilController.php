@@ -76,14 +76,30 @@ class RekapHasilController extends Controller
 
                 // Group hasil_data into pairs
 
-                $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
+                // dd($allHasilData[0]->rekap_hasil->tipe_wilayah);
+
+                switch ($allHasilData[0]->rekap_hasil->tipe_wilayah) {
+                        case 'App\Models\Desa':
+                            $tipe_wilayah = 'desa';
+                            break;
+                        case 'App\Models\Kecamatan':
+                            $tipe_wilayah = 'kecamatan';
+                            break;
+                        case 'App\Models\Kabupaten':
+                            $tipe_wilayah = 'kabupaten';
+                            break;
+                        default:
+                            return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
+                    }
+
+                $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) use ($tipe_wilayah) {
                     return [
                         'id' => $items[0]->rekap_hasil->id,
                         'nama' => $items[0]->rekap_hasil->nama,
                         'status' => $items[0]->rekap_hasil->status,
-                        'enumerator' => $items[0]->rekap_hasil->enumerator->only('id', 'nama', 'user_id'),
-                        'wilayah_id' => $items[0]->rekap_hasil->wilayah_id,
-                        'tipe_wilayah' => $items[0]->rekap_hasil->tipe_wilayah,
+                        'enumerator' => $items[0]->rekap_hasil->enumerator->only('id', 'nama', 'user_id','jabatan'),
+                        'wilayah' => $items[0]->rekap_hasil->wilayah,
+                        'tipe_wilayah' => $tipe_wilayah,
                         'hasil_data' => $items->map(function ($hasil) {
                             return [
                                 'hasil_data_id' => $hasil->id,
