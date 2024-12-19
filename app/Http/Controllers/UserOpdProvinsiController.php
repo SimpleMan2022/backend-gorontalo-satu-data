@@ -81,12 +81,17 @@ class UserOpdProvinsiController extends Controller
     public function store(Request $request)
     {
         try {
+            $userLogin = $request->user();
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'opd_provinsi_id' => 'required',
                 'jabatan' => 'required',
+                'opd_provinsi_id' => $userLogin->hasRole('admin') ? 'required' : '',
             ]);
+
+            if ($userLogin->hasRole('opd_provinsi')) {
+                $validated['opd_provinsi_id'] = $userLogin->user_opd_provinsi->opd_provinsi_id;
+            }
 
             if (User::where('email', $validated['email'])->exists()) {
                 return $this->errorResponse('Email telah terdaftar', Response::HTTP_BAD_REQUEST);
@@ -162,7 +167,6 @@ class UserOpdProvinsiController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'opd_provinsi_id' => 'required',
                 'jabatan' => 'required',
             ]);
 
@@ -204,7 +208,6 @@ class UserOpdProvinsiController extends Controller
             if ($user) {
                 $user_opd_provinsi->update([
                     'nama' => $request->nama,
-                    'opd_provinsi_id' => $request->opd_provinsi_id,
                     'jabatan' => $request->jabatan,
                 ]);
             }

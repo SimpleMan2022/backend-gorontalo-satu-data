@@ -89,14 +89,19 @@ class UserOpdKabupatenController extends Controller
     public function store(Request $request)
     {
         try {
+            $userLogin = $request->user();
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'opd_kabupaten_id' => 'required',
+                'opd_kabupaten_id' => $userLogin->hasRole('admin') ? 'required' : '',
                 'jabatan' => 'required',
                 'tipe_wilayah' => 'required',
                 'wilayah_id' => 'required'
             ]);
+
+            if ($userLogin->hasRole('opd_kabupaten')) {
+                $validated['opd_kabupaten_id'] = $userLogin->user_opd_kabupaten()->first()->opd_kabupaten_id;
+            }
 
             if (User::where('email', $validated['email'])->exists()) {
                 return $this->errorResponse('Email telah terdaftar', Response::HTTP_BAD_REQUEST);
