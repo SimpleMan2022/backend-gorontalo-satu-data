@@ -129,12 +129,12 @@ class UserOpdKabupatenController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-            $baseUsername = $validated['username'];
-            $counter = 1;
-            while (User::where('username', $validated['username'])->exists()) {
-                $validated['username'] = $baseUsername . $counter;
-                $counter++;
-            }
+            // $baseUsername = $validated['username'];
+            // $counter = 1;
+            // while (User::where('username', $validated['username'])->exists()) {
+            //     $validated['username'] = $baseUsername . $counter;
+            //     $counter++;
+            // }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
             $user = User::create($validated);
 
@@ -248,12 +248,12 @@ class UserOpdKabupatenController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-            $baseUsername = $validated['username'];
-            $counter = 1;
-            while (User::where('username', $validated['username'])->exists()) {
-                $validated['username'] = $baseUsername . $counter;
-                $counter++;
-            }
+            // $baseUsername = $validated['username'];
+            // $counter = 1;
+            // while (User::where('username', $validated['username'])->exists()) {
+            //     $validated['username'] = $baseUsername . $counter;
+            //     $counter++;
+            // }
             $user->update([
                 'email' => $request->email,
                 'username' => $validated['username'],
