@@ -478,6 +478,8 @@ class RekapHasilController extends Controller
                         $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe', 'angka')->get();
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe', 'angka');
 
+                        $indikator = Indikator::where('id', $request->query('indikator_id'))->first();
+
                         if($variabels->pluck('nama')->isEmpty()) {
                             return $this->errorResponse('Indikator tidak ditemukan', Response::HTTP_NOT_FOUND);
                         }
@@ -514,12 +516,12 @@ class RekapHasilController extends Controller
                         // dd($variabels->first()->indikator->id);
                         $response = [
                             "indikator" => [
-                                "id" => $variabels->first()->indikator->id, 
-                                "nama" => $variabels->first()->indikator->nama,
-                                "tingkatan" => $variabels->first()->indikator->tingkatan
+                                "id" => $indikator->id, 
+                                "nama" => $indikator->nama,
+                                "tingkatan" => $indikator->tingkatan
                             ],
                             "variabel" => $get_all_variabel->select('id', 'nama','tipe'),
-                            "subjek" => $variabels->first()->indikator->subjek->map(function ($subjek) {
+                            "subjek" => $indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
@@ -715,6 +717,8 @@ class RekapHasilController extends Controller
                         $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe','angka')->get();
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                             ->where('tipe', 'angka');
+
+                        $indikator = Indikator::where('id', $request->query('indikator_id'))->first();
                             
     
                         // Cek apakah variabel indikator kosong
@@ -760,11 +764,11 @@ class RekapHasilController extends Controller
                         })->values()->toArray();
                         $response = [
                             'indikator' => [
-                                'id' => $variabels->first()->indikator->id, 
-                                'nama' => $variabels->first()->indikator->nama,
-                                'tingkatan' => $variabels->first()->indikator->tingkatan
+                                'id' => $indikator->id, 
+                                'nama' => $indikator->nama,
+                                'tingkatan' => $indikator->tingkatan
                             ],
-                            "subjek" => $variabels->first()->indikator->subjek->map(function ($subjek) {
+                            "subjek" => $indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
@@ -964,6 +968,8 @@ class RekapHasilController extends Controller
 
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                             ->where('tipe', 'angka');
+
+                        $indikator = Indikator::where('id', $request->query('indikator_id'))->first();
                             // ->pluck('nama');
 
                         // Cek apakah variabel indikator kosong
@@ -1007,11 +1013,11 @@ class RekapHasilController extends Controller
                         })->values()->toArray();
                         $response = [
                             "indikator" => [
-                                "id" => $variabels->first()->indikator->id, 
-                                "nama" => $variabels->first()->indikator->nama,
-                                "tingkatan" => $variabels->first()->indikator->tingkatan
+                                "id" => $indikator->id, 
+                                "nama" => $indikator->nama,
+                                "tingkatan" => $indikator->tingkatan
                             ],
-                            "subjek" => $variabels->first()->indikator->subjek->map(function ($subjek) {
+                            "subjek" => $indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
