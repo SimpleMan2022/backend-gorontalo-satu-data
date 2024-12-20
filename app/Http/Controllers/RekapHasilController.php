@@ -346,6 +346,7 @@ class RekapHasilController extends Controller
                                     if ($periodeId = $request->query('periode_id')) {
                                         $query->where('periode_id', $periodeId);
                                     }
+                                    // $query->whereRaw('LEFT(wilayah_id, 4) = ?', [$user->user_opd_kabupaten->wilayah->id]);
                                     $query->where('indikator_id', $request->query('indikator_id'));
                                 })
 
@@ -546,6 +547,7 @@ class RekapHasilController extends Controller
                         if ($indikatorId = $request->query('indikator_id')) {
                             $hasilQuery->whereHas('indikator', function ($query) use ($indikatorId) {
                                 $query->where('id', $indikatorId);
+                                $query->whereRaw('LEFT(wilayah_id, 4) = ?', $request->query('wilayah_id'));
                             });
                         }
 
@@ -810,6 +812,7 @@ class RekapHasilController extends Controller
                                         $query->where('periode_id', $periodeId);
                                     }
                                     $query->where('indikator_id', $request->query('indikator_id'));
+                                    $query->whereRaw('LEFT(wilayah_id, 7) = ?', $request->query('wilayah_id'));
                                 })
 
                                 ->orderBy('created_at', 'desc')
@@ -1047,6 +1050,7 @@ class RekapHasilController extends Controller
                                 if ($periodeId = $request->query('periode_id')) {
                                     $query->where('periode_id', $periodeId);
                                 }
+                                $query->whereRaw('LEFT(wilayah_id, 10) = ?', $request->query('wilayah_id'));
                                 $query->where('indikator_id', $request->query('indikator_id'));
                             })
 
