@@ -35,6 +35,7 @@ class RekapHasilController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             if (!$request->query('indikator_id')) {
                 return $this->errorResponse('Parameter `indikator_id` tidak ditemukan', Response::HTTP_BAD_REQUEST);
             }
@@ -53,20 +54,24 @@ class RekapHasilController extends Controller
                 $hasilQuery->whereHas('indikator', function ($query) use ($indikatorId) {
                     $query->where('id', $indikatorId);
                 });
-            }
-
+            }            
 
             $data = $hasilQuery->first();
+
+            // return $data;
             if ($data) {
                 // Jika data ditemukan, format hasil seperti biasa
-
+                
                 $allHasilData = HasilData::with(['variabel', 'rekap_hasil'])
-                    ->whereHas('rekap_hasil', function ($query) use ($request) {
+                    ->whereHas('rekap_hasil', function ($query) use ($request, $user) {
                         if ($enumeratorId = $request->query('enumerator_id')) {
                             $query->where('enumerator_id', $enumeratorId);
                         }
                         if ($periodeId = $request->query('periode_id')) {
                             $query->where('periode_id', $periodeId);
+                        }
+                        if($user->hasRole('opd_kabupaten')) {
+                            $query->whereRaw('LEFT(wilayah_id, 4) = ?', [$user->user_opd_kabupaten->wilayah->id]);
                         }
                         $query->where('indikator_id', $request->query('indikator_id'));
                     })
@@ -91,6 +96,7 @@ class RekapHasilController extends Controller
                         default:
                             return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
                     }
+                // dd($tipe_wilayah);
                 // dd($groupedHasilData);
                 $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) use ($tipe_wilayah) {
                     return [
