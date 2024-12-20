@@ -111,6 +111,14 @@ class UserOpdProvinsiController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
+            $username = $validated['username'];
+            $counter = 1;
+            $validated['username'] = $username;
+            
+            while (User::where('username', $validated['username'])->exists()) {
+                $validated['username'] = $username . $counter;
+                $counter++;
+            }
             // $baseUsername = $validated['username'];
             // $counter = 1;
             // while (User::where('username', $validated['username'])->exists()) {
@@ -182,6 +190,14 @@ class UserOpdProvinsiController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
+            $username = $validated['username'];
+            $counter = 1;
+            $validated['username'] = $username;
+            
+            while (User::where('username', $validated['username'])->exists()) {
+                $validated['username'] = $username . $counter;
+                $counter++;
+            }
             // $baseUsername = $validated['username'];
             // $counter = 1;
             // while (User::where('username', $validated['username'])->exists()) {
