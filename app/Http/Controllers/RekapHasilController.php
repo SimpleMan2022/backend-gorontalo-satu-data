@@ -475,6 +475,7 @@ class RekapHasilController extends Controller
 
                         // dd($rekapHasilQuery);   
 
+                        $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe', 'angka')->get();
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe', 'angka');
 
                         if($variabels->pluck('nama')->isEmpty()) {
@@ -517,13 +518,13 @@ class RekapHasilController extends Controller
                                 "nama" => $variabels->first()->indikator->nama,
                                 "tingkatan" => $variabels->first()->indikator->tingkatan
                             ],
+                            "variabel" => $get_all_variabel->select('id', 'nama','tipe'),
                             "subjek" => $variabels->first()->indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
                                 ];
                             }),
-                            "variabel" => $variabels->select('id', 'nama', 'tipe')->get(),
                             "wilayah" => $wilayahData,
                             "rekap" => $formattedData,
                         ];
@@ -711,6 +712,7 @@ class RekapHasilController extends Controller
                             ->get();                    
     
                         // Fetch variabel names for the specific indikator_id
+                        $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe','angka')->get();
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                             ->where('tipe', 'angka');
                             
@@ -768,7 +770,7 @@ class RekapHasilController extends Controller
                                     'nama' => $subjek->nama,
                                 ];
                             }),
-                            "variabel" => $variabels->select('id', 'nama', 'tipe')->get(),
+                            "variabel" => $get_all_variabel->select('id', 'nama', 'tipe'),
                             "wilayah" => $wilayahData,
                             "rekap" => $formattedData,
                         ];
@@ -958,6 +960,8 @@ class RekapHasilController extends Controller
 
 
                         // Fetch variabel names for the specific indikator_id
+                        $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe','angka')->get();
+
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                             ->where('tipe', 'angka');
                             // ->pluck('nama');
@@ -1014,7 +1018,7 @@ class RekapHasilController extends Controller
                                 ];
                             }),
                             "wilayah" => $wilayahData,
-                            "variabel" => $variabels->select('id', 'nama', 'tipe')->get(),
+                            "variabel" => $get_all_variabel->select('id', 'nama', 'tipe'),
                             "rekap" => $formattedData,
                         ];
                         return $this->successResponseWithData(
