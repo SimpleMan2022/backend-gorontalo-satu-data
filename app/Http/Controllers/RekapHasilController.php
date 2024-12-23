@@ -699,7 +699,7 @@ class RekapHasilController extends Controller
                     }else {
 
                         // Kode Untuk yang Kabupaten
-    
+                        // dd('Kabupaten');
                         $rekapHasilQuery = DB::table('districts')
                             ->leftJoin(DB::raw('(
                                 SELECT 
@@ -711,8 +711,8 @@ class RekapHasilController extends Controller
                                 LEFT JOIN indikator ON rekap_hasil.indikator_id = indikator.id
                                 LEFT JOIN variabel ON hasil_data.variabel_id = variabel.id
                                 WHERE variabel.tipe = "angka" 
-                                AND rekap_hasil.indikator_id = ?
                                 AND rekap_hasil.status IN ("terima", "v3")
+                                AND rekap_hasil.indikator_id = ?
                                 AND SUBSTR(rekap_hasil.wilayah_id, 1, 4) = ?
                                 GROUP BY rekap_hasil.wilayah_id, variabel.nama
                             ) as hasil_rekap'), 'districts.id', '=', 'hasil_rekap.kode_kecamatan')
@@ -724,13 +724,22 @@ class RekapHasilController extends Controller
                         $rekapHasilQuery = $rekapHasilQuery
                             ->addBinding($request->query('indikator_id'), 'select')
                             ->addBinding(substr($request->query('wilayah_id'), 0, 4), 'select')
-                            ->get();                    
+                            ->get();     
+                            
+                        
     
                         // Fetch variabel names for the specific indikator_id
+<<<<<<< Updated upstream
+=======
+                        $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe','angka')->get();
+
+>>>>>>> Stashed changes
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                             ->where('tipe', 'angka');
                             
     
+                        // dd($rekapHasilQuery);
+                        
                         // Cek apakah variabel indikator kosong
                         if($variabels->pluck('nama')->isEmpty()) {
                             return $this->errorResponse('Indikator tidak ditemukan', Response::HTTP_NOT_FOUND);
@@ -746,7 +755,11 @@ class RekapHasilController extends Controller
                             }
                         }
     
-    
+                        // dd($rekapHasilQuery->groupBy(function ($item) {
+                        //     return $item->kode_kecamatan; // Gunakan nama kecamatan jika kode null
+                        // }))->map(function ($items, $kode_kecamatan) {
+                        //     return $items->first();
+                        // });
     
                         // Format data to the desired structure
                         $formattedData = $rekapHasilQuery->groupBy(function ($item) {
@@ -764,6 +777,7 @@ class RekapHasilController extends Controller
                             foreach ($items as $item) {
                                 if (!empty($item->nama)) {
                                     $result[$item->nama] = $item->total_nilai;
+                                    // return $result;
                                 }
                             }
     
@@ -772,6 +786,8 @@ class RekapHasilController extends Controller
     
                             return $result;
                         })->values()->toArray();
+
+                        
                         $response = [
                             'indikator' => [
                                 'id' => $hasilQuery->first()->indikator->id, 
@@ -971,6 +987,8 @@ class RekapHasilController extends Controller
                             ->addBinding(substr($request->query('wilayah_id'), 0, 7), 'select')
                             ->get();
 
+                        // dd($rekapHasilQuery);
+
 
                         // Fetch variabel names for the specific indikator_id
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
@@ -1016,6 +1034,8 @@ class RekapHasilController extends Controller
 
                             return $result;
                         })->values()->toArray();
+
+                        // dd($formattedData);
                         $response = [
                             "indikator" => [
                                 "id" => $hasilQuery->first()->indikator->id, 
