@@ -22,6 +22,7 @@ class UserOpdProvinsiController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
             $UserOpdProvinsiQuery = UserOpdProvinsi::orderBy('created_at', 'desc');
 
@@ -39,6 +40,11 @@ class UserOpdProvinsiController extends Controller
 
             if ($opdProvinsiId = $request->query('opd_provinsi_id')) {
                 $UserOpdProvinsiQuery->where('opd_provinsi_id', $opdProvinsiId);
+            }
+
+            if($user->hasRole('opd_provinsi')) {
+                $opdKabupatenId = $user->user_opd_provinsi()->first()->opd_provinsi_id;
+                $UserOpdProvinsiQuery->where('opd_provinsi_id', $opdKabupatenId);
             }
 
             $data = $UserOpdProvinsiQuery->paginate($perPage);
@@ -81,12 +87,17 @@ class UserOpdProvinsiController extends Controller
     public function store(Request $request)
     {
         try {
+            $userLogin = $request->user();
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'opd_provinsi_id' => 'required',
                 'jabatan' => 'required',
+                'opd_provinsi_id' => $userLogin->hasRole('admin') ? 'required' : '',
             ]);
+
+            if ($userLogin->hasRole('opd_provinsi')) {
+                $validated['opd_provinsi_id'] = $userLogin->user_opd_provinsi->opd_provinsi_id;
+            }
 
             if (User::where('email', $validated['email'])->exists()) {
                 return $this->errorResponse('Email telah terdaftar', Response::HTTP_BAD_REQUEST);
@@ -100,12 +111,20 @@ class UserOpdProvinsiController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-            $baseUsername = $validated['username'];
+            $username = $validated['username'];
             $counter = 1;
+            $validated['username'] = $username;
+            
             while (User::where('username', $validated['username'])->exists()) {
-                $validated['username'] = $baseUsername . $counter;
+                $validated['username'] = $username . $counter;
                 $counter++;
             }
+            // $baseUsername = $validated['username'];
+            // $counter = 1;
+            // while (User::where('username', $validated['username'])->exists()) {
+            //     $validated['username'] = $baseUsername . $counter;
+            //     $counter++;
+            // }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
             // dd($validated);
             $user = User::create([
@@ -116,7 +135,7 @@ class UserOpdProvinsiController extends Controller
             if ($request->jabatan == 'Admin') {
                 $permission_operator_provinsi = [
                     'kelola_user_opd_provinsi',
-                    'kelola_opd_provinsi',
+                    // 'kelola_opd_provinsi',
                 ];
 
                 $user->givePermissionTo($permission_operator_provinsi);
@@ -162,7 +181,6 @@ class UserOpdProvinsiController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'opd_provinsi_id' => 'required',
                 'jabatan' => 'required',
             ]);
 
@@ -172,12 +190,20 @@ class UserOpdProvinsiController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-            $baseUsername = $validated['username'];
+            $username = $validated['username'];
             $counter = 1;
+            $validated['username'] = $username;
+            
             while (User::where('username', $validated['username'])->exists()) {
-                $validated['username'] = $baseUsername . $counter;
+                $validated['username'] = $username . $counter;
                 $counter++;
             }
+            // $baseUsername = $validated['username'];
+            // $counter = 1;
+            // while (User::where('username', $validated['username'])->exists()) {
+            //     $validated['username'] = $baseUsername . $counter;
+            //     $counter++;
+            // }
             // $validated['password'] = Hash::make($request->password);
             $user = User::find($user_opd_provinsi->user_id);
             $user->update([
@@ -204,7 +230,6 @@ class UserOpdProvinsiController extends Controller
             if ($user) {
                 $user_opd_provinsi->update([
                     'nama' => $request->nama,
-                    'opd_provinsi_id' => $request->opd_provinsi_id,
                     'jabatan' => $request->jabatan,
                 ]);
             }

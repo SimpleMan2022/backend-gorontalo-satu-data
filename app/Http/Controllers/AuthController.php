@@ -135,6 +135,26 @@ class AuthController extends Controller
         'logo' => $opd->logo,
         'lokasi' => $opd->lokasi,
       ];
+      if($roleName === 'opd_kabupaten') {
+        $tipe_wilayah = '';
+        switch ($request->user()->user_opd_kabupaten->tipe_wilayah) {
+          case 'App\Models\Desa':
+              $tipe_wilayah = 'desa';
+              break;
+          case 'App\Models\Kecamatan':
+              $tipe_wilayah = 'kecamatan';
+              break;
+          case 'App\Models\Kabupaten':
+              $tipe_wilayah = 'kabupaten';
+              break;
+          default:
+              return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
+      }
+        $responseData['wilayah'] = [
+          'wilayah_id' => $request->user()->user_opd_kabupaten->wilayah,
+          'tipe_wilayah' => $tipe_wilayah,
+        ];
+      }
     }
 
     return $this->successResponseWithData(

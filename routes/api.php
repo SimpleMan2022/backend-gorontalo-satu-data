@@ -45,6 +45,7 @@ Route::prefix("landing")->controller(LandingController::class)->group(function (
     Route::get("sektor-spasial", "getSektorSpasial");
     Route::get("indikator", "getIndikatorandDataSearch");
     Route::get("indikator/{id}", "getIndikator");
+    Route::get("rekap-keseluruhan", "getRekapIndikator");
     Route::get("opd-provinsi", "getOpdProvinsi");
     Route::get("hasil-spasial", "getHasilSpasialandSearch");
     Route::get("hasil-spasial/{id}", "getHasilSpasial");

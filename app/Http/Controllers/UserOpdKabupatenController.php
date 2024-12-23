@@ -21,6 +21,7 @@ class UserOpdKabupatenController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             $perPage = $request->per_page ?? 10;
             $UserOpdKabupatenQuery = UserOpdKabupaten::orderBy('created_at', 'desc')->with([
                 'wilayah' => function ($query) {
@@ -47,6 +48,11 @@ class UserOpdKabupatenController extends Controller
             }
 
             if ($opdKabupatenId = $request->query('opd_kabupaten_id')) {
+                $UserOpdKabupatenQuery->where('opd_kabupaten_id', $opdKabupatenId);
+            }
+
+            if($user->hasRole('opd_kabupaten')) {
+                $opdKabupatenId = $user->user_opd_kabupaten()->first()->opd_kabupaten_id;
                 $UserOpdKabupatenQuery->where('opd_kabupaten_id', $opdKabupatenId);
             }
 
@@ -89,14 +95,19 @@ class UserOpdKabupatenController extends Controller
     public function store(Request $request)
     {
         try {
+            $userLogin = $request->user();
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'opd_kabupaten_id' => 'required',
+                'opd_kabupaten_id' => $userLogin->hasRole('admin') ? 'required' : '',
                 'jabatan' => 'required',
                 'tipe_wilayah' => 'required',
                 'wilayah_id' => 'required'
             ]);
+
+            if ($userLogin->hasRole('opd_kabupaten')) {
+                $validated['opd_kabupaten_id'] = $userLogin->user_opd_kabupaten()->first()->opd_kabupaten_id;
+            }
 
             if (User::where('email', $validated['email'])->exists()) {
                 return $this->errorResponse('Email telah terdaftar', Response::HTTP_BAD_REQUEST);
@@ -124,19 +135,28 @@ class UserOpdKabupatenController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-            $baseUsername = $validated['username'];
+            $username = $validated['username'];
             $counter = 1;
+            $validated['username'] = $username;
+
             while (User::where('username', $validated['username'])->exists()) {
-                $validated['username'] = $baseUsername . $counter;
+                $validated['username'] = $username . $counter;
                 $counter++;
             }
+
+            // $baseUsername = $validated['username'];
+            // $counter = 1;
+            // while (User::where('username', $validated['username'])->exists()) {
+            //     $validated['username'] = $baseUsername . $counter;
+            //     $counter++;
+            // }
             $validated['password'] = Hash::make(env('PASSWORD_OPD'));
             $user = User::create($validated);
 
             if ($request->jabatan == 'Admin') {
                 $permission_operator_kabupaten = [
                     'kelola_user_opd_kabupaten',
-                    'kelola_opd_kabupaten',
+                    // 'kelola_opd_kabupaten',
                 ];
 
                 $user->givePermissionTo($permission_operator_kabupaten);
@@ -190,7 +210,6 @@ class UserOpdKabupatenController extends Controller
             $validated = $request->validate([
                 'email' => 'required',
                 'nama' => 'required',
-                'opd_kabupaten_id' => 'required',
                 'jabatan' => 'required',
                 'wilayah_id' => 'required'
             ]);
@@ -215,7 +234,6 @@ class UserOpdKabupatenController extends Controller
             }
             $user_opd_kabupaten->update([
                 'nama' => $request->nama,
-                'opd_kabupaten_id' => $validated["opd_kabupaten_id"],
                 'jabatan' => $request->jabatan,
                 'tipe_wilayah' => $validated['tipe_wilayah'],
                 'wilayah_id' => $request->wilayah_id,
@@ -245,12 +263,20 @@ class UserOpdKabupatenController extends Controller
             $lowercaseString = strtolower($request->nama);
             // Menghapus spasi
             $validated['username'] = str_replace(' ', '', $lowercaseString);
-            $baseUsername = $validated['username'];
+            $username = $validated['username'];
             $counter = 1;
+            $validated['username'] = $username;
+            
             while (User::where('username', $validated['username'])->exists()) {
-                $validated['username'] = $baseUsername . $counter;
+                $validated['username'] = $username . $counter;
                 $counter++;
             }
+            // $baseUsername = $validated['username'];
+            // $counter = 1;
+            // while (User::where('username', $validated['username'])->exists()) {
+            //     $validated['username'] = $baseUsername . $counter;
+            //     $counter++;
+            // }
             $user->update([
                 'email' => $request->email,
                 'username' => $validated['username'],

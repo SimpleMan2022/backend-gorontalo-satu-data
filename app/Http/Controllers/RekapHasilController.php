@@ -15,7 +15,7 @@ use App\Models\{
     PivotEnumeratorIndikator, 
     Kabupaten,
     Kecamatan,
-    Desa
+    Desa,
 };
 use App\Http\Resources\RekapHasilResource;
 use App\Http\Traits\ApiResponse;
@@ -35,6 +35,7 @@ class RekapHasilController extends Controller
     public function index(Request $request)
     {
         try {
+            $user = $request->user();
             if (!$request->query('indikator_id')) {
                 return $this->errorResponse('Parameter `indikator_id` tidak ditemukan', Response::HTTP_BAD_REQUEST);
             }
@@ -53,20 +54,24 @@ class RekapHasilController extends Controller
                 $hasilQuery->whereHas('indikator', function ($query) use ($indikatorId) {
                     $query->where('id', $indikatorId);
                 });
-            }
-
+            }            
 
             $data = $hasilQuery->first();
+
+            // return $data;
             if ($data) {
                 // Jika data ditemukan, format hasil seperti biasa
-
+                
                 $allHasilData = HasilData::with(['variabel', 'rekap_hasil'])
-                    ->whereHas('rekap_hasil', function ($query) use ($request) {
+                    ->whereHas('rekap_hasil', function ($query) use ($request, $user) {
                         if ($enumeratorId = $request->query('enumerator_id')) {
                             $query->where('enumerator_id', $enumeratorId);
                         }
                         if ($periodeId = $request->query('periode_id')) {
                             $query->where('periode_id', $periodeId);
+                        }
+                        if($user->hasRole('opd_kabupaten')) {
+                            $query->whereRaw('LEFT(wilayah_id, 4) = ?', [$user->user_opd_kabupaten->wilayah->id]);
                         }
                         $query->where('indikator_id', $request->query('indikator_id'));
                     })
@@ -76,14 +81,32 @@ class RekapHasilController extends Controller
 
                 // Group hasil_data into pairs
 
-                $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) {
+                // dd($allHasilData[0]->rekap_hasil->tipe_wilayah);
+
+                switch ($allHasilData[0]->rekap_hasil->tipe_wilayah) {
+                        case 'App\Models\Desa':
+                            $tipe_wilayah = 'desa';
+                            break;
+                        case 'App\Models\Kecamatan':
+                            $tipe_wilayah = 'kecamatan';
+                            break;
+                        case 'App\Models\Kabupaten':
+                            $tipe_wilayah = 'kabupaten';
+                            break;
+                        default:
+                            return $this->errorResponse('Tipe wilayah tidak valid', Response::HTTP_BAD_REQUEST);
+                    }
+                // dd($tipe_wilayah);
+                // dd($groupedHasilData);
+                $groupedHasilData = $allHasilData->groupBy('rekap_hasil_id')->map(function ($items) use ($tipe_wilayah) {
                     return [
                         'id' => $items[0]->rekap_hasil->id,
                         'nama' => $items[0]->rekap_hasil->nama,
+                        'periode' => $items[0]->rekap_hasil->periode->only('id', 'nama', 'tanggal_mulai', 'tanggal_selesai'),
                         'status' => $items[0]->rekap_hasil->status,
-                        'enumerator' => $items[0]->rekap_hasil->enumerator->only('id', 'nama', 'user_id'),
-                        'wilayah_id' => $items[0]->rekap_hasil->wilayah_id,
-                        'tipe_wilayah' => $items[0]->rekap_hasil->tipe_wilayah,
+                        'enumerator' => $items[0]->rekap_hasil->enumerator->only('id', 'nama', 'user_id','jabatan'),
+                        'wilayah' => $items[0]->rekap_hasil->wilayah,
+                        'tipe_wilayah' => $tipe_wilayah,
                         'hasil_data' => $items->map(function ($hasil) {
                             return [
                                 'hasil_data_id' => $hasil->id,
@@ -113,7 +136,7 @@ class RekapHasilController extends Controller
                     'id' => (int) $indikatorId,
                     'nama' => $data->hasil_data->first()->variabel->indikator->nama,
                     'nama_opd' => $data->periode->opd_provinsi->nama,
-                    'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
+                    'subjek' => $data->hasil_data->first()->variabel->indikator->subjek ? $data->hasil_data->first()->variabel->indikator->subjek->map(function ($subjek) {
                         return [
                             'id' => $subjek->id,
                             'nama' => $subjek->nama,
@@ -125,12 +148,12 @@ class RekapHasilController extends Controller
                     //     'jabatan' => $data->enumerator->jabatan,
                     //     'enumerator_level' => $data->enumerator->enumerator_level,
                     // ],
-                    'periode' => [
-                        'id' => $data->periode->id,
-                        'nama' => $data->periode->nama,
-                        'tanggal_mulai' => $data->periode->tanggal_mulai,
-                        'tanggal_selesai' => $data->periode->tanggal_selesai,
-                    ],
+                    // 'periode' => [
+                    //     'id' => $data->periode->id,
+                    //     'nama' => $data->periode->nama,
+                    //     'tanggal_mulai' => $data->periode->tanggal_mulai,
+                    //     'tanggal_selesai' => $data->periode->tanggal_selesai,
+                    // ],
                     'variabel' => $data->hasil_data->map(function ($hasil) {
                         return [
                             'id' => $hasil->variabel->id,
@@ -215,8 +238,7 @@ class RekapHasilController extends Controller
     {
         try {
 
-            $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi']);
-
+            $hasilQuery = RekapHasil::with(['indikator', 'enumerator', 'periode.opd_provinsi']);            
             
             if ($wilayahId = $request->query('wilayah_id')) {
 
@@ -277,39 +299,7 @@ class RekapHasilController extends Controller
 
                 
 
-                if ($wilayahId != 75) {
-
-                    // if ($hasilQuery->where('wilayah_id', 'LIKE', "%{$wilayahId}%")->count() == 0) {
-                    //     // $wilayahId = substr($wilayahId, -4);
-                    //     return $this->errorResponse('Kode Wilayah tidak ditemukan', Response::HTTP_NOT_FOUND);
-                    // }
-
-                    // $wilayahData = [
-                    //     'desa' => $hasilQuery->first()->tipe_wilayah === \App\Models\Desa::class
-                    //         ? [
-                    //             'id' => $hasilQuery->first()->wilayah->id,
-                    //             'name' => $hasilQuery->first()->wilayah->name,
-                    //         ]
-                    //         : null,
-                    //     'kecamatan' => $hasilQuery->first()->tipe_wilayah !== \App\Models\Kabupaten::class
-                    //         ? [
-                    //             'id' => $hasilQuery->first()->wilayah->kecamatan->id ?? $hasilQuery->first()->wilayah->id,
-                    //             'name' => $hasilQuery->first()->wilayah->kecamatan->name ?? $hasilQuery->first()->wilayah->name,
-                    //         ]
-                    //         : null,
-                    //     'kabupaten' => [
-                    //         'id' => $hasilQuery->first()->tipe_wilayah === \App\Models\Desa::class
-                    //             ? $hasilQuery->first()->wilayah->kecamatan->kabupaten->id
-                    //             : ($hasilQuery->first()->tipe_wilayah === \App\Models\Kecamatan::class
-                    //                 ? $hasilQuery->first()->wilayah->kabupaten->id
-                    //                 : $hasilQuery->first()->wilayah->id),
-                    //         'name' => $hasilQuery->first()->tipe_wilayah === \App\Models\Desa::class
-                    //             ? $hasilQuery->first()->wilayah->kecamatan->kabupaten->name
-                    //             : ($hasilQuery->first()->tipe_wilayah === \App\Models\Kecamatan::class
-                    //                 ? $hasilQuery->first()->wilayah->kabupaten->name
-                    //                 : $hasilQuery->first()->wilayah->name),
-                    //     ],
-                    // ];                
+                if ($wilayahId != 75) {        
 
                     getWilayahData($wilayahData, $wilayahId);
                     
@@ -341,6 +331,9 @@ class RekapHasilController extends Controller
 
 
                         $data = $hasilQuery->first();
+
+ 
+                        
                         // dd($data);
                         if ($data) {
                             // Jika data ditemukan, format hasil seperti biasa
@@ -353,6 +346,7 @@ class RekapHasilController extends Controller
                                     if ($periodeId = $request->query('periode_id')) {
                                         $query->where('periode_id', $periodeId);
                                     }
+                                    // $query->whereRaw('LEFT(wilayah_id, 4) = ?', [$user->user_opd_kabupaten->wilayah->id]);
                                     $query->where('indikator_id', $request->query('indikator_id'));
                                 })
 
@@ -369,17 +363,13 @@ class RekapHasilController extends Controller
                                     ];
                                 });
                             
-                                return array_merge([
-                                    // 'id' => $rekapHasil->id,
+                                return array_merge([                                    
                                     'kode_wilayah' => $rekapHasil->wilayah_id,
-                                    'nama_wilayah' => $rekapHasil->wilayah->name,
-                                    // 'nama' => $rekapHasil->nama,
-                                    // 'status' => $rekapHasil->status,
-                                    // 'enumerator' => $rekapHasil->enumerator->only('id', 'nama', 'user_id'),
-                                    // 'wilayah_id' => $rekapHasil->wilayah_id,
-                                    // 'tipe_wilayah' => $rekapHasil->tipe_wilayah,
+                                    'nama_wilayah' => $rekapHasil->wilayah->name,                                    
                                 ], $additionalData->toArray()); // Gabungkan data utama dengan hasil_data
                             })->values();
+
+                            
 
                             $formattedData = [
                                 'id' => (int) $indikatorId,
@@ -388,21 +378,14 @@ class RekapHasilController extends Controller
                                     'nama' => $data->hasil_data->first()->variabel->indikator->nama,
                                     'tingkatan' => $data->hasil_data->first()->variabel->indikator->tingkatan,
                                 ],
-                                // 'indikator' => $data->hasil_data->first()->variabel->indikator->nama,
-                                // 'nama_opd' => $data->periode->opd_provinsi->nama,
+
                                 'subjek' => $data->subjek ? $data->subjek->map(function ($subjek) {
                                     return [
                                         'id' => $subjek->id,
                                         'nama' => $subjek->nama,
                                     ];
                                 }) : [],
-                                'wilayah' => $wilayahData,
-                                // 'periode' => [
-                                //     'id' => $data->periode->id,
-                                //     'nama' => $data->periode->nama,
-                                //     'tanggal_mulai' => $data->periode->tanggal_mulai,
-                                //     'tanggal_selesai' => $data->periode->tanggal_selesai,
-                                // ],
+                                'wilayah' => $wilayahData,                               
                                 'variabel' => $data->hasil_data->map(function ($hasil) {
                                     return [
                                         'id' => $hasil->variabel->id,
@@ -468,7 +451,7 @@ class RekapHasilController extends Controller
                             }
                         }
                     }else {
-
+                        
                         // Kode Untuk Provinsi 
                         $rekapHasilQuery = DB::table('regencies as kabupaten')
                             ->leftJoin(DB::raw('(
@@ -492,7 +475,10 @@ class RekapHasilController extends Controller
 
                         // dd($rekapHasilQuery);   
 
+                        $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe', 'angka')->get();
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe', 'angka');
+
+                        $indikator = Indikator::where('id', $request->query('indikator_id'))->first();
 
                         if($variabels->pluck('nama')->isEmpty()) {
                             return $this->errorResponse('Indikator tidak ditemukan', Response::HTTP_NOT_FOUND);
@@ -527,20 +513,20 @@ class RekapHasilController extends Controller
                         })->values()->toArray();
 
                         // return $formattedData;
-
+                        // dd($variabels->first()->indikator->id);
                         $response = [
                             "indikator" => [
-                                "id" => $hasilQuery->first()->indikator->id, 
-                                "nama" => $hasilQuery->first()->indikator->nama,
-                                "tingkatan" => $hasilQuery->first()->indikator->tingkatan
+                                "id" => $indikator->id, 
+                                "nama" => $indikator->nama,
+                                "tingkatan" => $indikator->tingkatan
                             ],
-                            "subjek" => $hasilQuery->first()->indikator->subjek->map(function ($subjek) {
+                            "variabel" => $get_all_variabel->select('id', 'nama','tipe'),
+                            "subjek" => $indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
                                 ];
                             }),
-                            "variabel" => $variabels->select('id', 'nama', 'tipe')->get(),
                             "wilayah" => $wilayahData,
                             "rekap" => $formattedData,
                         ];
@@ -564,6 +550,7 @@ class RekapHasilController extends Controller
                         if ($indikatorId = $request->query('indikator_id')) {
                             $hasilQuery->whereHas('indikator', function ($query) use ($indikatorId) {
                                 $query->where('id', $indikatorId);
+                                $query->whereRaw('LEFT(wilayah_id, 4) = ?', $request->query('wilayah_id'));
                             });
                         }
 
@@ -729,13 +716,12 @@ class RekapHasilController extends Controller
                         
     
                         // Fetch variabel names for the specific indikator_id
-<<<<<<< Updated upstream
-=======
-                        $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe','angka')->get();
 
->>>>>>> Stashed changes
+                        $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe','angka')->get();
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                             ->where('tipe', 'angka');
+
+                        $indikator = Indikator::where('id', $request->query('indikator_id'))->first();
                             
     
                         // dd($rekapHasilQuery);
@@ -790,17 +776,17 @@ class RekapHasilController extends Controller
                         
                         $response = [
                             'indikator' => [
-                                'id' => $hasilQuery->first()->indikator->id, 
-                                'nama' => $hasilQuery->first()->indikator->nama,
-                                'tingkatan' => $hasilQuery->first()->indikator->tingkatan
+                                'id' => $indikator->id, 
+                                'nama' => $indikator->nama,
+                                'tingkatan' => $indikator->tingkatan
                             ],
-                            "subjek" => $hasilQuery->first()->indikator->subjek->map(function ($subjek) {
+                            "subjek" => $indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
                                 ];
                             }),
-                            "variabel" => $variabels->select('id', 'nama', 'tipe')->get(),
+                            "variabel" => $get_all_variabel->select('id', 'nama', 'tipe'),
                             "wilayah" => $wilayahData,
                             "rekap" => $formattedData,
                         ];
@@ -844,6 +830,7 @@ class RekapHasilController extends Controller
                                         $query->where('periode_id', $periodeId);
                                     }
                                     $query->where('indikator_id', $request->query('indikator_id'));
+                                    $query->whereRaw('LEFT(wilayah_id, 7) = ?', $request->query('wilayah_id'));
                                 })
 
                                 ->orderBy('created_at', 'desc')
@@ -991,8 +978,12 @@ class RekapHasilController extends Controller
 
 
                         // Fetch variabel names for the specific indikator_id
+                        $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe','angka')->get();
+
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                             ->where('tipe', 'angka');
+
+                        $indikator = Indikator::where('id', $request->query('indikator_id'))->first();
                             // ->pluck('nama');
 
                         // Cek apakah variabel indikator kosong
@@ -1038,18 +1029,18 @@ class RekapHasilController extends Controller
                         // dd($formattedData);
                         $response = [
                             "indikator" => [
-                                "id" => $hasilQuery->first()->indikator->id, 
-                                "nama" => $hasilQuery->first()->indikator->nama,
-                                "tingkatan" => $hasilQuery->first()->indikator->tingkatan
+                                "id" => $indikator->id, 
+                                "nama" => $indikator->nama,
+                                "tingkatan" => $indikator->tingkatan
                             ],
-                            "subjek" => $hasilQuery->first()->indikator->subjek->map(function ($subjek) {
+                            "subjek" => $indikator->subjek->map(function ($subjek) {
                                 return [
                                     'id' => $subjek->id,
                                     'nama' => $subjek->nama,
                                 ];
                             }),
                             "wilayah" => $wilayahData,
-                            "variabel" => $variabels->select('id', 'nama', 'tipe')->get(),
+                            "variabel" => $get_all_variabel->select('id', 'nama', 'tipe'),
                             "rekap" => $formattedData,
                         ];
                         return $this->successResponseWithData(
@@ -1085,6 +1076,7 @@ class RekapHasilController extends Controller
                                 if ($periodeId = $request->query('periode_id')) {
                                     $query->where('periode_id', $periodeId);
                                 }
+                                $query->whereRaw('LEFT(wilayah_id, 10) = ?', $request->query('wilayah_id'));
                                 $query->where('indikator_id', $request->query('indikator_id'));
                             })
 
