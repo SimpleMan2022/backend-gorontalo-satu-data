@@ -61,7 +61,7 @@ class RekapHasilController extends Controller
             // return $data;
             if ($data) {
                 // Jika data ditemukan, format hasil seperti biasa
-                
+                // dd($user->user_opd_kabupaten->wilayah->id);
                 $allHasilData = HasilData::with(['variabel', 'rekap_hasil'])
                     ->whereHas('rekap_hasil', function ($query) use ($request, $user) {
                         if ($enumeratorId = $request->query('enumerator_id')) {
@@ -70,15 +70,30 @@ class RekapHasilController extends Controller
                         if ($periodeId = $request->query('periode_id')) {
                             $query->where('periode_id', $periodeId);
                         }
-                        if($user->hasRole('opd_kabupaten')) {
-                            $query->whereRaw('LEFT(wilayah_id, 4) = ?', [$user->user_opd_kabupaten->wilayah->id]);
+                        if ($user->hasRole('opd_kabupaten')) {
+                            // Ambil prefix 4 karakter pertama dari wilayah_id pengguna
+                            $userWilayahIdPrefix = substr($user->user_opd_kabupaten->wilayah->id, 0, 4); // Memastikan ini string
+                            $query->whereRaw('LEFT(wilayah_id, 4) = ?', [$userWilayahIdPrefix]);
                         }
                         $query->where('indikator_id', $request->query('indikator_id'));
                     })
-
                     ->orderBy('created_at', 'desc')
                     ->get();
 
+                    // dd(
+                    //     $user->user_opd_kabupaten->wilayah->id, // Wilayah user
+                    //     substr($user->user_opd_kabupaten->wilayah->id, 0, 4), // Prefix yang digunakan
+                    //     $request->query('indikator_id') // Nilai indikator_id dari request
+                    // );
+                    
+                // return $allHasilData;
+
+
+                    // dd($allHasilData->toSql());
+
+                    // ->orderBy('created_at', 'desc')
+                    // ->get();
+                // dd($allHasilData);
                 // Group hasil_data into pairs
 
                 // dd($allHasilData[0]->rekap_hasil->tipe_wilayah);
