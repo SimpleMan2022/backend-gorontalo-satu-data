@@ -501,10 +501,27 @@ class RekapHasilController extends Controller
                                 'kode_wilayah' => $kode_kabupaten,
                                 'nama_wilayah' => $items->first()->nama_kabupaten,
                             ];
+                            // foreach ($items as $item) {
+                            //     if (!empty($item->nama)) {
+                            //         $result[$item->nama] = $item->total_nilai;
+                            //     }
+                            // }
+
+                            $accumulatedValues = [];
+
+                            // Tambahkan nilai total untuk setiap variabel
                             foreach ($items as $item) {
                                 if (!empty($item->nama)) {
-                                    $result[$item->nama] = $item->total_nilai;
+                                    if (!isset($accumulatedValues[$item->nama])) {
+                                        $accumulatedValues[$item->nama] = 0;
+                                    }
+                                    $accumulatedValues[$item->nama] += $item->total_nilai; // Akumulasi nilai
                                 }
+                            }
+
+                            // Gabungkan hasil akumulasi ke dalam $result
+                            foreach ($accumulatedValues as $nama => $total) {
+                                $result[$nama] = $total;
                             }
 
                             addMissingVariables($result, $variabels->pluck('nama'));
@@ -512,8 +529,31 @@ class RekapHasilController extends Controller
                             return $result;
                         })->values()->toArray();
 
-                        // return $formattedData;
-                        // dd($variabels->first()->indikator->id);
+                        $totalSummary = [
+                            'kode_wilayah' => 75, // Kode untuk provinsi
+                            'nama_wilayah' => 'Provinsi Gorontalo',
+                        ];
+                        $totalValues = [];
+                        
+                        // Akumulasi semua nilai dari $formattedData
+                        foreach ($formattedData as $data) {
+                            foreach ($data as $key => $value) {
+                                if (strpos($key, 'Rata-rata lama sekolah') === 0 || strpos($key, 'Harapan Lama Sekolah') === 0) { 
+                                    // Hanya memproses variabel terkait
+                                    if (!isset($totalValues[$key])) {
+                                        $totalValues[$key] = 0;
+                                    }
+                                    $totalValues[$key] += $value; // Akumulasi nilai
+                                }
+                            }
+                        }
+                        
+                        // Gabungkan hasil akumulasi total ke dalam $totalSummary
+                        foreach ($totalValues as $key => $value) {
+                            $totalSummary[$key] = $value; // Tambahkan total nilai
+                        }
+                        
+                        
                         $response = [
                             "indikator" => [
                                 "id" => $indikator->id, 
@@ -529,6 +569,7 @@ class RekapHasilController extends Controller
                             }),
                             "wilayah" => $wilayahData,
                             "rekap" => $formattedData,
+                            "total" => $totalSummary,
                         ];
 
                         return $this->successResponseWithData(
@@ -687,6 +728,32 @@ class RekapHasilController extends Controller
 
                         // Kode Untuk yang Kabupaten
                         // dd('Kabupaten');
+                        // $rekapHasilQuery = DB::table('districts')
+                        //     ->leftJoin(DB::raw('(
+                        //         SELECT 
+                        //             LEFT(rekap_hasil.wilayah_id, 7) as kode_kecamatan,
+                        //             variabel.nama,
+                        //             SUM(hasil_data.konten) as total_nilai
+                        //         FROM rekap_hasil
+                        //         LEFT JOIN hasil_data ON rekap_hasil.id = hasil_data.rekap_hasil_id
+                        //         LEFT JOIN indikator ON rekap_hasil.indikator_id = indikator.id
+                        //         LEFT JOIN variabel ON hasil_data.variabel_id = variabel.id
+                        //         WHERE variabel.tipe = "angka" 
+                        //         AND rekap_hasil.status IN ("terima", "v3")
+                        //         AND rekap_hasil.indikator_id = ?
+                        //         AND SUBSTR(rekap_hasil.wilayah_id, 1, 4) = ?
+                        //         GROUP BY rekap_hasil.wilayah_id, variabel.nama
+                        //     ) as hasil_rekap'), 'districts.id', '=', 'hasil_rekap.kode_kecamatan')
+                        //     ->select('districts.id as kode_kecamatan', 'districts.name as nama_kecamatan', 'districts.regency_id as kode_kabupaten', 'hasil_rekap.nama', DB::raw('IFNULL(hasil_rekap.total_nilai, 0) as total_nilai'))
+                        //     ->whereRaw('SUBSTR(districts.id, 1, 4) = ?', [substr($request->query('wilayah_id'), 0, 4)])
+                        //     ->orderBy('districts.id');
+    
+                        // // Add bindings for indikator_id and wilayah_id filter
+                        // $rekapHasilQuery = $rekapHasilQuery
+                        //     ->addBinding($request->query('indikator_id'), 'select')
+                        //     ->addBinding(substr($request->query('wilayah_id'), 0, 4), 'select')
+                        //     ->get();     
+                        
                         $rekapHasilQuery = DB::table('districts')
                             ->leftJoin(DB::raw('(
                                 SELECT 
@@ -698,39 +765,36 @@ class RekapHasilController extends Controller
                                 LEFT JOIN indikator ON rekap_hasil.indikator_id = indikator.id
                                 LEFT JOIN variabel ON hasil_data.variabel_id = variabel.id
                                 WHERE variabel.tipe = "angka" 
-                                AND rekap_hasil.status IN ("terima", "v3")
                                 AND rekap_hasil.indikator_id = ?
+                                AND rekap_hasil.status IN ("terima", "v3")
                                 AND SUBSTR(rekap_hasil.wilayah_id, 1, 4) = ?
                                 GROUP BY rekap_hasil.wilayah_id, variabel.nama
                             ) as hasil_rekap'), 'districts.id', '=', 'hasil_rekap.kode_kecamatan')
                             ->select('districts.id as kode_kecamatan', 'districts.name as nama_kecamatan', 'districts.regency_id as kode_kabupaten', 'hasil_rekap.nama', DB::raw('IFNULL(hasil_rekap.total_nilai, 0) as total_nilai'))
                             ->whereRaw('SUBSTR(districts.id, 1, 4) = ?', [substr($request->query('wilayah_id'), 0, 4)])
                             ->orderBy('districts.id');
-    
+
                         // Add bindings for indikator_id and wilayah_id filter
                         $rekapHasilQuery = $rekapHasilQuery
                             ->addBinding($request->query('indikator_id'), 'select')
                             ->addBinding(substr($request->query('wilayah_id'), 0, 4), 'select')
-                            ->get();     
-                            
-                        
-    
-                        // Fetch variabel names for the specific indikator_id
+                            ->get();
 
+
+                        // Fetch variabel names for the specific indikator_id
                         $get_all_variabel = Variabel::where('indikator_id', $request->query('indikator_id'))->where('tipe','angka')->get();
+
                         $variabels = Variabel::where('indikator_id', $request->query('indikator_id'))
                             ->where('tipe', 'angka');
 
                         $indikator = Indikator::where('id', $request->query('indikator_id'))->first();
-                            
-    
-                        // dd($rekapHasilQuery);
-                        
+                            // ->pluck('nama');
+
                         // Cek apakah variabel indikator kosong
                         if($variabels->pluck('nama')->isEmpty()) {
                             return $this->errorResponse('Indikator tidak ditemukan', Response::HTTP_NOT_FOUND);
                         }
-    
+
                         // Function to add missing variables with 0 total_nilai
                         function addMissingVariables(&$result, $variabels)
                         {
@@ -740,38 +804,44 @@ class RekapHasilController extends Controller
                                 }
                             }
                         }
-    
-                        // dd($rekapHasilQuery->groupBy(function ($item) {
-                        //     return $item->kode_kecamatan; // Gunakan nama kecamatan jika kode null
-                        // }))->map(function ($items, $kode_kecamatan) {
-                        //     return $items->first();
-                        // });
-    
+
                         // Format data to the desired structure
                         $formattedData = $rekapHasilQuery->groupBy(function ($item) {
-                            return $item->kode_kecamatan ?? $item->nama_kecamatan; // Gunakan nama kecamatan jika kode null
+                            return $item->kode_kecamatan ?? $item->nama_kecamatan; // Gunakan nama desa jika kode null
                         })->map(function ($items, $kode_kecamatan) use ($variabels) {
-                            // Inisialisasi data kecamatan
+                            // Inisialisasi data desa
                             $firstItem = $items->first(); // Ambil elemen pertama
                             $result = [
                                 'kode_wilayah' => $kode_kecamatan,
                                 'nama_wilayah' => $firstItem->nama_kecamatan ?? null,
-                                // 'kode_kabupaten' => $firstItem->kode_kabupaten ?? null,
+                                // 'kode_kecamatan' => $firstItem->kode_kecamatan ?? null,
                             ];
-    
+
+                            // Inisialisasi array untuk akumulasi nilai
+                            $accumulatedValues = [];
+
                             // Tambahkan nilai total untuk setiap variabel
                             foreach ($items as $item) {
                                 if (!empty($item->nama)) {
-                                    $result[$item->nama] = $item->total_nilai;
-                                    // return $result;
+                                    if (!isset($accumulatedValues[$item->nama])) {
+                                        $accumulatedValues[$item->nama] = 0;
+                                    }
+                                    $accumulatedValues[$item->nama] += $item->total_nilai; // Akumulasi nilai
                                 }
                             }
-    
+
+                            // Gabungkan hasil akumulasi ke dalam $result
+                            foreach ($accumulatedValues as $nama => $total) {
+                                $result[$nama] = $total;
+                            }
+
                             // Tambahkan variabel yang hilang
                             addMissingVariables($result, $variabels->pluck('nama'));
-    
+
                             return $result;
                         })->values()->toArray();
+
+                        
 
                         
                         $response = [
@@ -1013,11 +1083,28 @@ class RekapHasilController extends Controller
                                 // 'kode_kecamatan' => $firstItem->kode_kecamatan ?? null,
                             ];
 
+                            // // Tambahkan nilai total untuk setiap variabel
+                            // foreach ($items as $item) {
+                            //     if (!empty($item->nama)) {
+                            //         $result[$item->nama] = $item->total_nilai;
+                            //     }
+                            // }
+
+                            $accumulatedValues = [];
+
                             // Tambahkan nilai total untuk setiap variabel
                             foreach ($items as $item) {
                                 if (!empty($item->nama)) {
-                                    $result[$item->nama] = $item->total_nilai;
+                                    if (!isset($accumulatedValues[$item->nama])) {
+                                        $accumulatedValues[$item->nama] = 0;
+                                    }
+                                    $accumulatedValues[$item->nama] += $item->total_nilai; // Akumulasi nilai
                                 }
+                            }
+
+                            // Gabungkan hasil akumulasi ke dalam $result
+                            foreach ($accumulatedValues as $nama => $total) {
+                                $result[$nama] = $total;
                             }
 
                             // Tambahkan variabel yang hilang
